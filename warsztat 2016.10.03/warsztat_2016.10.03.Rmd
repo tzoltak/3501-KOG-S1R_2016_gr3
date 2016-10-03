@@ -28,6 +28,32 @@ output:
     - Napisany i&nbsp;udokumentowany po polsku [pakiet](https://github.com/tzoltak/KTT) do analizy własności psychometrycznych testu przy pomocy narzędzi z&nbsp;Klasycznej Teorii Testu.
     - Gry edukacyjnej dotyczącej regresji - funkcja *regression()* w&nbsp;ramach pakietu [BetaBit](https://cran.r-project.org/web/packages/BetaBit).
 
+# Kwestie organizacyjne
+
+## Tryb pracy na zajęciach
+
+  * Lektury do przeczytania przed zajęciami (nie więcej niż 30 minut tygodniowo).
+  * Zajęcia - krótki wstęp teoretyczny (nie więcej niż 30 minut) i praca z komputerami.
+  * Prace domowe (około 1,5 godziny tygodniowo)
+  * Prace domowe do wyboru (dłuższe, przynajmniej 3 w semestrze).
+    - Będą polegały na napisaniu bardziej skomplikowanego skryptu albo przygotowania raportu z symulacji albo na przygotowaniu serii grafik, etc.
+  * Prace domowe zupełnie dodatkowe.
+    * Rozszerzenie materiału dla chętnych, zakres według potrzeb, możliwości:
+        * wizualizacje (`ggplot2`, `lattice`, `plotly`, etc.)
+	  * pisanie całych pipeline'ów (pobieranie danych, obróbka wstępna, analiza, wizualizacje)
+	  * symulacje
+
+## Warunki zaliczenia
+
+  * Aktywna praca na zajęciach.
+  * Robienie zadań domowych obowiązkowych + 3 do wyboru dłuższe w semestrze.
+  * Staramy się nie spóźniać, ale jak ktoś odeśle prace domowe spóźniony to lepiej, niż gdyby miał nigdy nie odesłać.
+
+## Forma przesyłania prac
+
+  * Być może Moodle, ale prawdopodobnie mailem (do ustalenia).
+  * Wszystkie materiały będą dostępne na moim [koncie na GitHubie](https://github.com/tzoltak/3501-KOG-S1R_2016_gr3).
+
 # Co to jest R?
 
 ## Dwa słowa historii I
