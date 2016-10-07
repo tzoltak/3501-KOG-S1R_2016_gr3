@@ -45,13 +45,14 @@ output:
 
 ## Warunki zaliczenia
 
-  * Aktywna praca na zajęciach.
+  * Aktywna praca na zajęciach (dozwolone 2 nieobecności).
   * Robienie zadań domowych obowiązkowych + 3 do wyboru dłuższe w semestrze.
   * Staramy się nie spóźniać, ale jak ktoś odeśle prace domowe spóźniony to lepiej, niż gdyby miał nigdy nie odesłać.
 
 ## Forma przesyłania prac
 
   * Być może Moodle, ale prawdopodobnie mailem (do ustalenia).
+  * Mój adres e-mail: zoltakt@is.uw.edu.pl
   * Wszystkie materiały będą dostępne na moim [koncie na GitHubie](https://github.com/tzoltak/3501-KOG-S1R_2016_gr3).
 
 # Co to jest R?
