@@ -1,2 +1,4 @@
 slide h1,h2,p,li {font-family: sans-serif;}
 slide ul li ul li {font-size: 80%;}
+
+hr {border-top-width: 2px; border-top-color: #606060;}
