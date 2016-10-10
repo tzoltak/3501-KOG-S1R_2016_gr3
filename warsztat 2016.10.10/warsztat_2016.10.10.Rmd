@@ -153,7 +153,7 @@ Jeśli dwa wektory są różnej długości, ten który jest krótszy zostanie wy
   1. Do wykonywania podstawowych operacji arytmetycznych służą operatory `+`, `-`, `*`, `/`. Operator `^` oznacza potęgowanie (i pierwiastkowanie - przez podnoszenie do niecałkowitych potęg z przedziału (0;1) ).
   2. Moduł liczby pozwala obliczyć funkcja `abs()`.
   3. Zaokrąglanie: funkcje `floor()`, `ceiling()`, `trunc()`, `round()` (p. ich dokumentacja).
-  4. Część całkowita z dzielenia: operator `%/%`.
+  4. Reszta z dzielenia: operator `%%`; część całkowita z dzielenia: operator `%/%`.
   5. Eksponensa i logarytm: funkcje `exp()` i `log()`.
 
 ```{r comment="", prompt=TRUE, collapse=TRUE}
@@ -163,6 +163,7 @@ abs(x)
 trunc(x)
 y = 1:5
 y / 2
+y %% 2
 y %/% 2
 trunc(y / 2)
 ```
@@ -179,20 +180,22 @@ sort(z)
 
 ## Porównywanie wartości wektorów
 
-Możemy też oczywiście porównywać ze sobą wartości wektorów używając operatorów `>`, `<`, `>=`, `<=` i `==` (pamiętajmy, że pojedynczy znak równości to operator przypisania). W efekcie przeprowadzenia takiego porównania otrzymamy wektor wartości logicznych.
+Możemy też oczywiście porównywać ze sobą wartości wektorów używając operatorów `>`, `<`, `>=`, `<=`, `==` (pamiętajmy, że pojedynczy znak równości to operator przypisania) i `!=` (różne od). W efekcie przeprowadzenia takiego porównania otrzymamy wektor wartości logicznych.
 
 ```{r comment="", prompt=TRUE, collapse=TRUE}
 x
 x >= 2
 x == 2
+x != 2
 x == 1:5
 ```
 
-Na wektorach logicznych możemy też wykonywać operacje *lub*, *i*, stosując operatory odpowiednio: `|`, `&`, a także operację *albo-albo* stosując funkcję `xor()`.
+Na wektorach logicznych możemy też wykonywać operacje: negację, *lub*, *i*, stosując operatory odpowiednio: `!`, `|`, `&`, a także operację *albo-albo* stosując funkcję `xor()`.
 
 ```{r comment="", prompt=TRUE, collapse=TRUE}
 y = c(TRUE, TRUE, FALSE, FALSE)
 z = c(TRUE, FALSE, TRUE, FALSE)
+!y
 y | z
 y & z
 xor(y, z)
@@ -204,7 +207,7 @@ xor(y, z)
 x = 1:100
 ```
 
-Czasem chemy użyć tylko niektórych elementów wektora. Wybieranie ich umożliwia operato `[]`. Można to zrobić na kilka sposobów:
+Czasem chemy użyć tylko niektórych elementów wektora. Wybieranie ich umożliwia operator `[]`. Można to zrobić na kilka sposobów:
 
   1. Podając wektor numerów elementów które chcemy wybrać:
 ```{r comment="", prompt=TRUE, collapse=TRUE}
@@ -223,7 +226,6 @@ x[(x > 50 & x <= 55) | x < 10]
 ```
 
 Warto zwrócić uwagę, że pierwszy z opisanych sposobów posiada pewną własność, której nie mają dwa pozostałe - pozwala zwrócić elementy wektora w dowolnej kolejności, potencjalnie innej niż ta, w której występują one w wektorze, z którego je wybieramy.
-
 
 ---
 
@@ -307,7 +309,7 @@ Przykłady bardzo prostych funkcji:
 
 ```{r comment="", prompt=TRUE, collapse=TRUE}
 # funkcja, która zwraca dokładnie to, co podano jej jako argument
-ToSamo = function (x) {
+ToSamo = function(x) {
   return(x)
 }
 ToSamo(1:5)
