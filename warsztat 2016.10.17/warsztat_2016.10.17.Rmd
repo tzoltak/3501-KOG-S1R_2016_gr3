@@ -313,13 +313,14 @@ Jeśli interesuje Cię zrozumienie, co robimy na początku każdych zajęć, aby
 
 ## Praca domowa
 
-Pobierz ze strony
+Informacja zostanie rozesłana mailem.
 
 ## Do przeczytania na następne zajęcia
 
 G. Lissowski, J. Haman i M. Jasiński. (2011). Podstawy statystyki dla socjologów. Wyd. II poprawione. Warszawa: Wydawnictwo Naukowe SCHOLAR.  Rozdział 2.
 
 Względnie inne źródła, w których opisane zostało co to jest:
+
   * łączny rozkład statystyczny liczebności dwóch zmiennych,
   * łączny rozkład statystyczny częstości dwóch zmiennych,
   * rodzina rozkładów warunkowych liczebności,
