@@ -1,0 +1,164 @@
+---
+title: "Praca domowa na 24 października 2016"
+author: "Tomasz Żółtak"
+date: "17 października 2016"
+output: html_document
+---
+
+# Przygotowanie do pracy
+
+  1. Jeśli nie zrobiłeś/aś tego wcześniej, zainstaluj na swoim komputerze [R](https://cran.r-project.org) i [RStudio](https://www.rstudio.com/products/rstudio/download3).
+  2. Jeśli nie zrobiłeś/aś tego wcześniej, otwórz RStudio i zainstaluj potrzebne pakiety, wywołując polecenie:
+
+```{r, eval=FALSE}
+install.packages(c("reshape2", "plyr", "dplyr", "car", "effects", "multcomp",
+                   "ggplot2", "knitr", "yaml", "rmarkdown", "devtools"))
+```
+
+  3. Otwórz w RStudio plik "praca_domowa_2016.10.17.Rmd" (np. menu: File -> Open file...).
+  4. Otwórz w RStudio plik "dane_2016.10.17.RData" (np. menu: File -> Open file...).
+     * Pojawi się okno zawierające pytanie, czy chcesz wczytać obiekty z pliku danych do przestrzeni roboczej - klikamy "tak".
+  5. Otwórz w przeglądarce internetowej plik "warsztat_2016.10.17.html", żeby móc korzystać z niego jako pomocy.
+
+# Zadania - generowanie rozkładów
+
+## 1. Oblicz rozkłady częstości
+
+Korzystając z poznanych funkcji dla każdej ze zmiennych V1, ..., V7 oblicz brzegowe rozkłady częstości i przypisz je do obiektówo nazwach podanych w poniższych blokach kodu.
+
+  * Zmienna V1 - zadowolenie z miejsca zamieszkania:
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+pV1 =  # to jest miejsce na Twój kod (może Ci to zająć kilka linii)
+pV1  # obejrzyjmy ten rozkład
+```
+
+  * Zmienna V2 - z czasu wolnego i wypoczynku:
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+pV2 =  # to jest miejsce na Twój kod (może Ci to zająć kilka linii)
+pV2  # obejrzyjmy ten rozkład
+```
+  * Zmienna V3 - zadowolenie z życia rodzinnego:
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+pV3 =  # to jest miejsce na Twój kod (może Ci to zająć kilka linii)
+pV3  # obejrzyjmy ten rozkład
+```
+  * Zmienna V4 - zadowolenie z przyjaźni:
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+pV4 =  # to jest miejsce na Twój kod (może Ci to zająć kilka linii)
+pV4  # obejrzyjmy ten rozkład
+```
+  * Zmienna V5 - zadowolenie ze stanu zdrowia:
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+pV5 =  # to jest miejsce na Twój kod (może Ci to zająć kilka linii)
+pV5  # obejrzyjmy ten rozkład
+```
+  * Zmienna V6 - zadowolenie ze swoich warunków mieszkaniowych:
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+pV6 =  # to jest miejsce na Twój kod (może Ci to zająć kilka linii)
+pV6  # obejrzyjmy ten rozkład
+```
+  * Zmienna V7 - zadowolenie z własnego wykształcenia:
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+pV7 =  # to jest miejsce na Twój kod (może Ci to zająć kilka linii)
+pV7  # obejrzyjmy ten rozkład
+```
+
+## 2. Oblicz skumulowane rozkłady częstości
+
+Korzystając z poznanych funkcji dla każdej ze zmiennych V1, ..., V7 oblicz skumulowane brzegowe rozkłady częstości i przypisz je do obiektówo nazwach podanych w poniższych blokach kodu. Możesz tu wykorzystać to, że w obiektach `pV1`, ..., `pV7` masz już przygotowane wcześniej brzegowe rozkłady częstości.
+
+  * Zmienna V1 - zadowolenie z miejsca zamieszkania:
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+pSV1 =  # to jest miejsce na Twój kod (może Ci to zająć kilka linii)
+pSV1  # obejrzyjmy ten rozkład
+```
+
+  * Zmienna V2 - z czasu wolnego i wypoczynku:
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+pSV2 =  # to jest miejsce na Twój kod (może Ci to zająć kilka linii)
+pSV2  # obejrzyjmy ten rozkład
+```
+  * Zmienna V3 - zadowolenie z życia rodzinnego:
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+pSV3 =  # to jest miejsce na Twój kod (może Ci to zająć kilka linii)
+pSV3  # obejrzyjmy ten rozkład
+```
+  * Zmienna V4 - zadowolenie z przyjaźni:
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+pSV4 =  # to jest miejsce na Twój kod (może Ci to zająć kilka linii)
+pSV4  # obejrzyjmy ten rozkład
+```
+  * Zmienna V5 - zadowolenie ze stanu zdrowia:
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+pSV5 =  # to jest miejsce na Twój kod (może Ci to zająć kilka linii)
+pSV5  # obejrzyjmy ten rozkład
+```
+  * Zmienna V6 - zadowolenie ze swoich warunków mieszkaniowych:
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+pSV6 =  # to jest miejsce na Twój kod (może Ci to zająć kilka linii)
+pSV6  # obejrzyjmy ten rozkład
+```
+  * Zmienna V7 - zadowolenie z własnego wykształcenia:
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+pSV7 =  # to jest miejsce na Twój kod (może Ci to zająć kilka linii)
+pSV7  # obejrzyjmy ten rozkład
+```
+
+# Zadania - analiza wyników
+
+Aby wygodniej było Ci porównywać ze sobą rozkłady różnych zmiennych, zbierzmy je w jednej macierzy przy pomocy funkcji `cbind()` i zaokrąglijmy częstości przy pomocy funkcji `round()`.
+
+### Brzegowe rozkłady częstości zmiennych V1-V7
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+round(cbind(pV1, pV2, pV3, pV4, pV5, pV6, pV7), 3)
+```
+
+Uwaga! To **nie jest** żaden rozkład łączny, ani rodzina rozkładów warunkowych, tylko zestawione obok siebie rozkłady brzegowe zmiennych, które mają wspólny zbiór wartości, jakie mogąprzyjmować.
+
+### Skumulwane brzegowe rozkłady częstości zmiennych V1-V7
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+round(cbind(pSV1, pSV2, pSV3, pSV4, pSV5, pSV6, pSV7), 3)
+```
+
+Wygodne może też być dla Ciebie skompilowanie w tej chwili raportu przy pomocy opcji "Knit" (obok ikonki kłębka włóczki), która znajduje się na górze panelu RStudio zawierającego kod. W ten sposób powyższe tabelki będziesz mógł/mogła podejrzeć sobie w zewnętrzym pliku HTML, który zostanie utworzony w wyniku dokonanie takiej operacji.
+
+## 4. Odczytywanie wartości z rozkładów I
+
+Na podstawie wygenerowanych wcześniej rozkładóW odpowiedz na poniższe pytania. Jeśli będziesz potrzebował(a) dokonać jakichś obliczeń, możesz oczywiście skorzystać z konsoli R, ale poniżej nie wpisuj kodu, a jedynie liczbę - wynik ew. operacji (lub wartość, którą daje się odczytać wprost z któregośc z rozkładów).
+
+  - Jaki odsetek badanej zbiorowości stanowią Ci, który na pytanie o zadowolenie ze swojego stanu zdrowia udzielili odpowiedzi "raczej zadowolony"? **TU WPISZ LICZBĘ**
+  - Jaki odsetek badanej zbiorowości stanowią Ci, którzy zadeklarowali, że nie są zadowoleni z własnego wykształcenia (łącznie, bez względu na to, jak bardzo są niezadwoleni)? **TU WPISZ LICZBĘ**
+  - Jaki odsetek badanej zbiorowości stanowią Ci, którzy w pytaniu o zadowolenie z przyjaźni udzielili odpowiedzi wskazujących na niezdecydowanie ("raczej zadowolony"lub "raczej niezadowolony")? **TU WPISZ LICZBĘ**
+
+## 5. Odczytywanie wartości z rozkładów II
+
+Na podstawie wygenerowanych wcześniej rozkładóW odpowiedz na poniższe pytania.
+
+  - Z jakiej spośród analizowanych dziedzin życia respondenci byli najbardziej, a z jakiej najmniej zadowoleni? Przy porównaniu pomiń natężenie zadowolenia/niezadowolenia.
+    - Dziedzina, z której respondenci są najbardziej zadowoleni: **TU WPISZ ODPOWIEDŹ**.
+    - Dziedzina, z której respondenci są najmniej zadowoleni: **TU WPISZ ODPOWIEDŹ**.
+  - W odniesieniu do jakiej dziedziny respondenci udzielili najmniej, a w odniesieniu do jakiej najwięcej odpowiedzi niezdecydowanych ("raczej zadowolony"lub "raczej niezadowolony")?
+    - Dziedzina z najmniejszą liczbą odpowiedzi niezdecydowanych: **TU WPISZ ODPOWIEDŹ**.
+    - Dziedzina z największą liczbą odpowiedzi niezdecydowanych: **TU WPISZ ODPOWIEDŹ**.
+
+# Czynności końcowe
+
+  - Zapisz wyniki swojej pracy (tj. plik "praca_domowa_2016.10.17.Rmd").
+  - Zmień jego nazwę na "moje_imie_i_nazwisko_2016.10.17.Rmd".
+  - Wyślij go na adres email: zoltakt@is.uw.edu.pl

@@ -1,0 +1,225 @@
+---
+title: "Statystyka I z R<br/>Warsztat 4. Rozkłady łączne i warunkowe"
+author: "Tomasz Żółtak"
+date: "24 października 2016"
+output:
+  html_document:
+    css: ../styles.css
+    toc: TRUE
+    toc_depth: 3
+---
+
+Na dzisiejszych zajęciach zapoznamy się z wykorzystaniem funkcji `table()` do tworzenia rozkładów łącznych dwóch zmiennych i (rodzin rozkładów) warunkowych. Poznamy też **podstawy** wizualizowania (dyskretnych) rozkładów zmiennych w R przy pomocy wykresów słupkowych.
+
+# Rozkłady łączne i warunkowe (rodziny rozkładów warunkowych)
+
+Zacznijmy od wczytania danych, na których będziemy dalej pracować. Funkcja `load()` pozwala wczytać obiekty R zapisane w natywnym formacie R-a, czyli .RData (linijka wcześniej służy upewnieniu się, że bęziemy próbowali wczytać dane z odpowiedniego folderu). Funkcja `load()` zwraca nazwy wczytanych obiektów - w tym przypadku jest to 11 wektorów. Wektor o nazwie *etykiety* opisuje znaczenie pozostałych wektorów, które zawierają dane - zmienne z badania Polski Generalny Sondaż Społeczny (uwzględniono tylko wybrane edycje i tylko respondentów pomiędzy 20 a 29 rokiem życia).
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+try(setwd("warsztat 2016.10.24"), silent = TRUE)
+nazwyObiektow = load("dane_2016.10.24.RData")
+nazwyObiektow
+etykiety
+summary(cbind(Y, X, Z, W, V1, V2, V3, V4, V5, V6, V7))
+```
+
+## Funkcja table()
+
+### Rozkłady łączne dwóch zmiennych
+
+Funkcja `table()` pozwala też łatwo uzyskać **łączny rozkład liczebności** dwóch zmiennych - wystarczy podać jej jako drugi argument inny wektor (o tej samej liczbie elementów, co ten, który podajemy jako pierwszy argument).
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# łączny rozkład liczebności zadowolenia z własnego wykształcenia
+#   i roku przeprowadzenia badania PGSS
+nV7Y = table(V7, Y)
+nV7Y
+```
+
+Zwrócony obiekt, jak w przypadku jednowymiarowym, jest typu *table*, ale tym razem ma dwa wymiary i możemy go traktować podobnie jak macierz.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+str(nV7Y)
+colnames(nV7Y)
+rownames(nV7Y)
+nV7Y[3:4, 2:3]
+```
+
+Do uzyskanego rozkładu możemy też dodać rozkłady brzegowe, przy pomocy poznanej już wcześniej funkcji `addmargins()`. Wywołanie jej bez podania drugiego parametru spowoduje dodanie wszystkich możliwych (tu: dwóch) rozkładów brzegowych. Możemy też zrobić to *na piechotę*, korzystając z  funkcji `rowSums()`, `colSums()`, `rbind()` i `cbind()`.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# przy pomocy funkcji addmargins()
+addmargins(nV7Y)
+# "na piechotę"
+nBV7Y = rbind(nV7Y, "suma" = colSums(nV7Y))
+nBV7Y = cbind(nBV7Y, "suma" = rowSums(nBV7Y))
+nBV7Y
+```
+
+---
+
+#### Zadanie
+
+Dysponując łącznym rozkładem liczebności zmiennych *V7* i *Y*, zapisanym w obiekcie `nV7Y` oblicz **łączny rozkład częstości** tych zmiennych i przypisz go do obiektu `pV7Y`. Pokaż ten rozkład w konsoli z wartościami zaokrąglonymi do trzeciego miejsca po przecinku, używając polecenia `round(pV7Y, 3)`.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# to jest miejsce na Twój kod
+
+
+
+
+```
+
+---
+
+
+### Rozkłady warunkowe
+
+**Warunkowe rozkłady liczebności** w istocie możemy traktować po prostu jako *wycinki* z łącznego rozkładu liczebności.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# warunkowy rozkład liczebności zadowolenia z własnego wykształcenia
+#   dla roku badania PGSS równego 1995
+nV7Y[, colnames(nV7Y) == "1995"]
+# warunkowy rozkład liczebności zadowolenia z własnego wykształcenia
+#   dla roku badania PGSS mniejszego niż 2000
+temp = nV7Y[, as.numeric(colnames(nV7Y)) < 2000]
+temp
+rowSums(temp)
+```
+
+**Rodzina warunkowych rozkładów liczebności** jest z kolei właściwie tożsama, z łącznym rozkładem liczebności, z którego *obcięto* rozkład brzegowy jednej zmiennej.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# łączny rozkład liczebności zadowolenia z własnego wykształcenia
+#   i roku badania PGSS
+addmargins(nV7Y)
+# rodzina warunkowych rozkładów liczebności zadowolenia z własnego wykształcenia
+#   pod warunkiem roku badania PGSS
+addmargins(nV7Y)[, -(ncol(nV7Y) + 1)]
+# lub równoważnie (a nawet prościej)
+addmargins(nV7Y, 1)
+```
+
+Pojedynczy **warunkowy rozkład częstości** możemy uzyskać na podstawie odpowiedniego warunkowego rozkładu liczebności w analogiczny sposób, jak brzegowy rozkład częstości na podstawie brzegowego rozkładu liczebności.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# jakiś rozkład warunkowy
+nWarunkowyV7Y1995 = nV7Y[, colnames(nV7Y) == "1995"]
+nWarunkowyV7Y1995
+# "ręcznie"
+pWarunkowyV7Y1995 = nWarunkowyV7Y1995 / sum(nWarunkowyV7Y1995)
+pWarunkowyV7Y1995
+# przy pomocy funkcji prop.table
+prop.table(nWarunkowyV7Y1995)
+```
+
+**Pamiętamy oczywiście o tym, że w sytuacji, gdy do nasz rozkład łączny już wcześniej uzupełniliśmy o rozkłady brzegowe, musielibyśmy obliczyć to nieco inaczej!**
+
+**Rodzinę warunkowych rozkładów częstości** również możemy uzyskać przy pomocy funkcji `prop.table()`, podając jej drugi (opcjonalny), argument. Podobnie jak w przypadku funkcji `addmargins()` wskazuje on, *w którą stronę* ma być wykonana operacja (tu: procentowania). Żeby sprawy nie były zbyt proste, **wartości tego drugiego argumentu mają inne znaczenie w ramach funkcji `prop.table()`, niż w ramach funkcji `addmargins()`**:
+
+  * `prop.table()`: 1 - procentuj w wierszach, 2 - procentuj w kolumnach;
+  * `addmargins()`: 1 - dodaj rozkład brzegowy pierwszej zmiennej (dla dwóch zmiennych: ten na dole, tzn. sumuj w kolumnach), 2 - dodaj rozkład brzegowy drugiej zmienej (dla dwóch zmiennych: ten po prawej, tzn. sumuj w wierszach).
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# rodzina warunkowych rozkładów częstości zadowolenia z własnego wykształcenia
+#   w zależności od roku badania PGSS
+rWRPV7Y = addmargins(prop.table(nV7Y, 2), 1)
+rWRPV7Y
+round(rWRPV7Y, 3)
+```
+
+## Prosta wizualizacja rozkładów zmiennych (kategorialnych) - funkcja barplot()
+
+### Prosta wizualizacja rozkładu jednej zmiennej
+
+Wykres słupkowy obrazujący rozkład jednej zmiennej możemy uzyskać korzystając z funkcji `barplot`, której jako argument podajemy rozkład danej zmiennej (uwaga, bez ew. elementu z sumą).
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+nX = table(X)
+pX = prop.table(nX)
+barplot(nX)
+barplot(pX)
+```
+
+Funkcja ma też dużą liczbę dodatkowych argumentów, które pozwalają nam zarządzać jego wyglądem i uzupełnić o dodatkowe elmenty (np. tytuł, czy etykiety osi). Funkcji `grid()` możemy użyć, aby dodać linie siatki.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+barplot(pX, col = 3,
+        main = "Wielkość miejscowości zamieszkania w analizowane zbiorowości",
+        ylab = "czestość")
+grid(col = grey(0.3), nx = NA, ny = NULL)
+```
+
+Czasem bardziej użyteczne byłoby pokazanie wykresu w postaci *skumulowanej* - słupków reprezentujących częstość (względnie liczebność) poszczególnych słupków *nałożonych jeden na drugim*. Możemy to łatwo uzyskać, konwertując nasz rozkład na macierz przed przekazaniem funkcji `barplot()`.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+barplot(as.matrix(nX))
+# nawet mając macierz możemy wrócić do poprzedniego wyglądu
+barplot(as.matrix(nX), beside = TRUE)
+# żeby móc coś zrozumieć, warto dodać legendę
+barplot(as.matrix(pX),
+        main = "Wielkość miejscowości zamieszkania w analizowane zbiorowości",
+        legend.text = TRUE, args.legend =  list(x = "right"), xlim = c(0, 1.8))
+```
+
+Niestety kwestia pozycjonowania legendy nie jest tu rozwiązana w niezawodny sposób.
+
+### Prosta wizualizacja rozkładu dwóch zmiennych
+
+Opisane poniżej rozwiązania można oczywiście zastosować do różnych typów rozkładów łącznych i rodzin rozkładów warunkowych, ale **prowadząc analizy zwykle skupiamy się na porównywania ze sobą rozkładów w ramach rodziny warunkowych rozkładów częstości**. Stąd przykład odnosi się właśnie do takiej rodziny rozkładów.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# rodzina warunkowych rozkładów częstości zadowolenia z własnego wykształcenia
+#   w zależności od roku badania PGSS
+rWRPV7Y = prop.table(nV7Y, 2)
+barplot(rWRPV7Y)
+```
+
+Bez legendy, tytułu i etykiet osi trochę trudno się zorientować, o co chodzi.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+barplot(rWRPV7Y,
+        main = "Zadowolenie z własnego wykształcenia\nw różnych rundach badania PGSS",
+        xlab = "rok badania PGSS",
+        ylab = "częstość",
+        legend.text = TRUE, args.legend =  list(x = "right"), xlim = c(0, 10))
+```
+
+Możemy też uzyskać wykres w postaci słupków zestawionych obok siebie - choć w tym przypadku jest on raczej mniej użyteczny analitycznie.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+barplot(rWRPV7Y, beside = TRUE,
+        main = "Zadowolenie z własnego wykształcenia\nw różnych rundach badania PGSS",
+        xlab = "rok badania PGSS",
+        ylab = "częstość",
+        legend.text = TRUE, args.legend =  list(x = "topright"), ylim = c(0, 0.9))
+```
+
+# Na następne zajęcia
+
+## Praca domowa
+
+Wejdź dziś wieczorem na stronę projektu na GitHubie z materiałami z tego warsztatu i zobacz, co pojawiło się w tym miejscu.
+
+## Do przeczytania na następne zajęcia
+
+G. Lissowski, J. Haman i M. Jasiński. (2011). Podstawy statystyki dla socjologów. Wyd. II poprawione. Warszawa: Wydawnictwo Naukowe SCHOLAR. - Rozdziały: 1.1.-1.2., 3.5.-3.6., 4.1.-4.2. oraz 4.5. w zakresie, w jakim odnosi się do parametrów omówionych w 4.1. i 4.2.
+
+Względnie inne publikacje, w których opisane są następujące parametry poziomu wartości zmiennych statystycznych:
+
+   * modalna (dominanta),
+   * minimum i maksimum,
+   * mediana,
+   * kwartyle,
+   * średnia,
+
+i następujące parametry rozproszenia zmiennych statystycznych:
+
+  * rozstęp,
+  * odchylenie ćwiartkowe,
+  * odchylenie przeciętne od mediany,
+  * wariancja,
+  * odchylenie standardowe,
+  * współczynnik zmienności.
+
