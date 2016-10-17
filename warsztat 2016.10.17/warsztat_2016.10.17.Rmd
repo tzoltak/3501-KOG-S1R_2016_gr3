@@ -1,0 +1,487 @@
+---
+title: "Statystyka I z R<br/>Warsztat 3. Struktury danych II; rozkłady zmiennych"
+author: "Tomasz Żółtak"
+date: "17 października 2016"
+output:
+  html_document:
+    css: ../styles.css
+    toc: TRUE
+    toc_depth: 3
+---
+
+Na dzisiejszych zajęciach zapoznamy się z używaniem macierzy. Poznamy też funkcję `table()`, przy pomocy której będziemy tworzyć rozkłady zmiennych. Poznamy też sposób tworzenia **prostych** tabel w Rmarkdown i wizualizowania (dyskretnych) rozkładów zmiennych.
+
+# Podstawowe struktury danych w R - macierze
+
+Macierze to dwuwymiarowe struktury danych składające się z elementów tego samego typu. Możemy wykorzystywać je m. in. do reprezentowania macierzy danych, rozkładów łączynych lub rodzin rozkładów warunkowych.
+
+## Tworzenie macierzy
+
+Macierz możemy utworzyć korzystając z funkcji `matrix()`, która jako pierwszy argument przyjmuje wektor wartości, którymi chcemy wypełnić macierz. Liczbę wierszy i kolumn macierzy podajemy korzystając z argumentów odpowiednio `nrow` i `ncol`.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+x = matrix(1:16, nrow = 4)
+x
+str(x)
+matrix(1:16, nrow = 2)
+matrix(1:16, ncol = 2)
+```
+
+Zwróćmy uwagę, że macierz wypełniana jest kolejno kolumnami. Gdybyśmy z jakichś powodów chcieli wypełniać ją wierszami, możemy wykorzystać argument `byrow`.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+matrix(letters[1:16], nrow = 2)
+matrix(letters[1:16], nrow = 2, byrow = TRUE)
+```
+
+Jeśli chcemy całą macierz wypełnić tą samą wartością, wystarczy, że jako pierwszy argument podamy tą pojedynczą wartość (wektor jedoelementowy). O ile nie chcemy uzyskać macierzy 1x1, musimy oczywiście w takim przypadku podać zarówno argument `nrow` jak i `ncol`.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+matrix(10, nrow = 2, ncol = 3)
+matrix(FALSE, nrow = 5, ncol = 3)
+```
+
+## Nazwy wierszy i kolumn
+
+Wierszom i kolumnom macierzy możemy nadać nazwy, korzystając z funkcji `rownames()` i `colnames()` (możemy też zrobić to w ramach funkcji `matrix()`, ale nie będziemy teraz o tym mówić, jako że wymagałoby to użycia struktury danych, której jeszcze nie poznaliśmy - listy). Wykorzystuje się przy tym nieco dziwaczną składnię:
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+x = matrix(1:15, nrow = 5)
+x
+# póki co wiersze ani kolumny macierzy 'x' nie mają żadnych nazw
+rownames(x)
+colnames(x)
+# nadajmy im nazwy
+rownames(x) = paste("w", 1:nrow(x), sep = "")
+colnames(x) = paste("k", 1:ncol(x), sep = "")
+# tak wygląda nasza macierz z nazwami wierszy i kolumn
+x
+rownames(x)
+colnames(x)
+```
+
+## Wybieranie elementów macierzy
+
+Jeśli chcemy wybrać z macierzy pewne elementy, możemy to zrobić analogicznymi metodami jak w przypadku wektorów, tyle że:
+
+  1. Indeksowanie odbywa się w dwóch wymiarach.
+  2. Co do zasady wybieramy *prostokątny* obszar.
+
+Do wybierania służy nam operator `[]`, z tym że w przypadku macierzy przyjmuje on dwa argumenty, oddzielone przecinkiem: `[wektor_wskazujący_które_wybrać, wektor_wskazujący_które_kolumny_wybrać]`.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+x = matrix(1:30, nrow = 5)
+rownames(x) = paste("w", 1:nrow(x), sep = "")
+colnames(x) = paste("k", 1:ncol(x), sep = "")
+x
+# możemy wybrać tylko niektóre wiersze i/lub kolumny macierzy
+x[2:4, 4:6]
+x[-c(1, 3, 5), c(TRUE, TRUE, FALSE, TRUE, FALSE, TRUE)]
+x[c(5, 1, 2, 4, 3), -5]
+# możemy też oczywiście chcieć wybrać konkretny element
+x[1, 4]
+```
+
+Jeśli chcemy wybrać całe rzędy lub całe kolumny, możemy po prostu nie podawać nic jako odpowiedni argumentu operatora `[]`:
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# całe rzędy
+x[2:4, ]
+x[(x[, 6] %% 2) == 0, ]
+# całe kolumny
+x[, 5:4]
+x[, x[1, ] > 11]
+```
+
+### Specjalne funkcje dla macierzy kwadratowych
+
+W przypadku macierzy kwadratowych (mających taką samą liczbę wierszy i kolumn) mamy dostępnych kilka funkcji, które pozwalają nam uzyskać łatwy dostęp do pewnych ich fragmentów. Ponieważ fregmenty te nie mają *prostokątnego* kształtu, w efekcie otrzymamy wektory wartości.
+
+  1. Elementy leżące na przekątnej możemy uzyskać korzystając z funkcji `diag()`.
+  2. Elementy poniżej lub powyżej przekątnej - korzystając z funkcji `lower.tri()` i `upper.tri()`.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+y = matrix(1:16, nrow = 4)
+y
+diag(y)
+y[lower.tri(y)]
+y[upper.tri(y)]
+```
+
+Póki co funkcje te nie będą mieć dla nas znaczenia.
+
+## Zmiana wartości elementów macierzy
+
+Wartości macierzy możemy zmieniać, wskazując, o które elementy nam chodzi i podając wartości, które mają im zostać przypisane.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+x
+x[1, 1] = 100
+x
+x[, 2] = 101:105
+x
+x[2:3, 3:5] = -1:-6
+x
+```
+
+## Operacje na macierzach
+
+### Proste operacje arytmetyczne
+
+Podobnie jak w przypadku wektorów, wykonanie operacji w rodzaju dodania/odjęcia/pomnożenia/podzielenia przez stałą wykonywane jest w odniesieniu do wszystkich elementów macierzy.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+y = matrix(1, nrow = 3, ncol = 4)
+y
+y - 1
+(2 * y)^2
+```
+
+Również analogicznie do wektorów, jeśli dokonamy tego typu operacji na dwóch macierzach o równej sobie liczbie wierszy i równej sobie liczbie kolumn, operacja zostanie wykonana parami na odpowiadających sobie elementach macierzy.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+x = matrix(1, nrow = 3, ncol = 4)
+y = matrix(rep(0:11, 4), nrow = 3, ncol = 4)
+x
+y
+x + y
+```
+
+### Najbardziej typowe operacje na całych wierszach i/lub kolumnach
+
+Dwie najbardziej typowe operacje, które wykonuje się na całych wierszach i/lub kolumnach macierzy to obliczenie sumy lub średniej elementów wiersza/kolumny. Pozwalają na to funkcje `rowSums()`, `colSums()`, `rowMeans()` i `colMeans()`.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+x = matrix(rep(1:5, 6), nrow = 5)
+x
+rowSums(x)
+rowMeans(x)
+colSums(x)
+colMeans(x)
+```
+
+### Łączenie ze sobą macierzy oraz macierzy i wektorów
+
+Macierze mające taką samą liczbę kolumn możemy połączyć *dostawiając drugą poniżej pierwszej* przy pomocy funkcji `rbind()`. Macierze o takiej samej liczbie wierszy możemy z kolei połączyć *dostawiając drugą po prawej stronie pierwszej* przy pomocy funkcji `cbind()`. Drugim argumentem tych funkcji może też być wektor, o liczbie elementów równej odpowiednio liczbie kolumn lub liczbie wierszy macierzy będącej pierwszym argumentem.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+x = matrix(0, nrow = 2, ncol = 3)
+y = matrix(1, nrow = 3, ncol = 3)
+z = matrix(2, nrow = 2, ncol = 2)
+x
+y
+z
+rbind(x, y)
+cbind(x, z)
+rbind(y, colSums(y))
+cbind(z, rowSums(z))
+```
+### Operacje macierzowe
+
+R posiada też oczywiście zestaw funkcji pozwalających nam wykonać podstawowe operacje algebry macierzy: 
+
+  * transpozycję -  funkcja `t()`,
+  * mnożenie mcierzowe - operator `%*%`,
+  * obliczanie odwrotności - funkcja `solve()`.
+  
+Podczas tego kursu raczej nie będziemy ich jednak wykorzystywać.
+
+# Rozkłady
+
+Zacznijmy od wczytania danych, na których będziemy dalej pracować. Funkcja `load()` pozwala wczytać obiekty R zapisane w natywnym formacie R-a, czyli .RData (linijka wcześniej służy upewnieniu się, że bęziemy próbowali wczytać dane z odpowiedniego folderu). Funkcja `load()` zwraca nazwy wczytanych obiektów - w tym przypadku jest to 11 wektorów. Wektor o nazwie *etykiety* opisuje znaczenie pozostałych wektorów, które zawierają dane - zmienne z badania Polski Generalny Sondaż Społeczny (uwzględniono tylko wybrane edycje i tylko respondentów pomiędzy 20 a 29 rokiem życia).
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+try(setwd("warsztat 2016.10.17"), silent = TRUE)
+nazwyObiektow = load("dane_2016.10.17.RData")
+nazwyObiektow
+etykiety
+summary(cbind(Y, X, Z, W, V1, V2, V3, V4, V5, V6, V7))
+```
+
+## Funkcja table()
+
+### Rozkład brzegowy liczebności
+
+Aby uzyskać **rozkład liczebności**, najprościej posłużyć się funkcją `table()`. Możemy wywołać ją z jednym argumentem, uzyskując rozkład brzegowy danej zmiennej.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# rozkład wielkości miejscowości zamieszkania w analizowanej zbiorowości
+nX = table(X)
+nX
+str(nX)
+```
+
+Zwrócony obiekt jest typu *table*, ale w pratyce możemy postępować z nim analogicznie jak z wektorem, którego elementom zostały przypisane nazwy.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+nX
+names(nX)
+nX[2:4]
+nX[names(nX) == "2 M do 25 tys"]
+nX * 2
+```
+
+Aby obejrzeć rozkład w formie, do jakiej jesteśmy nieco bardziej przyzwyczajeni, możemy użyć funkcji `as.matrix()`.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+mNX = as.matrix(nX)
+colnames(mNX) = "N(X = X_i)"
+mNX
+```
+
+W stosunku do tego, jak przywykliśmy opisywać rozkłady w tabelach brakuje jeszcze jednego elementu - sumy wszystkich obserwacji. Możemy ją dodać na dwa sposoby - *ręcznie*, lub przy pomocy funkcji `addmargins()`.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# "ręcznie"
+c(nX, "suma" = sum(nX))
+## analogicznie do rozkładu w formie macierzy
+rbind(mNX, "suma" = sum(mNX))
+# przy pomocy funkcji addmargins()
+addmargins(nX)
+## w przypadku macierzy musimy podać dodatkowy argument, wskazujący, w którą
+##   stronę ma zostać dokonane zliczanie (1 - w pionie, 2 - w poziomie)
+addmargins(mNX, 1)
+```
+
+### Rozkład brzegowy częstości
+
+Aby uzyskać **rozkład częstości**, musimy podzielić liczebności w poszczególnych komórkach przez liczbę wszystkich obserwacji. Podobnie jak w przypadku dodawania komórki z sumą wszystkich obserwacji, możemy to zrobić *ręcznie*, lub korzystając z gotowej funkcji - w tym przypadku `prop.table()` (uwaga - jej argumentem jest wynik działania funkcji `table()`, a nie surowe dane).
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# "ręcznie"
+nX
+pX = nX / sum(nX)
+pX
+# przy pomocy funkcji prop.table()
+pX = prop.table(nX)
+pX
+# dalej możemy nadać rozkładowi nieco ładniejszy wygląd
+mPX = as.matrix(c(pX, "suma" = sum(pX)))
+colnames(mPX) = "P(X = x_i)"
+mPX
+```
+
+Uwaga, **jeśli w obiekcie mamy rozkład z dopisanym elementem *sumy*,** musimy oczywiście dzielić przez wartość tego elementu (względnie wartość wszystkich komórek rozkładu poza tą opisującą sumę).
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+nXS = c(nX, "suma" = sum(nX))
+nXS
+# "ręcznie" (w tym przypadku to nawet prościej!)
+pXS = nXS / nXS[length(nXS)]
+pXS
+# przy pomocy funkcji prop.table()
+pXS = prop.table(nXS[-length(nXS)])
+pXS = c(pXS, "suma" = sum(pXS))
+pXS
+# !!! źle !!!
+nXS / sum(nXS)  # !!! źle !!!
+prop.table(nXS)  # !!! źle !!!
+# !!! źle !!!
+```
+
+### Skumulowane rozkłady brzegowe
+
+Aby obliczyć **skumulowany rozkład brzegowy liczebności**, najprościej posłużyć się funkcją `cumsum()`. Przyjmuje ona jako argument wektor i zwraca wektor tej samej długości, którego kolejne elementy przyjmują wartości równe sumie wartości elementów wektora wejściowego, od pierwszego do danego.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+rbind("x" = 0:6, "cumsum(x)" = cumsum(0:6))
+```
+
+---
+
+#### Zadanie
+
+Dysponując brzegowym rozkładem liczebności zmiennej *X*, zapisanym w obiekcie `nX` oblicz **skumulowany rozkład liczebności** zmiennej *X* i przypisz go do obiektu `sNX`, a następnie **skumulowany rozkład częstości** tej samej zmiennej i przypisz go do obiektu `sPX`.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+nX = table(X)
+nX
+# to jest miejsce na Twój kod
+
+
+
+
+```
+
+---
+
+### Rozkłady łączne dwóch zmiennych
+
+Funkcja `table()` pozwala też łatwo uzyskać **łączny rozkład liczebności** dwóch zmiennych - wystarczy podać jej jako drugi argument inny wektor (o tej samej liczbie elementów, co ten, który podajemy jako pierwszy argument).
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# łączny rozkład liczebności zadowolenia z własnego wykształcenia
+#   i roku przeprowadzenia badania PGSS
+nV7Y = table(V7, Y)
+nV7Y
+```
+
+Zwrócony obiekt, jak w przypadku jednowymiarowym, jest typu *table*, ale tym razem ma dwa wymiary i możemy go traktować podobnie jak macierz.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+str(nV7Y)
+colnames(nV7Y)
+rownames(nV7Y)
+nV7Y[3:4, 2:3]
+```
+
+Do uzyskanego rozkładu możemy też dodać rozkłady brzegowe, przy pomocy poznanej już wcześniej funkcji `addmargins()`. Wywołanie jej bez podania drugiego parametru spowoduje dodanie wszystkich możliwych (tu: dwóch) rozkładów brzegowych. Możemy też zrobić to *na piechotę*, korzystając z  funkcji `rowSums()`, `colSums()`, `rbind()` i `cbind()`.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# przy pomocy funkcji addmargins()
+addmargins(nV7Y)
+# "na piechotę"
+nBV7Y = rbind(nV7Y, "suma" = colSums(nV7Y))
+nBV7Y = cbind(nBV7Y, "suma" = rowSums(nBV7Y))
+nBV7Y
+```
+
+---
+
+#### Zadanie
+
+Dysponując łącznym rozkładem liczebności zmiennych *V7* i *Y*, zapisanym w obiekcie `nV7Y` oblicz **łączny rozkład częstości** tych zmiennych i przypisz go do obiektu `pV7Y`. Pokaż ten rozkład w konsoli z wartościami zaokrąglonymi do trzeciego miejsca po przecinku, używając polecenia `round(pV7Y, 3)`.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# to jest miejsce na Twój kod
+
+
+
+
+```
+
+---
+
+
+### Rozkłady warunkowe
+
+**Warunkowe rozkłady liczebności** w istocie możemy traktować po prostu jako *wycinki* z łącznego rozkładu liczebności.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# warunkowy rozkład liczebności zadowolenia z własnego wykształcenia
+#   dla roku badania PGSS równego 1995
+nV7Y[, colnames(nV7Y) == "1995"]
+# warunkowy rozkład liczebności zadowolenia z własnego wykształcenia
+#   dla roku badania PGSS mniejszego niż 2000
+temp = nV7Y[, as.numeric(colnames(nV7Y)) < 2000]
+temp
+rowSums(temp)
+```
+
+**Rodzina warunkowych rozkładów liczebności** jest z kolei właściwie tożsama, z łącznym rozkładem liczebności, z którego *obcięto* rozkład brzegowy jednej zmiennej.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# łączny rozkład liczebności zadowolenia z własnego wykształcenia
+#   i roku badania PGSS
+addmargins(nV7Y)
+# rodzina warunkowych rozkładów liczebności zadowolenia z własnego wykształcenia
+#   pod warunkiem roku badania PGSS
+addmargins(nV7Y)[, -(ncol(nV7Y) + 1)]
+# lub równoważnie (a nawet prościej)
+addmargins(nV7Y, 1)
+```
+
+Pojedynczy **warunkowy rozkład częstości** możemy uzyskać na podstawie odpowiedniego warunkowego rozkładu liczebności w analogiczny sposób, jak brzegowy rozkład częstości na podstawie brzegowego rozkładu liczebności.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# jakiś rozkład warunkowy
+nWarunkowyV7Y1995 = nV7Y[, colnames(nV7Y) == "1995"]
+nWarunkowyV7Y1995
+# "ręcznie"
+pWarunkowyV7Y1995 = nWarunkowyV7Y1995 / sum(nWarunkowyV7Y1995)
+pWarunkowyV7Y1995
+# przy pomocy funkcji prop.table
+prop.table(nWarunkowyV7Y1995)
+```
+
+**Pamiętamy oczywiście o tym, że w sytuacji, gdy do nasz rozkład łączny już wcześniej uzupełniliśmy o rozkłady brzegowe, musielibyśmy obliczyć to nieco inaczej!**
+
+**Rodzinę warunkowych rozkładów częstości** również możemy uzyskać przy pomocy funkcji `prop.table()`, podając jej drugi (opcjonalny), argument. Podobnie jak w przypadku funkcji `addmargins()` wskazuje on, *w którą stronę* ma być wykonana operacja (tu: procentowania). Żeby sprawy nie były zbyt proste, **wartości tego drugiego argumentu mają inne znaczenie w ramach funkcji `prop.table()`, niż w ramach funkcji `addmargins()`**:
+
+  * `prop.table()`: 1 - procentuj w wierszach, 2 - procentuj w kolumnach;
+  * `addmargins()`: 1 - dodaj rozkład brzegowy pierwszej zmiennej (dla dwóch zmiennych: ten na dole, tzn. sumuj w kolumnach), 2 - dodaj rozkład brzegowy drugiej zmienej (dla dwóch zmiennych: ten po prawej, tzn. sumuj w wierszach).
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# rodzina warunkowych rozkładów częstości zadowolenia z własnego wykształcenia
+#   w zależności od roku badania PGSS
+rWRPV7Y = addmargins(prop.table(nV7Y, 2), 1)
+rWRPV7Y
+round(rWRPV7Y, 3)
+```
+
+## Prosta wizualizacja rozkładów zmiennych (kategorialnych) - funkcja barplot()
+
+### Prosta wizualizacja rozkładu jednej zmiennej
+
+Wykres słupkowy obrazujący rozkład jednej zmiennej możemy uzyskać korzystając z funkcji `barplot`, której jako argument podajemy rozkład danej zmiennej (uwaga, bez ew. elementu z sumą).
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+nX = table(X)
+pX = prop.table(nX)
+barplot(nX)
+barplot(pX)
+```
+
+Funkcja ma też dużą liczbę dodatkowych argumentów, które pozwalają nam zarządzać jego wyglądem i uzupełnić o dodatkowe elmenty (np. tytuł, czy etykiety osi). Funkcji `grid()` możemy użyć, aby dodać linie siatki.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+barplot(pX, col = 3,
+        main = "Wielkość miejscowości zamieszkania w analizowane zbiorowości",
+        ylab = "czestość")
+grid(col = grey(0.3), nx = NA, ny = NULL)
+```
+
+Czasem bardziej użyteczne byłoby pokazanie wykresu w postaci *skumulowanej* - słupków reprezentujących częstość (względnie liczebność) poszczególnych słupków *nałożonych jeden na drugim*. Możemy to łatwo uzyskać, konwertując nasz rozkład na macierz przed przekazaniem funkcji `barplot()`.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+barplot(as.matrix(nX))
+# nawet mając macierz możemy wrócić do poprzedniego wyglądu
+barplot(as.matrix(nX), beside = TRUE)
+# żeby móc coś zrozumieć, warto dodać legendę
+barplot(as.matrix(pX),
+        main = "Wielkość miejscowości zamieszkania w analizowane zbiorowości",
+        legend.text = TRUE, args.legend =  list(x = "right"), xlim = c(0, 1.8))
+```
+
+Niestety kwestia pozycjonowania legendy nie jest tu rozwiązana w niezawodny sposób.
+
+### Prosta wizualizacja rozkładu dwóch zmiennych
+
+Opisane poniżej rozwiązania można oczywiście zastosować do różnych typów rozkładów łącznych i rodzin rozkładów warunkowych, ale **prowadząc analizy zwykle skupiamy się na porównywania ze sobą rozkładów w ramach rodziny warunkowych rozkładów częstości**. Stąd przykład odnosi się właśnie do takiej rodziny rozkładów.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# rodzina warunkowych rozkładów częstości zadowolenia z własnego wykształcenia
+#   w zależności od roku badania PGSS
+rWRPV7Y = prop.table(nV7Y, 2)
+barplot(rWRPV7Y)
+```
+
+Bez legendy, tytułu i etykiet osi trochę trudno się zorientować, o co chodzi.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+barplot(rWRPV7Y,
+        main = "Zadowolenie z własnego wykształcenia\nw różnych rundach badania PGSS",
+        xlab = "rok badania PGSS",
+        ylab = "częstość",
+        legend.text = TRUE, args.legend =  list(x = "right"), xlim = c(0, 10))
+```
+
+Możemy też uzyskać wykres w postaci słupków zestawionych obok siebie - choć w tym przypadku jest on raczej mniej użyteczny analitycznie.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+barplot(rWRPV7Y, beside = TRUE,
+        main = "Zadowolenie z własnego wykształcenia\nw różnych rundach badania PGSS",
+        xlab = "rok badania PGSS",
+        ylab = "częstość",
+        legend.text = TRUE, args.legend =  list(x = "topright"), ylim = c(0, 0.9))
+```
+
+# Na następne zajęcia
+
+## Praca domowa
+
+Wejdź dziś wieczorem na stronę projektu na GitHubie z materiałami z tego warsztatu i zobacz, co pojawiło się w tym miejscu.
+
+## Do przeczytania na następne zajęcia
+
+[G. Lissowski, J. Haman i M. Jasiński. (2011). Podstawy statystyki dla socjologów. Wyd. II poprawione. Warszawa: Wydawnictwo Naukowe SCHOLAR.](http://libra.ibuk.pl/book/145985) - Rozdziały: 1.1.-1.2., 3.5.-3.6., 4.1.-4.2. oraz 4.5. w zakresie, w jakim odnosi się do parametrów omówionych w 4.1. i 4.2.
