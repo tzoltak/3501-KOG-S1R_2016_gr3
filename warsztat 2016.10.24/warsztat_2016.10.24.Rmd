@@ -9,7 +9,7 @@ output:
     toc_depth: 3
 ---
 
-Na dzisiejszych zajęciach zapoznamy się z wykorzystaniem funkcji `table()` do tworzenia rozkładów łącznych dwóch zmiennych i (rodzin rozkładów) warunkowych. Poznamy też **podstawy** wizualizowania (dyskretnych) rozkładów zmiennych w R przy pomocy wykresów słupkowych.
+Na dzisiejszych zajęciach zapoznamy się z wykorzystaniem funkcji `table()` do tworzenia rozkładów łącznych dwóch zmiennych i (rodzin rozkładów) warunkowych. Będziemy też ćwiczyć przekładanie pytań badawczych na tworzenie rozkładów, pozwalających uzyskać na nie odpowiedzi. Poznamy również **podstawy** wizualizowania (dyskretnych) rozkładów zmiennych w R przy pomocy wykresów słupkowych.
 
 # Rozkłady łączne i warunkowe (rodziny rozkładów warunkowych)
 
@@ -129,7 +129,51 @@ rWRPV7Y
 round(rWRPV7Y, 3)
 ```
 
-## Prosta wizualizacja rozkładów zmiennych (kategorialnych) - funkcja barplot()
+---
+
+#### Zadanie
+
+Korzystając z poznanych możliwości tworzenia rozkładów łącznych i warunkowych, przygotuj rozkłady pozwalające udzielić odpowiedzi na poniższe pytania, a następnie analiuzjąc rozkłady udziel odpowiedzi na te pytania.
+
+  1. Jaka jest kategoria welkości miejscowości zamieszkania, w ramach której badani najczęściej są bardzo zadowoleni z życia rodzinnego?
+     - Aby odpowiedzieć na to pytanie należy przeanalizować rodzinę warunkowych rozkładów częstości zmiennej **TU WPISZ SYMBOL ZMIENNEJ** ze względu na zmienną **TU WPISZ SYMBOL ZMIENNEJ**.
+     - Kategoria wielkości miejscowości zamieszkania, w ramach której badani są najczęściej bardzo zadowoleni z życia rodzinnego to **TU WPISZ odpowiedź**.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# to jest miejsce na Twój kod - przygotuj odpowiedni rozkład/rozkłady
+
+
+
+```
+
+  2. O ilu więcej/mniej jest w analizowanej grupie respondentów mieszkających na wsi, którzy zostali zbadani w latach 1992-1999, niż respondentów mieszkających w miastać o wielkości od 100 tys. do 500 tys. mieszkańców, którzy zostali zbadaniu w latach 2005-2010?
+    - Aby odpowiedzieć na to pytanie należy przeanalizować **TU WPISZ SWOJĄ ODPOWIEDŹ**.
+    - Respondentów mieszkających na wsi, którzy zostali zbadani w latach 1992-1999, jest w analizowanej grupie o **PODAJ LICZBĘ** **więcej/mniej**, niż respondentów mieszkających w miastać o wielkości od 100 tys. do 500 tys. mieszkańców, którzy zostali zbadaniu w latach 2005-2010.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# to jest miejsce na Twój kod - przygotuj odpowiedni rozkład/rozkłady
+
+
+
+```
+
+
+  3. Czy w analizowanej grupie daje się dostrzec związek pomiędzy zadowoleniem ze stanu własnego zdrowia, a zadowoleniem z własnego wykształcenia?
+    - Aby odpowiedzieć na to pytanie należy przeanalizować **TU WPISZ SWOJĄ ODPOWIEDŹ**.
+    - Zadowolenie z własnego stanu zdrowia i zadowolenie z własnego wykształcenia są ze sobą w badanej grupie powiązane, w ten sposób, że **OPISZ, JAKi OGÓLNY ZWIĄZEK DOSTRZEGASZ**.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# to jest miejsce na Twój kod - przygotuj odpowiedni rozkład/rozkłady
+
+
+
+```
+
+---
+
+# Podstawy tworzenia wykresów
+
+## Funkcja barplot()
 
 ### Prosta wizualizacja rozkładu jednej zmiennej
 
@@ -158,12 +202,12 @@ barplot(as.matrix(nX))
 # nawet mając macierz możemy wrócić do poprzedniego wyglądu
 barplot(as.matrix(nX), beside = TRUE)
 # żeby móc coś zrozumieć, warto dodać legendę
-barplot(as.matrix(pX),
+barplot(as.matrix(pX), col = 2:6,
         main = "Wielkość miejscowości zamieszkania w analizowane zbiorowości",
         legend.text = TRUE, args.legend =  list(x = "right"), xlim = c(0, 1.8))
 ```
 
-Niestety kwestia pozycjonowania legendy nie jest tu rozwiązana w niezawodny sposób.
+Niestety kwestia pozycjonowania legendy nie jest tu rozwiązana w niezawodny sposób i w ramach kombinacji funkcji `barplot()` i `legend()` nie da się na to nic łatwo poradzić.
 
 ### Prosta wizualizacja rozkładu dwóch zmiennych
 
@@ -196,25 +240,47 @@ barplot(rWRPV7Y, beside = TRUE,
         legend.text = TRUE, args.legend =  list(x = "topright"), ylim = c(0, 0.9))
 ```
 
+
+---
+
+#### Zadanie
+
+Wykonaj wykres słupkowy (w formie skumulowanej), ilustrujący rozkład(y), które wykorzystałeś/aś do odpowiedzi na pyanie 3. w poprzednim zadaniu: czy w analizowanej grupie daje się dostrzec związek pomiędzy zadowoleniem ze stanu własnego zdrowia, a zadowoleniem z własnego wykształcenia?
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# to jest miejsce na Twój kod - przygotuj odpowiedni rozkład/rozkłady
+
+
+
+```
+
+Zastanów się, dlaczego dokonałeś/aś procentowania (wybrałeś/aś jako zmienną grupującą) właśnie tą zmienną, a nie drugą. Czy możnaby równie dobrze zamienić obie zmienne rolami? Od czego to zależy?
+
+---
+
 # Na następne zajęcia
 
 ## Praca domowa
 
-Wejdź dziś wieczorem na stronę projektu na GitHubie z materiałami z tego warsztatu i zobacz, co pojawiło się w tym miejscu.
+Zostanie nadesłana mailem.
 
 ## Do przeczytania na następne zajęcia
 
-G. Lissowski, J. Haman i M. Jasiński. (2011). Podstawy statystyki dla socjologów. Wyd. II poprawione. Warszawa: Wydawnictwo Naukowe SCHOLAR. - Rozdziały: 1.1.-1.2., 3.5.-3.6., 4.1.-4.2. oraz 4.5. w zakresie, w jakim odnosi się do parametrów omówionych w 4.1. i 4.2.
+G. Lissowski, J. Haman i M. Jasiński. (2011). Podstawy statystyki dla socjologów. Wyd. II poprawione. Warszawa: Wydawnictwo Naukowe SCHOLAR. - Rozdziały: 1.1.-1.2., rozdziały 1.2.2, 3.5.-3.6., 4.1.-4.2. oraz 4.5. w zakresie, w jakim odnosi się do parametrów omówionych w 4.1. i 4.2.
 
-Względnie inne publikacje, w których opisane są następujące parametry poziomu wartości zmiennych statystycznych:
+Względnie inne publikacje, w których opisane są
 
-   * modalna (dominanta),
-   * minimum i maksimum,
-   * mediana,
-   * kwartyle,
-   * średnia,
+  * rodzaje skal pomiarowych (nominalne/porządkowe/przedziałowe/ilorazowe/absolutne)
 
-i następujące parametry rozproszenia zmiennych statystycznych:
+i następujące parametry poziomu wartości zmiennych statystycznych:
+
+  * modalna (dominanta),
+  * minimum i maksimum,
+  * mediana,
+  * kwartyle,
+  * średnia,
+
+oraz następujące parametry rozproszenia zmiennych statystycznych:
 
   * rozstęp,
   * odchylenie ćwiartkowe,
@@ -222,4 +288,3 @@ i następujące parametry rozproszenia zmiennych statystycznych:
   * wariancja,
   * odchylenie standardowe,
   * współczynnik zmienności.
-
