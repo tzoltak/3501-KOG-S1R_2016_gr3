@@ -1,0 +1,129 @@
+---
+title: "Praca domowa na 7 listopada 2016"
+author: "Tomasz Żółtak"
+date: "24 października 2016"
+output: html_document
+---
+
+# Przygotowanie do pracy
+
+  1. Otwórz RStudio. Wybierz w menu: Tools -> Global Options... -> Code (z listy ikon w lewej części okna) -> Saving (z zakładek na górze w prawej części okna). Znajdź pole podpisane jako "Default text encoding" i wpisz w nie "UTF-8". Zapisz zmiany. Dzięki temu, polskie znaki w plikach .Rmd przesyłanych przez prowadzącego nie powinny już się *krzaczyć*.
+  2. Otwórz w RStudio plik "praca_domowa_2016.10.24.Rmd" (np. menu: File -> Open file...).
+     * Mogło się zdarzyć, że przy zapisywaniu pliku "praca_domowa_2016.10.24.Rmd" z programu pocztowego na dysk Twojego komputera do jego nazwy zostało dopisane dodatkowo rozszerzenie ".txt". W takim przypadku po otwarciu go w RStudio kod nie będzie się kolorował (RStudio uzna go za zwykły plik tesktsowy, a nie plik raportu R). Aby rozwiązać problem, mając taki plik otwarty w RStudio wybierz z menu: File -> Save As... i w okienku, w którym ma być podana nazwa pliku wpisz "praca_domowa_2016.10.24.Rmd", po czym kliknij "zapisz". Możesz potem skasować wersję pliku z dodanym rozszerzeniem ".txt".
+  3. Otwórz w RStudio plik "dane_2016.10.24.RData" (np. menu: File -> Open file...).
+     * Pojawi się okno zawierające pytanie, czy chcesz wczytać obiekty z pliku danych do przestrzeni roboczej - klikamy "tak".
+  4. Otwórz w przeglądarce internetowej plik "warsztat_2016.10.24.html", żeby móc korzystać z niego jako pomocy.
+
+# Wczytywanie danych
+
+Jeśli plik "dane_2016.10.24.RData" zapisałeś/aś w tym samym folderze, co plik "praca_domowa_2016.10.24.Rmd" (który właśnie edytujesz), to poniższa linijka kodu pozwoli wczytać dane na potrzeby "zknitowania" raportu (gdybyś chciał(a) to zrobić).
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+load("dane_2016.10.24.RData")
+```
+
+Powyższego polecenia możesz też użyć, żeby wczytać dane zamiast otwierania pliku metodą przez menu: File -> Open file... Jednakże aby operacja ta się udała, aktywny folder R musi być ustawiony na ten, w którym znajduje się ten plik. Aby sprawdzić, jaki jest folder roboczy, wywołaj w konsoli funkcję `getwd()`. Możesz go zmienić, używając funkcji `setwd("ścieżka_do_folderu")`.
+
+# Zadanie 1.
+
+Korzystając z poznanych możliwości tworzenia rozkładów łącznych i warunkowych, przygotuj rozkłady pozwalające udzielić odpowiedzi na poniższe pytania, a następnie analizując rozkłady udziel odpowiedzi na te pytania.
+
+Pierwsze z poniższych zadać zostało rozwiązane na zajęciach - załączam jego rozwiązanie jako przykład i podpowiedź.
+
+  1. Jaka jest kategoria welkości miejscowości zamieszkania, w ramach której badani najczęściej są bardzo zadowoleni z życia rodzinnego?
+     - Aby odpowiedzieć na to pytanie należy przeanalizować rodzinę warunkowych rozkładów częstości zmiennej **V3** ze względu na zmienną **X**.
+     - Kategoria wielkości miejscowości zamieszkania, w ramach której badani są najczęściej bardzo zadowoleni z życia rodzinnego to **miasta 25-99 tys. mieszkańców**.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# to jest miejsce na Twój kod - przygotuj odpowiedni rozkład/rozkłady
+pV3X = prop.table(table(V3, X), 2)
+addmargins(pV3X, 1)
+round(pV3X, 3)
+# przykład tego, jak można uzyskać końcową odpowiedź konsekwentnie używając kodu R
+#   jako ciekawostka dla zainteresowanych - nie musisz powielać takich rozwiązań
+#   w swoim kodzie, dalej w tej pracy domowej
+colnames(pV3X)[which.max(pV3X[1, ])]
+```
+
+  2. O ilu więcej/mniej jest w analizowanej grupie respondentów mieszkających na wsi, którzy zostali zbadani w latach 1992-1999, niż respondentów mieszkających w miastać o wielkości od 100 tys. do 500 tys. mieszkańców, którzy zostali zbadaniu w latach 2005-2010?
+    - Aby odpowiedzieć na to pytanie należy przeanalizować **TU WPISZ SWOJĄ ODPOWIEDŹ - OPIS ROZKŁADU**.
+    - Respondentów mieszkających na wsi, którzy zostali zbadani w latach 1992-1999, jest w analizowanej grupie o **PODAJ LICZBĘ** **więcej/mniej**, niż respondentów mieszkających w miastać o wielkości od 100 tys. do 500 tys. mieszkańców, którzy zostali zbadaniu w latach 2005-2010.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# to jest miejsce na Twój kod - przygotuj odpowiedni rozkład/rozkłady
+
+
+
+```
+
+  3. Czy w analizowanej grupie daje się dostrzec związek pomiędzy zadowoleniem ze stanu własnego zdrowia, a zadowoleniem z własnego wykształcenia?
+    - Aby odpowiedzieć na to pytanie należy przeanalizować **TU WPISZ SWOJĄ ODPOWIEDŹ - OPIS ROZKŁADU**.
+    - Zadowolenie z własnego stanu zdrowia i zadowolenie z własnego wykształcenia są ze sobą w badanej grupie powiązane, w ten sposób, że **OPISZ, JAKi OGÓLNY ZWIĄZEK DOSTRZEGASZ**.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# to jest miejsce na Twój kod - przygotuj odpowiedni rozkład/rozkłady
+
+
+
+```
+
+# Zadanie 2.
+
+Przyjmijmy, że w kontekście zmiennych V1-V5 jako *zadowolonych* będziemy uznawać tych respondentów, którzy udielili odpowiedzi *raczej zadowolony*, *zadowolony* lub *bardzo zadowolony*, a za *niezadowolonych* tych, którzy udzielili którejś z pozostałych odpowiedzi. Analizując poziom zadowolenia w analizowanej grupie w kolejnych rundach badania PGSS odpowiedz:
+
+  1. Dla jakich aspektów życia (których spośród zmiennych V1-V7) nastąpił wzrost, a dla których spadek zadowolenia pomiędzy rokiem 1992 a rokiem 1999?
+     - Pomiędzy rokiem 1992 a rokiem 1999 nastąpił wzrost zadowolenia w aspektach: **Tu WPISZ ODPOWIEŹ**.
+     - Pomiędzy rokiem 1992 a rokiem 1999 nastąpił spadek zadowolenia w aspektach: **Tu WPISZ ODPOWIEŹ**.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# to jest miejsce na Twój kod - przygotuj odpowiedni rozkład/rozkłady
+
+
+
+```
+
+  2. Dla jakiego aspektu (absolutna) wielkość zmiany zadowolenia pomiędzy rokiem 1992, a rokiem 1999 była największa?
+     - Największa zmiana zadowolenia w analizowanej grupie pomiędzy rokiem 1992 a rokiem 1999 dotyczyła **PODAJ ASPEKT** i był to **wzrost/spadek** o **PODAJ WIELKOŚĆ ZMIANY** punktów procentowych.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# to jest miejsce na Twój kod - przygotuj odpowiedni rozkład/rozkłady
+
+
+
+```
+
+  3. Pomiędzy którymi kolejnymi rundami nastąpił w analizowanej grupie największy wzrost odsetka badanych, deklarujących zadowolenie z własnego wykształcenia?
+     - Największy wzrost odsetka badanych deklarujących zadowolenie z własnego wykształcenia wystąpił pomiędzy badaniem w roku **PODAJ ROK** a badaniem w roku **PODAJ ROK** i wyniósł **PODAJ WIELKOŚĆ ZMIANY** punktów procentowych.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# to jest miejsce na Twój kod - przygotuj odpowiedni rozkład/rozkłady
+
+
+
+```
+  
+  4. Badani z których **dwóch** klas wielkości miejscowości zamieszkania byli w 1992 roku najbardziej zadowleni ze swojego wykształcenia? A z jakich w 2010 roku? W ramach której z klas wielkości miejscowości zamieszkania najbardziej wzrosło w ramach analizowanej grupy zadowolenie ze swojego wykształcenia pomiędzy rokiemm 1992 a rokiem 2010?
+     - W 1992 r. największy odsetek zadowolonych z własnego wykształcenia dwudziestokilkulatków odnotowano w grupie mieszkańców **PODAJ ODPOWIEDŹ** (**PODAJ % ZADOWOLONYCH W TEJ GRUPIE**) i **PODAJ ODPOWIEDŹ** (**PODAJ % ZADOWOLONYCH W TEJ GRUPIE**).
+     - W 2010 r. największy odsetek zadowolonych z własnego wykształcenia dwudziestokilkulatków odnotowano w grupie mieszkańców **PODAJ ODPOWIEDŹ** (**PODAJ % ZADOWOLONYCH W TEJ GRUPIE**) i **PODAJ ODPOWIEDŹ** (**PODAJ % ZADOWOLONYCH W TEJ GRUPIE**).
+     - Największą zmianę zadowolenia ze swojego wykształcenia pomiędzy rokiem 1992 a rokiem 2010 odnotowano wśród mieszkańców **PODAJ ODPOWIEDŹ**, gdzie odsetek zadowolonych **wzrósł/spadł** o **PODAJ LICZBĘ** punktów procentowych.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# pamiętaj, że możesz wybrać tylko niektóre elementy wektora używając składni:
+#   `wektor[warunek_logiczny]`, np.
+# rozkład liczebności liczby osób w gosp. dom. wśród badanych w wieku poniżej 25 lat
+table(Z[W < 25])  
+# łączny rozkład liczebności liczby osób w gosp. dom. i zadowolenia z miejsca
+#   zamieszkania wśród badanych w wieku poniżej 25 lat
+table(Z[W < 25], V1[W < 25])
+# to jest miejsce na Twój kod - przygotuj odpowiedni rozkład/rozkłady
+
+
+
+
+```
+
+# Czynności końcowe
+
+  - Zapisz wyniki swojej pracy (tj. plik "praca_domowa_2016.10.24.Rmd").
+  - Zmień jego nazwę na "moje_imie_i_nazwisko_2016.10.24.Rmd".
+  - Wyślij go na adres email: **zoltakt@is.uw.edu.pl**

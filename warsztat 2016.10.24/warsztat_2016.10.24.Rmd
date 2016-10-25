@@ -51,8 +51,8 @@ Do uzyskanego rozkładu możemy też dodać rozkłady brzegowe, przy pomocy pozn
 # przy pomocy funkcji addmargins()
 addmargins(nV7Y)
 # "na piechotę"
-nBV7Y = rbind(nV7Y, "suma" = colSums(nV7Y))
-nBV7Y = cbind(nBV7Y, "suma" = rowSums(nBV7Y))
+nBV7Y = rbind(nV7Y, "łącznie" = colSums(nV7Y))
+nBV7Y = cbind(nBV7Y, "łącznie" = rowSums(nBV7Y))
 nBV7Y
 ```
 
@@ -64,10 +64,10 @@ Dysponując łącznym rozkładem liczebności zmiennych *V7* i *Y*, zapisanym w 
 
 ```{r comment="", prompt=TRUE, collapse=TRUE}
 # to jest miejsce na Twój kod
-
-
-
-
+pV7Y = nV7Y / sum(nV7Y)
+pV7Y = nV7Y / nBV7Y[nrow(nBV7Y), ncol(nBV7Y)]
+pV7Y = addmargins(pV7Y)
+round(pV7Y, 3)
 ```
 
 ---
@@ -133,17 +133,17 @@ round(rWRPV7Y, 3)
 
 #### Zadanie
 
-Korzystając z poznanych możliwości tworzenia rozkładów łącznych i warunkowych, przygotuj rozkłady pozwalające udzielić odpowiedzi na poniższe pytania, a następnie analiuzjąc rozkłady udziel odpowiedzi na te pytania.
+Korzystając z poznanych możliwości tworzenia rozkładów łącznych i warunkowych, przygotuj rozkłady pozwalające udzielić odpowiedzi na poniższe pytania, a następnie analizując rozkłady udziel odpowiedzi na te pytania.
 
   1. Jaka jest kategoria welkości miejscowości zamieszkania, w ramach której badani najczęściej są bardzo zadowoleni z życia rodzinnego?
-     - Aby odpowiedzieć na to pytanie należy przeanalizować rodzinę warunkowych rozkładów częstości zmiennej **TU WPISZ SYMBOL ZMIENNEJ** ze względu na zmienną **TU WPISZ SYMBOL ZMIENNEJ**.
+     - Aby odpowiedzieć na to pytanie należy przeanalizować rodzinę warunkowych rozkładów częstości zmiennej **V3** ze względu na zmienną **X**.
      - Kategoria wielkości miejscowości zamieszkania, w ramach której badani są najczęściej bardzo zadowoleni z życia rodzinnego to **TU WPISZ odpowiedź**.
 
 ```{r comment="", prompt=TRUE, collapse=TRUE}
 # to jest miejsce na Twój kod - przygotuj odpowiedni rozkład/rozkłady
-
-
-
+pV3X = prop.table(table(V3, X), 2)
+addmargins(pV3X, 1)
+round(pV3X, 3)
 ```
 
   2. O ilu więcej/mniej jest w analizowanej grupie respondentów mieszkających na wsi, którzy zostali zbadani w latach 1992-1999, niż respondentów mieszkających w miastać o wielkości od 100 tys. do 500 tys. mieszkańców, którzy zostali zbadaniu w latach 2005-2010?

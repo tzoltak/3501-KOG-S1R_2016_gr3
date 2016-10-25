@@ -72,7 +72,7 @@ pV7  # obejrzyjmy ten rozkład
 
 ## 2. Oblicz skumulowane rozkłady częstości
 
-Korzystając z poznanych funkcji dla każdej ze zmiennych V1, ..., V7 oblicz skumulowane brzegowe rozkłady częstości i przypisz je do obiektówo nazwach podanych w poniższych blokach kodu. Możesz tu wykorzystać to, że w obiektach `pV1`, ..., `pV7` masz już przygotowane wcześniej brzegowe rozkłady częstości.
+Korzystając z poznanych funkcji dla każdej ze zmiennych V1, ..., V7 oblicz skumulowane brzegowe rozkłady częstości i przypisz je do obiektów o nazwach podanych w poniższych blokach kodu. Możesz tu wykorzystać to, że w obiektach `pV1`, ..., `pV7` masz już przygotowane wcześniej brzegowe rozkłady częstości.
 
   * Zmienna V1 - zadowolenie z miejsca zamieszkania:
 
@@ -128,7 +128,7 @@ Aby wygodniej było Ci porównywać ze sobą rozkłady różnych zmiennych, zbie
 round(cbind(pV1, pV2, pV3, pV4, pV5, pV6, pV7), 3)
 ```
 
-Uwaga! To **nie jest** żaden rozkład łączny, ani rodzina rozkładów warunkowych, tylko zestawione obok siebie rozkłady brzegowe zmiennych, które mają wspólny zbiór wartości, jakie mogąprzyjmować.
+Uwaga! To **nie jest** żaden rozkład łączny, ani rodzina rozkładów warunkowych, tylko zestawione obok siebie rozkłady brzegowe zmiennych, które mają wspólny zbiór wartości, jakie mogą przyjmować.
 
 ### Skumulwane brzegowe rozkłady częstości zmiennych V1-V7
 
