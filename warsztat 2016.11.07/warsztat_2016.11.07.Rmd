@@ -9,7 +9,7 @@ output:
     toc_depth: 3
 ---
 
-Na dzisiejszych zajęciach poznamy funkcje pozwalające obliczyć typowo wykorzystywane parametry poziomu wartości i parametry rozproszenia zmiennych statystycznych. Zobaczymy też, w jaki sposób R traktuje (typowo) braki danych.
+Na dzisiejszych zajęciach poznamy funkcje pozwalające obliczyć typowo wykorzystywane parametry poziomu wartości zmiennych statystycznych.
 
 # Wczytanie danych
 
@@ -142,232 +142,6 @@ names(nTMR)[which.max(nTMR)]
 names(which.max(nTMR))
 ```
 
-# Parametry rozproszenia
-
-## Rozstęp i odchylenie ćwiartkowe
-
-W R nie mamy funkcji pozwalającej bezpośrednio obliczyć rozstęp, niemniej zrobienie tego samemu jest oczywiście banalnie proste. Z kolei funkcja `IQR()`, służąca obliczeniu odchylenia ćwiartkowego robi to nieco inaczej, niż w typowych (stosowanych w Polsce) definicjach (nie dzieli różnicy wartości 3. i 1. kwartyla przez dwa). Niemniej obliczenie samemu odchylenia ćwiartkowego również nie nastręcza trudności (jeśli umiemy obliczyć kwartyle).
-
----
-
-#### Zadanie
-
-Oblicz rozstęp i odchylenie ćwiartkowe zmiennej `scoreTMR`.
-
-```{r comment="", prompt=TRUE, collapse=TRUE}
-# rozstęp
-# to jest miejsce na TWój kod
-
-# odchylenie ćwiartkowe
-# to jest miejsce na TWój kod
-
-```
-
----
-
-## Wariancja i odchylenie standardowe
-
-Do obliczenia wariancji i odchylenia standardowego domyślnie wykorzystue się w R funkcje odpowiednio `var()` i `sd()`. W praktyce jest jednak z nimi pewien problem, bowiem **zwracają one wartości, które są nieobciążonymi przewidywaniami (odpowiednio wariancji i odchylenia standardowego), jeśli zadany im wektor traktować jako prostą próbę losową z populacji, dla której chcemy oszacować wartość danego parametru**.
-
-Od strony technicznej oznacza to, że w przypadku wariancji suma kwadratów różnic od średniej jest dzielona nie przez liczbę elmentów wektora, lecz przez liczbę elementów pomniejszoną o jeden. Jeśli wektor jest długi, robi to niewielką różnicę, jednak jeśli jest krótki, będzie ona bardzo wyraźna.
-
-```{r comment="", prompt=TRUE, collapse=TRUE}
-# to się nie uda, bo var() nie liczy wariancji jako statystyki opisowej
-#   lecz jako oszacoanie wartości parametru w populacji na podstawie prostej próby losowej
-var(1)
-```
-
-Jeśli chcemy uzyskać *normalną* wariancję/odchylenie standardowe musimy więc obliczyć ją sobie sami, lub skorygować wynik działania funkcji `var()` lub `sd()`:
-
-  1. Wariancja policzona *na piechotę* ze wzoru definicyjnego:
-  
-```{r comment="", prompt=TRUE, collapse=TRUE}
-varTMR = mean((scoreTMR - mean(scoreTMR, na.rm = TRUE))^2, na.rm = TRUE)
-sdTMR = varTMR^0.5
-varTMR
-sdTMR
-# dla porównania
-var(scoreTMR, na.rm = TRUE)
-sd(scoreTMR, na.rm = TRUE)
-```
-
-  2. Wariancja policzona *na piechotę* z alternatywnego wzoru, jako różnica średniej kwadratów wartości zmiennej i kwadratu średniej tej zmiennej:
-
-```{r comment="", prompt=TRUE, collapse=TRUE}
-var2TMR = mean(scoreTMR^2, na.rm = TRUE) - mean(scoreTMR, na.rm = TRUE)^2
-sd2TMR = var2TMR^0.5
-var2TMR
-sd2TMR
-```
-
-
-  3. Skorygowanie (przeliczenie) wyników działania funkcji `var()` lub `sd()`:
-
-```{r comment="", prompt=TRUE, collapse=TRUE}
-poprawka = (length(scoreTMR) - 1) / length(scoreTMR)
-poprawka
-var(scoreTMR^2, na.rm = TRUE) * poprawka
-sd(scoreTMR, na.rm = TRUE) * poprawka^0.5
-```
-
-## Współczynnik zmienności
-
-Współczynniki zmienności są często bardziej użyteczną miarą zróżnicowania w przypadku zmiennych mierzonych na skalach ilorazowych, które przyjmują tylko wartości nieujemne, a więc mają zakres wartości ograniczony z jednej strony, ale otwarty z drugiej. Pozwalają bowiem uwzględnić, że w takim przypadku w ramach grupy o wysokiej średniej wartości zmiennej jest znacznie więcej *miejsca* na różnicowanie się wartości, niż w ramach grupy, w której średnia wartości tej zmiennej jest niska, a więc bliska granicy zakresu możliwych do przyjęcia wartości.
-
-Najszerzej wykorzystywany typ wskaźnika zmieności obliczamy dzieląc wartość odchylenia standardowego przez wartość średniej.
-
-
----
-
-#### Zadanie
-
-Jaka zmienna/zmienne spośród wczytanych na początku zajęć spełnia warunki umożliwiające policzenie współczynnika zmienności? Odpowiedz na podstawie opisu zmiennych i wartości parametrów wartości (kod poniżej).
-
-```{r comment="", prompt=TRUE, collapse=TRUE}
-variablesDescription
-summary(cbind(age, scoreTMR, scoreKKS, scoreKNS, scorePISAMath, scorePISARead,
-              scorePISAScie, noPersHous, wealth, income, parEdu, hisei))
-```
-
-Oblicz wartość współczynnika zmienności dla tej zmiennej (zmienych).
-
-```{r comment="", prompt=TRUE, collapse=TRUE}
-# to jest miejsce na TWój kod
-```
-
----
-
-
-## Odchylenie przeciętne od mediany
-
----
-
-#### Zadanie
-
-Oblicz odchylenie przeciętne od mediany zmiennej `scoreTMR`, pamiętając że:
-
-  * Odchylenie przeciętne od mediany to średnia modułóW różnic pomiędzy wartością zmiennej dla danej jednostki obserwacji a wartością mediany.
-  * Do obliczenia modułu liczby można wykorzystać funkcję `abs()`.
-  
-```{r comment="", prompt=TRUE, collapse=TRUE}
-# to jest miejsce na Twój kod
-```
-
----
-
-# Braki danych i specjalne wartości liczbowe
-
-## Braki danych w operacjach logicznych
-
-Dokonując operacji logicznych alternatywy (*lub*) oraz koniunkcji (*i*), z użyciem wektorów zawierających braki danych trzeba mieć na uwadze, że R wartość `NA` stanowi trzecią, zupełnie legalną, wartość logiczną, która w operacjach tych zachowuje się następująco:
-
-```{r comment="", prompt=TRUE, collapse=TRUE}
-c(TRUE, FALSE) & NA
-c(TRUE, FALSE) | NA
-# to samo w tabelce
-m = matrix(c(c(TRUE, FALSE) & NA, c(TRUE, FALSE) | NA), ncol = 2)
-colnames(m) = c("   & NA", "   | NA")
-rownames(m) = c("TRUE", "FALSE")
-m
-```
-
-## Braki danych w operacjach porównania
-
-Jeśli wybieramy elementy wektora (macierzy, innego rypu obiektu) wykorzystując porównanie (czy ogólnie rzecz biorąc wektor wartości logicznych), musimy mieć na uwadze, że zwrócone zostaną nie elementy, dla których wektor użyty do indeksowania (wyboru) przyjmuje wartości `TRUE` ale te, dla których nieprzyjmuje on wartości `FALSE`.
-
-```{r comment="", prompt=TRUE, collapse=TRUE}
-x = c(1:10, NA)
-x
-x > 5
-x[x > 5]  # zwraca również element z brakie danych!
-```
-
-Ponieważ typowo (a przynajmniej tak wynika z mojego osobistego doświadczenia) nie prowadzi to do wyniku, który chcielibyśmy osiągnąć, musimy pamiętać o zastosowaniu w takim przypadku środków zaradczych: użycia funkcji `is.na()` lub `na.omit()`, albo operatora `%in%`.
-
-```{r comment="", prompt=TRUE, collapse=TRUE}
-# funkcja is.na(): użycie składni '[warunek & !is.na(...)]
-x
-is.na(x)
-x[x > 5 & !is.na(x)]  # teraz dostajemy to, czego typowo oczekujemy
-# funkcja na.omit(): usuwa braki danych z obiektu
-x
-y = na.omit(x)
-y
-y[y > 5]
-# operator %in%: dla każdej wartości wektora podanego przed operatorem zwraca
-#   TRUE, jeśli występuje ona wśród elementów wektora podanego po operatorze
-#   lub FALSE w przeciwnym wypadku
-x
-x %in% 6:10  # tyle że musieliśmy tu podać zbiór konkretnych wartości
-x[x %in% 6:10]
-```
-
-## Specjalne wartości liczbowe
-
-Pewne operacje są w matematyce zasadzie niedozwolone, lub nie mają sensu, np. dzielenie przez zero, czy wykonywanie jakichkolwiek operacji arytmetycznych na nieskończonościach. Próba ich wykonania w R nie wywoła jednak błędu, za to spowoduje zwrócenie w wyniku jednej ze specjalnych wartości liczbowych.
-
-### Nieskończoność
-
-W R element wektora liczb może mieć wartość *nieskończoność*: `Inf` lub *minus nieskończoność*: `-Inf` i **nie są** one traktowane jak braki danych! Wartości te możemy wykorzystać do porównań większe/mniejsze:
-
-```{r comment="", prompt=TRUE, collapse=TRUE}
-Inf > 0
-c(1, 0, -Inf) >= 0
-Inf > 10^308
-# ale
-Inf > 10^309
-# bo
-10^308  # to się jeszcze daje reprezentować w typie danych 'numeric'
-10^309  # a to jest już zbyt duża liczba
-# Inf to nie brak danych!
-is.na(Inf)
-```
-
-Poddają się też one operacjom arytemtycznym (z wyjątkiem odejmowania), choć w większości wypadków zwracają w nich siebie lub minus siebie:
-
-```{r comment="", prompt=TRUE, collapse=TRUE}
-Inf + 2
-Inf + Inf
-Inf * 5
-Inf * -5
-Inf * Inf
-Inf / 123
-# ale (p. dalsza część warsztatu)
-Inf - Inf
-Inf / Inf
-```
-
-Wartości `Inf` lub `-Inf` typowo uzyskujemy w wyniku wykonania jednej z dwóch operacji:
-
-  1. Podania jako argumentu funkcji `min()` lub `max()` wektora zawierającego same braki danych, przy pozostawieniu wartości argumentu `na.rm` na `TRUE` (poskutkuje to wywołaniem ostrzeżenia).
-  2. Podzieleniu liczby (nie będącej zerem) przez zero (zwróćmy uwagę, że oznacza to przyjęcie milczącego założenia, że tak na prawdę to nie chcieliśmy podzielić przez zero, tylko coś bardzo, bardzo małego - na tyle, że zostało zapisane jako zero, bo w programie zabrakło nam precyzji pozwalającej reprezentować tak małe liczby).
-
-```{r comment="", prompt=TRUE, collapse=TRUE}
-min(NA, na.rm = TRUE)
-max(NA, na.rm = TRUE)
-10 / 0
--5 / 0
--5 / (10 / 10^309)
-```
-
-### "Nie liczba"
-
-Wartość "Nie liczba": `NaN` jest specyficznym rodzajem braku danych, który uzyskamy, jeśli spróbujemy wykonać jedną z trzech operacji:
-
-  1. Podzielić zero przez zero.
-  2. Odjąć *nieskończoność* od *nieskończoności*.
-  3. Podzielić *nieskończoność* przez *nieskończoność*.
-
-```{r comment="", prompt=TRUE, collapse=TRUE}
-0 / 0
-Inf - Inf
-Inf / Inf
-
-is.na(NaN)
-```
-
-Wartość `NaN` jest uznawana za brak danych. Tyle tylko, że niesie ze sobą dodatkową inforację, że powstał on w wyniku próby wykonania *nielegalnej* operacji arytmetycznej.
-
 # Na następne zajęcia
 
 ## Praca domowa
@@ -376,4 +150,25 @@ Zostanie nadesłana mailem.
 
 ## Do przeczytania na następne zajęcia
 
-Zostanie nadesłana mailem.
+G. Lissowski, J. Haman i M. Jasiński. (2011). Podstawy statystyki dla socjologów. Wyd. II poprawione. Warszawa: Wydawnictwo Naukowe SCHOLAR. - Rozdziały: 1.1.-1.2., rozdziały 1.2.2, 3.5.-3.6., 4.1.-4.2. oraz 4.5. w zakresie, w jakim odnosi się do parametrów omówionych w 4.1. i 4.2.
+
+Względnie inne publikacje, w których opisane są
+
+  * rodzaje skal pomiarowych (nominalne/porządkowe/przedziałowe/ilorazowe/absolutne)
+
+i następujące parametry poziomu wartości zmiennych statystycznych:
+
+  * modalna (dominanta),
+  * minimum i maksimum,
+  * mediana,
+  * kwartyle,
+  * średnia,
+
+oraz następujące parametry rozproszenia zmiennych statystycznych:
+
+  * rozstęp,
+  * odchylenie ćwiartkowe,
+  * odchylenie przeciętne od mediany,
+  * wariancja,
+  * odchylenie standardowe,
+  * współczynnik zmienności.

@@ -1,0 +1,198 @@
+---
+title: "Praca domowa na 7 listopada 2016"
+author: "Tomasz Żółtak"
+date: "24 października 2016"
+output: html_document
+---
+
+# Przygotowanie do pracy
+
+  1. Otwórz w RStudio plik "praca_domowa_2016.11.07.Rmd" (np. menu: File -> Open file...).
+     * Mogło się zdarzyć, że przy zapisywaniu pliku "praca_domowa_2016.11.07.Rmd" z programu pocztowego na dysk Twojego komputera do jego nazwy zostało dopisane dodatkowo rozszerzenie ".txt". W takim przypadku po otwarciu go w RStudio kod nie będzie się kolorował (RStudio uzna go za zwykły plik tesktsowy, a nie plik raportu R). Aby rozwiązać problem, mając taki plik otwarty w RStudio wybierz z menu: File -> Save As... i w okienku, w którym ma być podana nazwa pliku wpisz "praca_domowa_2016.11.07.Rmd", po czym kliknij "zapisz". Możesz potem skasować wersję pliku z dodanym rozszerzeniem ".txt".
+  3. Otwórz w RStudio plik "dane_2016.11.07.RData" (np. menu: File -> Open file...).
+     * Pojawi się okno zawierające pytanie, czy chcesz wczytać obiekty z pliku danych do przestrzeni roboczej - klikamy "tak".
+  4. Otwórz w przeglądarce internetowej plik "warsztat_2016.11.07.html", żeby móc korzystać z niego jako pomocy.
+
+# Wczytywanie danych
+
+Jeśli plik "dane_2016.11.07.RData" zapisałeś/aś w tym samym folderze, co plik "praca_domowa_2016.11.07.Rmd" (który właśnie edytujesz), to poniższa linijka kodu pozwoli wczytać dane na potrzeby "zknitowania" raportu (gdybyś chciał(a) to zrobić).
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+load("dane_2016.11.07.RData")
+```
+
+Powyższego polecenia możesz też użyć, żeby wczytać dane zamiast otwierania pliku metodą przez menu: File -> Open file... Jednakże aby operacja ta się udała, aktywny folder R musi być ustawiony na ten, w którym znajduje się ten plik. Aby sprawdzić, jaki jest folder roboczy, wywołaj w konsoli funkcję `getwd()`. Możesz go zmienić, używając funkcji `setwd("ścieżka_do_folderu")`.
+
+# Braki danych i specjalne wartości liczbowe (do przeczytania)
+
+## Braki danych w operacjach logicznych
+
+Dokonując operacji logicznych alternatywy (*lub*) oraz koniunkcji (*i*), z użyciem wektorów zawierających braki danych trzeba mieć na uwadze, że R wartość `NA` stanowi trzecią, zupełnie legalną, wartość logiczną, która w operacjach tych zachowuje się następująco:
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+c(TRUE, FALSE) & NA
+c(TRUE, FALSE) | NA
+# to samo w tabelce
+m = matrix(c(c(TRUE, FALSE) & NA, c(TRUE, FALSE) | NA), ncol = 2)
+colnames(m) = c("   & NA", "   | NA")
+rownames(m) = c("TRUE", "FALSE")
+m
+```
+
+## Braki danych w operacjach porównania
+
+Jeśli jedną (lub oboma) z dwóch wartości porównywanych w ramach zastosowania operatorów `==`, `!=`, `>`, `<`, `>=`, `<=` jest brak danych (`NA`), to w efekcie zwrócony zostanie brak danych.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+c(-1, 1, NA) > 0
+```
+
+## Braki danych a wybieranie elementów wektora (macierzy)
+
+Jeśli wybieramy elementy wektora (macierzy, innego rypu obiektu) wykorzystując porównanie (czy ogólnie rzecz biorąc wektor wartości logicznych), musimy mieć na uwadze, że zwrócone zostaną **nie** te elementy, dla których wektor użyty do indeksowania (wyboru) przyjmuje wartości `TRUE` (choć zapewne tego właśnie byśmy oczekiwali) ale te, dla których nie przyjmuje on wartości `FALSE`. Tak więc zwrócone zostaną wszystkie elementy, dla których wekotr indeksujący przyjmuje wartości `TRUE` lub `NA`.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+x = c(1:10, NA)
+x
+x > 5
+x[x > 5]  # zwraca również element z brakie danych!
+```
+
+Ponieważ typowo (a przynajmniej tak wynika z mojego osobistego doświadczenia) nie prowadzi to do wyniku, który chcielibyśmy osiągnąć, musimy pamiętać o zastosowaniu w takim przypadku środków zaradczych: użycia funkcji `is.na()` lub `na.omit()`, albo operatora `%in%`.
+
+  1. Użycie funkcji `is.na()` w ramach składni postaci `x[warunek_odnoszący_się_do_x & !is.na(x)]`:
+```{r comment="", prompt=TRUE, collapse=TRUE}
+x
+is.na(x)
+x[x > 5 & !is.na(x)]  # teraz dostajemy to, czego typowo oczekujemy
+```
+
+  2. Użycie funkcji `na.omit()` w celu usunięcia z wektora elementów z brakami danych.
+```{r comment="", prompt=TRUE, collapse=TRUE}
+x
+y = na.omit(x)
+y
+y[y > 5]
+```
+
+  3. Użycie operatora `%in%`. Operator `%in%` dla każdej wartości wektora podanego przed operatorem zwraca `TRUE`, jeśli występuje ona wśród elementów wektora podanego po operatorze lub `FALSE` w przeciwnym wypadku. Widać jednak, że aby móc postąpić w ten sposób, musimy być w stanie podać wyczerpujący zbiór wartości, które mogą przyjąć te elementy wektora, które chcemy wybrać.
+```{r comment="", prompt=TRUE, collapse=TRUE}
+x
+x %in% 6:10  # po operatorze musimy podać zbiór konkretnych wartości
+x[x %in% 6:10]
+```
+
+## Specjalne wartości liczbowe
+
+Pewne operacje są w matematyce zasadzie niedozwolone, lub nie mają sensu, np. dzielenie przez zero, czy wykonywanie jakichkolwiek operacji arytmetycznych na nieskończonościach. Próba ich wykonania w R nie wywoła jednak błędu, za to spowoduje zwrócenie w wyniku jednej ze specjalnych wartości liczbowych.
+
+### Nieskończoność
+
+W R element wektora liczb może mieć wartość *nieskończoność*: `Inf` lub *minus nieskończoność*: `-Inf` i **nie są** one traktowane jak braki danych! Wartości te możemy wykorzystać do porównań większe/mniejsze:
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+Inf > 0
+c(1, 0, -Inf) >= 0
+Inf > 10^308
+# ale
+Inf > 10^309
+# bo
+10^308  # to się jeszcze daje reprezentować w typie danych 'numeric'
+10^309  # a to jest już zbyt duża liczba
+Inf == Inf
+# Inf to nie brak danych!
+is.na(Inf)
+```
+
+Poddają się też one operacjom arytmetycznym (z pewnym ograniczeniem w zakresie odejmowania i dzielenia), choć w większości wypadków zwracają w nich siebie lub minus siebie:
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+Inf + 2
+Inf + Inf
+Inf * 5
+Inf * -5
+Inf * Inf
+Inf / 123
+# ale (p. dalsza część warsztatu)
+Inf - Inf
+Inf / Inf
+```
+
+Wartości `Inf` lub `-Inf` typowo uzyskujemy w wyniku wykonania jednej z dwóch operacji:
+
+  1. Podania jako argumentu funkcji `min()` lub `max()` wektora zawierającego same braki danych, przy pozostawieniu wartości argumentu `na.rm` na `TRUE` (poskutkuje to wywołaniem ostrzeżenia).
+```{r comment="", prompt=TRUE, collapse=TRUE}
+min(NA, na.rm = TRUE)
+max(NA, na.rm = TRUE)
+```
+
+  
+  2. Podzieleniu liczby (nie będącej zerem) przez zero (zwróćmy uwagę, że oznacza to przyjęcie milczącego założenia, że tak na prawdę to nie chcieliśmy podzielić przez zero, tylko coś bardzo, bardzo małego - na tyle, że zostało zapisane jako zero, bo w programie zabrakło nam precyzji pozwalającej reprezentować tak małe liczby).
+```{r comment="", prompt=TRUE, collapse=TRUE}
+10 / 0
+-5 / 0
+-5 / (10 / 10^309)
+```
+
+### "Nie liczba"
+
+Wartość "Nie liczba": `NaN` jest specyficznym rodzajem braku danych, który uzyskamy, jeśli spróbujemy wykonać jedną z trzech operacji:
+
+  1. Podzielić zero przez zero.
+  2. Odjąć *nieskończoność* od *nieskończoności*.
+  3. Podzielić *nieskończoność* przez *nieskończoność*.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+0 / 0
+Inf - Inf
+Inf / Inf
+
+is.na(NaN)
+```
+
+Wartość `NaN` jest uznawana za brak danych. Tyle tylko, że niesie ze sobą dodatkową inforację, że powstał on w wyniku próby wykonania *nielegalnej* operacji arytmetycznej.
+
+# Analiza danych (do wykonania)
+
+## Zadanie 1.
+
+W badaniu PISA badane są umiejętności uczniów w zakresie trzech dziedzin: *matematyki* (zmienna `scorePISAMath`), *czytania ze zrozumieniem* (zmienna `scorePISARead`) i *rozumowania w naukach przyrodniczych* (zmienna `scorePISAScie`). Możemy przyjąć, że wszystkie te trzy zmienne wyrażone są na jednej skali (jest to skala standardowa o średniej 500 i odchyleniu standardowym 100 w populacji krajów należących do OECD). Wykonaj niezbędne analizy i określ, które z dziedzin okazały się średnio najtrudniejsze, a które średnio najłatwiejsze oddzielnie dla zbadanych kobiet i mężczyzn.
+
+  - Kobiety najniższe średnie wyniki uzyskały w dziedzinie **NAZWA DZIEDZINY** (**WPISZ WARTOŚĆ ŚREDNIEJ**), a najwyższe średnie wyniki uzyskały w dziedzinie **NAZWA DZIEDZINY** (**WPISZ WARTOŚĆ ŚREDNIEJ**).
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# to jest miejsce na Twój kod
+
+
+
+```
+
+  - Mężczyźni najniższe średnie wyniki uzyskali w dziedzinie **NAZWA DZIEDZINY** (**WPISZ WARTOŚĆ ŚREDNIEJ**), a najwyższe średnie wyniki uzyskali w dziedzinie **NAZWA DZIEDZINY** (**WPISZ WARTOŚĆ ŚREDNIEJ**).
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# to jest miejsce na Twój kod
+
+
+
+```
+
+## Zadanie 2.
+
+Przeanalizuj, jak różnią się między sobą średnie wyniki z poszczególnych dziedzin testu PISA pomiędzy tymi badanymi, dla których liczba lat nauki rodzica (zmienna `parEdu`; ściśle jest to maksimum z liczby lat nauki matki i liczby lat nauki ojca) była nie większa niż mediana liczby lat nauki rodzica a tymi badanymi, dla których liczba lat nauki rodzica była większa od mediany. **Pomiń w analizie osoby, dla których liczba lat nauki rodzica jest nieznana.** Zapisz odpowiedzi:
+
+Różnica średnich wyników pomiędzy badanymi posiadającymi lepiej a badanymi posiadającymi gorzej wykształconych rodziców (zgodnie z przedstawioną wyżej definicją tych dwóch grup) to:
+
+ - **WPISZ LICZBĘ** w dziedzinie *matematyki*,
+ - **WPISZ LICZBĘ** w dziedzinie *czytania ze zrozumieniem*,
+ - **WPISZ LICZBĘ** w dziedzinie *rozumowania w naukach przyrodniczych*.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# to jest miejsce na Twój kod
+
+
+
+```
+
+# Czynności końcowe
+
+  - Zapisz wyniki swojej pracy (tj. plik "praca_domowa_2016.11.07.Rmd").
+  - Zmień jego nazwę na "moje_imie_i_nazwisko_2016.11.07.Rmd".
+  - Wyślij go na adres email: **zoltakt@is.uw.edu.pl**
