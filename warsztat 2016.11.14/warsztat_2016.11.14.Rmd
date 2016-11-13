@@ -1,0 +1,173 @@
+---
+title: "Statystyka I z R<br/>Warsztat 6. Parametry rozproszenia"
+author: "Tomasz Żółtak"
+date: "14 listopada 2016"
+output:
+  html_document:
+    css: ../styles.css
+    toc: TRUE
+    toc_depth: 3
+---
+
+Na dzisiejszych zajęciach poznamy funkcje pozwalające obliczyć typowo wykorzystywane parametry parametry rozproszenia zmiennych statystycznych.
+
+# Wczytanie danych
+
+Zacznijmy od wczytania danych, na których będziemy dalej pracować. Funkcja `load()` pozwala wczytać obiekty R zapisane w natywnym formacie R-a, czyli .RData (linijka wcześniej służy upewnieniu się, że bęziemy próbowali wczytać dane z odpowiedniego folderu). Funkcja `load()` zwraca nazwy wczytanych obiektów - w tym przypadku jest to 15 wektorów. Wektor o nazwie *variablesDescription* opisuje znaczenie pozostałych wektorów, które zawierają dane - zmienne z dodatkowej próby badawczej uczniów szkół pogimnazjalnych, zrealizowanej w ramach badania PISA 2009.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+try(setwd("warsztat 2016.11.14"), silent = TRUE)
+nazwyObiektow = load("dane_2016.11.14.RData")
+nazwyObiektow
+variablesDescription
+```
+
+# Parametry rozproszenia
+
+## Rozstęp i odchylenie ćwiartkowe
+
+W R nie mamy funkcji pozwalającej bezpośrednio obliczyć rozstęp, niemniej zrobienie tego samemu jest oczywiście banalnie proste. Z kolei funkcja `IQR()`, służąca obliczeniu odchylenia ćwiartkowego robi to nieco inaczej, niż w typowych (stosowanych w Polsce) definicjach (nie dzieli różnicy wartości 3. i 1. kwartyla przez dwa). Niemniej obliczenie samemu odchylenia ćwiartkowego również nie nastręcza trudności (jeśli umiemy obliczyć kwartyle).
+
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# rozstęp
+max(scoreTMR, na.rm = TRUE) - min(scoreTMR, na.rm = TRUE)
+# odchylenie ćwiartkowe
+IQR(scoreTMR, na.rm = TRUE) / 2
+# równoważnie
+q = quantile(scoreTMR, na.rm = TRUE)
+q
+(q[4] - q[2]) / 2
+```
+
+---
+
+## Wariancja i odchylenie standardowe
+
+Do obliczenia wariancji i odchylenia standardowego domyślnie wykorzystue się w R funkcje odpowiednio `var()` i `sd()`. W praktyce jest jednak z nimi pewien problem, bowiem **zwracają one wartości, które są nieobciążonymi przewidywaniami (odpowiednio wariancji i odchylenia standardowego), jeśli zadany im wektor traktować jako prostą próbę losową z populacji, dla której chcemy oszacować wartość danego parametru**.
+
+Od strony technicznej oznacza to, że w przypadku wariancji suma kwadratów różnic od średniej jest dzielona nie przez liczbę elmentów wektora, lecz przez liczbę elementów pomniejszoną o jeden. Jeśli wektor jest długi, robi to niewielką różnicę, jednak jeśli jest krótki, będzie ona bardzo wyraźna.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+x = 0:10  # niewielka liczba obserwacji
+y = rep(x, 10)  # spora liczba obserwacji
+z = rep(x, 100)  # duża liczba obserwacji
+srednie = c(x = mean(x), y = mean(y), z = mean(z))
+# wariancja obliczona jako oszacowanie na podstawie prostej próby losowej
+warOszac = c(x = var(x), y = var(y), z = var(z))
+# wariancja obliczona na całej populacji (jeden ze sposobów)
+warPopul = c(x = mean(x^2) - mean(x)^2, y = mean(y^2) - mean(y)^2,
+             z = mean(z^2) - mean(z)^2)
+# porównajmy
+round(rbind(srednie, warOszac, warPopul), 1)
+# to się w ogóle nie uda!
+var(1)
+```
+
+Jeśli chcemy uzyskać *normalną* wariancję/odchylenie standardowe musimy więc obliczyć ją sobie sami, lub skorygować wynik działania funkcji `var()` lub `sd()`:
+
+  1. Wariancja policzona *na piechotę* ze wzoru definicyjnego:
+  
+```{r comment="", prompt=TRUE, collapse=TRUE}
+varTMR = mean((scoreTMR - mean(scoreTMR, na.rm = TRUE))^2, na.rm = TRUE)
+sdTMR = varTMR^0.5
+varTMR
+sdTMR
+# dla porównania
+var(scoreTMR, na.rm = TRUE)
+sd(scoreTMR, na.rm = TRUE)
+```
+
+  2. Wariancja policzona *na piechotę* z alternatywnego wzoru, jako różnica średniej kwadratów wartości zmiennej i kwadratu średniej tej zmiennej:
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+var2TMR = mean(scoreTMR^2, na.rm = TRUE) - mean(scoreTMR, na.rm = TRUE)^2
+sd2TMR = var2TMR^0.5
+var2TMR
+sd2TMR
+```
+
+  3. Skorygowanie (przeliczenie) wyników działania funkcji `var()` lub `sd()`:
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+poprawka = (length(scoreTMR) - 1) / length(scoreTMR)
+poprawka
+var(scoreTMR^2, na.rm = TRUE) * poprawka
+sd(scoreTMR, na.rm = TRUE) * poprawka^0.5
+```
+
+## Współczynnik zmienności
+
+Współczynniki zmienności są często bardziej użyteczną miarą zróżnicowania w przypadku zmiennych mierzonych na skalach ilorazowych, które przyjmują tylko wartości nieujemne, a więc mają zakres wartości ograniczony z jednej strony, ale otwarty z drugiej. Pozwalają bowiem uwzględnić, że w takim przypadku w ramach grupy o wysokiej średniej wartości zmiennej jest znacznie więcej *miejsca* na różnicowanie się wartości, niż w ramach grupy, w której średnia wartości tej zmiennej jest niska, a więc bliska granicy zakresu możliwych do przyjęcia wartości.
+
+Najszerzej wykorzystywany typ wskaźnika zmieności obliczamy dzieląc wartość odchylenia standardowego przez wartość średniej.
+
+Aby prześledzić opisane wyżej własności współczynika zmienności w stosunku do odchylenia standardowego, rozpatrzmy dwie zmienne: `x` i `y`, które mogą przyjmować tylko wartości nieujemne i są określone w 10-cio elementowej zbiorowości. Przyjmiemy przy tym arbitralnie, że średnia zmiennej `x` wynosi 1, a średnia zmiennej `y` wynosi 10. Następnie dobierzemy wartości tych zmiennych dla poszczególnych jednostek zbiorowości w ten sposób, aby zmaksymalizować wartość odchylenia standardowego (w ramach przyjętych założeń, że zmienne mają opisane wyżej średnie i nie mogą przyjmować wartości ujemnych).
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# dla 10-cio elementowej zbiorowości odch. std. zm. x i y maksymalizuje
+#   takie przypisanie wartości tych zmiennych:
+x = c(rep(0, 9), 10)
+y = c(rep(0, 9), 100)
+# obejrzyjmy rozkłady (pionowa niebieska linia wskazuje średnią)
+par(mfcol = c(1, 2))
+hist(x, xlim = c(0, 100), breaks = 0:100, col = 2)
+abline(v = mean(x), lwd = 2, col = 4)
+hist(y, xlim = c(0, 100), breaks = 0:100, col = 2)
+abline(v = mean(y), lwd = 2, col = 4)
+# obliczmy parametry rozkładów tych zmiennych
+srednie = c(x = mean(x), y = mean(y))
+odchStd = c(x = mean(x^2) - mean(x)^2, y = mean(y^2) - mean(y)^2)^0.5
+round(rbind(srednie, odchStd), 1)
+# jak widać, odchylenia standardowe dramatycznie się różnią
+wspZm = odchStd / srednie
+round(rbind(srednie, odchStd, wspZm), 1)
+# ale współczynniki zmienności są już takie same
+```
+
+---
+
+#### Zadanie
+
+Jaka zmienna/zmienne spośród wczytanych na początku zajęć spełnia warunki umożliwiające policzenie współczynnika zmienności? Odpowiedz na podstawie opisu zmiennych i wartości parametrów wartości (kod poniżej).
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+variablesDescription
+summary(cbind(age, scoreTMR, scoreKKS, scoreKNS, scorePISAMath, scorePISARead,
+              scorePISAScie, noPersHous, wealth, income, parEdu, hisei))
+```
+
+Oblicz wartość współczynnika zmienności dla tej zmiennej (zmienych).
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# to jest miejsce na TWój kod
+```
+
+---
+
+## Odchylenie przeciętne od mediany
+
+---
+
+#### Zadanie
+
+Oblicz odchylenie przeciętne od mediany zmiennej `scoreTMR`, pamiętając że:
+
+  * Odchylenie przeciętne od mediany to średnia modułóW różnic pomiędzy wartością zmiennej dla danej jednostki obserwacji a wartością mediany.
+  * Do obliczenia modułu liczby można wykorzystać funkcję `abs()`.
+  
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# to jest miejsce na Twój kod
+```
+
+---
+
+# Na następne zajęcia
+
+## Praca domowa
+
+Zostanie nadesłana mailem.
+
+## Do przeczytania na następne zajęcia
+
+Zostanie nadesłana mailem.

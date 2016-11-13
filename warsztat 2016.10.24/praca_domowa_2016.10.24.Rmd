@@ -28,7 +28,7 @@ Powyższego polecenia możesz też użyć, żeby wczytać dane zamiast otwierani
 
 Korzystając z poznanych możliwości tworzenia rozkładów łącznych i warunkowych, przygotuj rozkłady pozwalające udzielić odpowiedzi na poniższe pytania, a następnie analizując rozkłady udziel odpowiedzi na te pytania.
 
-Pierwsze z poniższych zadać zostało rozwiązane na zajęciach - załączam jego rozwiązanie jako przykład i podpowiedź.
+Pierwsze z poniższych zadań zostało rozwiązane na zajęciach - załączam jego rozwiązanie jako przykład i podpowiedź.
 
   1. Jaka jest kategoria welkości miejscowości zamieszkania, w ramach której badani najczęściej są bardzo zadowoleni z życia rodzinnego?
      - Aby odpowiedzieć na to pytanie należy przeanalizować rodzinę warunkowych rozkładów częstości zmiennej **V3** ze względu na zmienną **X**.
@@ -45,7 +45,7 @@ round(pV3X, 3)
 colnames(pV3X)[which.max(pV3X[1, ])]
 ```
 
-  2. O ilu więcej/mniej jest w analizowanej grupie respondentów mieszkających na wsi, którzy zostali zbadani w latach 1992-1999, niż respondentów mieszkających w miastać o wielkości od 100 tys. do 500 tys. mieszkańców, którzy zostali zbadaniu w latach 2005-2010?
+  2. O ilu więcej/mniej jest w analizowanej grupie respondentów mieszkających na wsi, którzy zostali zbadani w latach 1992-1999, niż respondentów mieszkających w miastach o wielkości od 100 tys. do 500 tys. mieszkańców, którzy zostali zbadaniu w latach 2005-2010?
     - Aby odpowiedzieć na to pytanie należy przeanalizować **TU WPISZ SWOJĄ ODPOWIEDŹ - OPIS ROZKŁADU**.
     - Respondentów mieszkających na wsi, którzy zostali zbadani w latach 1992-1999, jest w analizowanej grupie o **PODAJ LICZBĘ** **więcej/mniej**, niż respondentów mieszkających w miastać o wielkości od 100 tys. do 500 tys. mieszkańców, którzy zostali zbadaniu w latach 2005-2010.
 
@@ -102,7 +102,7 @@ Przyjmijmy, że w kontekście zmiennych V1-V5 jako *zadowolonych* będziemy uzna
 
 ```
   
-  4. Badani z których **dwóch** klas wielkości miejscowości zamieszkania byli w 1992 roku najbardziej zadowleni ze swojego wykształcenia? A z jakich w 2010 roku? W ramach której z klas wielkości miejscowości zamieszkania najbardziej wzrosło w ramach analizowanej grupy zadowolenie ze swojego wykształcenia pomiędzy rokiemm 1992 a rokiem 2010?
+  4. Badani z których **dwóch** klas wielkości miejscowości zamieszkania byli w 1992 roku najbardziej zadowleni ze swojego wykształcenia? A z jakich w 2010 roku? W ramach której z klas wielkości miejscowości zamieszkania najbardziej wzrosło w ramach analizowanej grupy zadowolenie ze swojego wykształcenia pomiędzy rokiem 1992 a rokiem 2010?
      - W 1992 r. największy odsetek zadowolonych z własnego wykształcenia dwudziestokilkulatków odnotowano w grupie mieszkańców **PODAJ ODPOWIEDŹ** (**PODAJ % ZADOWOLONYCH W TEJ GRUPIE**) i **PODAJ ODPOWIEDŹ** (**PODAJ % ZADOWOLONYCH W TEJ GRUPIE**).
      - W 2010 r. największy odsetek zadowolonych z własnego wykształcenia dwudziestokilkulatków odnotowano w grupie mieszkańców **PODAJ ODPOWIEDŹ** (**PODAJ % ZADOWOLONYCH W TEJ GRUPIE**) i **PODAJ ODPOWIEDŹ** (**PODAJ % ZADOWOLONYCH W TEJ GRUPIE**).
      - Największą zmianę zadowolenia ze swojego wykształcenia pomiędzy rokiem 1992 a rokiem 2010 odnotowano wśród mieszkańców **PODAJ ODPOWIEDŹ**, gdzie odsetek zadowolonych **wzrósł/spadł** o **PODAJ LICZBĘ** punktów procentowych.
