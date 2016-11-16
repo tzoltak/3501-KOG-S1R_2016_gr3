@@ -132,6 +132,7 @@ $(document).ready(function () {
 <li><a href="#wspoczynnik-zmiennosci">Współczynnik zmienności</a></li>
 <li><a href="#odchylenie-przecietne-od-mediany">Odchylenie przeciętne od mediany</a></li>
 </ul></li>
+<li><a href="#podsumowanie-informacji-o-skalach-pomiarowych-i-podstawowych-parametrach-statystycznych">Podsumowanie informacji o skalach pomiarowych i podstawowych parametrach statystycznych</a></li>
 <li><a href="#na-nastepne-zajecia">Na następne zajęcia</a><ul>
 <li><a href="#praca-domowa">Praca domowa</a></li>
 <li><a href="#do-przeczytania-na-nastepne-zajecia">Do przeczytania na następne zajęcia</a></li>
@@ -149,8 +150,8 @@ $(document).ready(function () {
  [1] &quot;schoolType&quot;           &quot;sex&quot;                  &quot;age&quot;                 
  [4] &quot;scoreTMR&quot;             &quot;scoreKKS&quot;             &quot;scoreKNS&quot;            
  [7] &quot;scorePISAMath&quot;        &quot;scorePISARead&quot;        &quot;scorePISAScie&quot;       
-[10] &quot;noPersHous&quot;           &quot;wealth&quot;               &quot;income&quot;              
-[13] &quot;parEdu&quot;               &quot;hisei&quot;                &quot;variablesDescription&quot;
+[10] &quot;noPersHous&quot;           &quot;hisei&quot;                &quot;parEdu&quot;              
+[13] &quot;wealth&quot;               &quot;income&quot;               &quot;variablesDescription&quot;
 &gt; variablesDescription
                                             schoolType 
                                  &quot;School type (track)&quot; 
@@ -172,13 +173,13 @@ $(document).ready(function () {
     &quot;Score on PISA science test (pseudoEAP estimator)&quot; 
                                             noPersHous 
                     &quot;Number of persons in a household&quot; 
-                                                wealth 
-                &quot;Highest parental occupational status&quot; 
-                                                income 
-                 &quot;Highest parental education in years&quot; 
-                                                parEdu 
-                                              &quot;Wealth&quot; 
                                                  hisei 
+                &quot;Highest parental occupational status&quot; 
+                                                parEdu 
+                 &quot;Highest parental education in years&quot; 
+                                                wealth 
+                                              &quot;Wealth&quot; 
+                                                income 
                              &quot;Houshold monthly income&quot; </code></pre>
 </div>
 <div id="parametry-rozproszenia" class="section level1">
@@ -254,8 +255,8 @@ warPopul 10 10.0 10
 <pre class="r"><code>&gt; poprawka = (length(scoreTMR) - 1) / length(scoreTMR)
 &gt; poprawka
 [1] 0.9997366
-&gt; var(scoreTMR^2, na.rm = TRUE) * poprawka
-[1] 423791.9
+&gt; var(scoreTMR, na.rm = TRUE) * poprawka
+[1] 54.03551
 &gt; sd(scoreTMR, na.rm = TRUE) * poprawka^0.5
 [1] 7.350885</code></pre>
 </div>
@@ -315,13 +316,13 @@ wspZm   3  3
     &quot;Score on PISA science test (pseudoEAP estimator)&quot; 
                                             noPersHous 
                     &quot;Number of persons in a household&quot; 
-                                                wealth 
-                &quot;Highest parental occupational status&quot; 
-                                                income 
-                 &quot;Highest parental education in years&quot; 
-                                                parEdu 
-                                              &quot;Wealth&quot; 
                                                  hisei 
+                &quot;Highest parental occupational status&quot; 
+                                                parEdu 
+                 &quot;Highest parental education in years&quot; 
+                                                wealth 
+                                              &quot;Wealth&quot; 
+                                                income 
                              &quot;Houshold monthly income&quot; 
 &gt; summary(cbind(age, scoreTMR, scoreKKS, scoreKNS, scorePISAMath, scorePISARead,
 +               scorePISAScie, noPersHous, wealth, income, parEdu, hisei))
@@ -364,10 +365,111 @@ wspZm   3  3
 <li>Odchylenie przeciętne od mediany to średnia modułóW różnic pomiędzy wartością zmiennej dla danej jednostki obserwacji a wartością mediany.</li>
 <li>Do obliczenia modułu liczby można wykorzystać funkcję <code>abs()</code>.</li>
 </ul>
-<pre class="r"><code>&gt; # to jest miejsce na Twój kod</code></pre>
+<pre class="r"><code>&gt; # to jest miejsce na Twój kod
+&gt; mean(abs(scoreTMR - median(scoreTMR, na.rm = TRUE)), na.rm = TRUE)
+[1] 5.468369
+&gt; 
+&gt; scoreTMRbbd = na.omit(scoreTMR)
+&gt; mean(abs(scoreTMRbbd - median(scoreTMRbbd)))
+[1] 5.468369</code></pre>
 <hr />
 </div>
 </div>
+</div>
+<div id="podsumowanie-informacji-o-skalach-pomiarowych-i-podstawowych-parametrach-statystycznych" class="section level1">
+<h1>Podsumowanie informacji o skalach pomiarowych i podstawowych parametrach statystycznych</h1>
+<table style="width:100%;">
+<colgroup>
+<col width="9%"></col>
+<col width="16%"></col>
+<col width="7%"></col>
+<col width="8%"></col>
+<col width="8%"></col>
+<col width="7%"></col>
+<col width="12%"></col>
+<col width="10%"></col>
+<col width="10%"></col>
+<col width="8%"></col>
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">typ skali</th>
+<th align="left">przykładowe zmienne</th>
+<th align="left">sensowne operacje</th>
+<th align="center">dominanta (modalna)</th>
+<th align="center">mediana (kwantyle)</th>
+<th align="center">średnia</th>
+<th align="center">rozstęp (odch. ćwiart.)</th>
+<th align="center">odch. przec. od mediany</th>
+<th align="center">wariancja (odch. std.)</th>
+<th align="center">współcz. zmienności</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">nominalna</td>
+<td align="left">płeć, wyznanie, narodowość</td>
+<td align="left">=, !=</td>
+<td align="center">V</td>
+<td align="center">-</td>
+<td align="center">-</td>
+<td align="center">-</td>
+<td align="center">-</td>
+<td align="center">-</td>
+<td align="center">-</td>
+</tr>
+<tr class="even">
+<td align="left">porządkowa</td>
+<td align="left">poziom wykształcenia, preferencje, pozycja w hierarchii, ranking (czegośtam), odpowiedź w ankiecie na skali „tak”, „raczej tak”, …</td>
+<td align="left">=, !=, &gt;, &lt;</td>
+<td align="center">V</td>
+<td align="center">V</td>
+<td align="center">-</td>
+<td align="center">-</td>
+<td align="center">-</td>
+<td align="center">-</td>
+<td align="center">-</td>
+</tr>
+<tr class="odd">
+<td align="left">przedziałowa</td>
+<td align="left">stopnie C, data kalendarzowa, skale standardowe</td>
+<td align="left">=, !=, &gt;, &lt;, różnice</td>
+<td align="center">V*</td>
+<td align="center">V</td>
+<td align="center">V</td>
+<td align="center">V</td>
+<td align="center">V</td>
+<td align="center">V</td>
+<td align="center">-</td>
+</tr>
+<tr class="even">
+<td align="left">ilorazowa</td>
+<td align="left">zarobki, odległości, wiek</td>
+<td align="left">=, !=, &gt;, &lt;, różnice**, ilorazy</td>
+<td align="center">V*</td>
+<td align="center">V</td>
+<td align="center">V</td>
+<td align="center">V</td>
+<td align="center">V</td>
+<td align="center">V</td>
+<td align="center">V</td>
+</tr>
+<tr class="odd">
+<td align="left">absolutna</td>
+<td align="left">liczba osób, liczba zdarzeń</td>
+<td align="left">=, !=, &gt;, &lt;, różnice, ilorazy</td>
+<td align="center">V*</td>
+<td align="center">V</td>
+<td align="center">V</td>
+<td align="center">V</td>
+<td align="center">V</td>
+<td align="center">V</td>
+<td align="center">V</td>
+</tr>
+</tbody>
+</table>
+<p> * Dla skal przedziałowych, ilorazowych i absolutnych obliczenie modalnej jest zawsze poprawne formalnie, ale jeśli zmienna może przyjmować bardzo wiele wartości (zwłaszcza jeśli w analizowanej zbiorowości jest niewiele obserwacji), może to mieć znikomą wartość informacyjną. W skrajnym przypadku każda jednostka obserwacji będzie mieć inną wartość zmiennej i każda z tych wartości będzie modalną.</p>
+<p>** W przypadku zmiennych mierzonych na skalach ilorazowych, które przyjmują tylko wartości nieujemne analizowanie różnic ma często mniejszy sens, niż analizowanie ilorazów (stosunków). Np. załóżmy, że porównujemy zarobki dwóch osób w dwóch punktach czasu i że dla każdej z tych osób jej zarobki wzrastały w analizowanym okresie proporcjonalnie do inflacji - w efekcie stosunek zarobków tych dwóch osób będzie cały czas ten sam, chociaż różnica zarobków się zwiększy (zakładając, że inflacja była niezerowa).</p>
 </div>
 <div id="na-nastepne-zajecia" class="section level1">
 <h1>Na następne zajęcia</h1>

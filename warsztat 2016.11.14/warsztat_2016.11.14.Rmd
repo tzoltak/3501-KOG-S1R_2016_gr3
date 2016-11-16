@@ -92,7 +92,7 @@ sd2TMR
 ```{r comment="", prompt=TRUE, collapse=TRUE}
 poprawka = (length(scoreTMR) - 1) / length(scoreTMR)
 poprawka
-var(scoreTMR^2, na.rm = TRUE) * poprawka
+var(scoreTMR, na.rm = TRUE) * poprawka
 sd(scoreTMR, na.rm = TRUE) * poprawka^0.5
 ```
 
@@ -158,9 +158,51 @@ Oblicz odchylenie przeciętne od mediany zmiennej `scoreTMR`, pamiętając że:
   
 ```{r comment="", prompt=TRUE, collapse=TRUE}
 # to jest miejsce na Twój kod
+mean(abs(scoreTMR - median(scoreTMR, na.rm = TRUE)), na.rm = TRUE)
+
+scoreTMRbbd = na.omit(scoreTMR)
+mean(abs(scoreTMRbbd - median(scoreTMRbbd)))
 ```
 
 ---
+
+# Podsumowanie informacji o skalach pomiarowych i podstawowych parametrach statystycznych
+
+----------------------------------------------------------------------------------------------------------------------------------------------
+typ skali     przykładowe zmienne    sensowne    dominanta   mediana     średnia   rozstęp           odch. przec.   wariancja      współcz.
+                                     operacje    (modalna)   (kwantyle)            (odch. ćwiart.)   od mediany     (odch. std.)   zmienności
+------------- ---------------------- ---------- ----------- ----------- --------- ----------------- -------------- -------------- ------------
+nominalna     płeć, wyznanie,        =, !=      V           -           -          -                -              -              -
+              narodowość
+
+porządkowa    poziom wykształcenia,  =, !=,     V           V           -          -                -              -              -
+              preferencje,           >, <
+              pozycja w hierarchii,
+              ranking (czegośtam),
+              odpowiedź w ankiecie
+              na skali „tak”,
+              „raczej tak”, ...
+
+przedziałowa  stopnie C,             =, !=,     V*          V           V          V                V              V              -
+              data kalendarzowa,     >, <,
+              skale standardowe      różnice
+
+ilorazowa     zarobki, odległości,   =, !=,     V*          V           V          V                V              V              V
+              wiek                   >, <,
+                                     różnice**,
+                                     ilorazy
+
+absolutna     liczba osób,           =, !=,     V*          V           V          V                V              V              V
+              liczba zdarzeń         >, <,
+                                     różnice,
+                                     ilorazy
+----------------------------------------------------------------------------------------------------------------------------------------------
+
+&nbsp;* Dla skal przedziałowych, ilorazowych i absolutnych obliczenie modalnej jest zawsze poprawne formalnie, ale jeśli zmienna może przyjmować bardzo wiele wartości (zwłaszcza jeśli w analizowanej zbiorowości jest niewiele obserwacji), może to mieć znikomą wartość informacyjną. W skrajnym przypadku każda jednostka obserwacji będzie mieć inną wartość zmiennej i każda z tych wartości będzie modalną.
+
+** W przypadku zmiennych mierzonych na skalach ilorazowych, które przyjmują tylko wartości nieujemne analizowanie różnic ma często mniejszy sens, niż analizowanie ilorazów (stosunków). Np. załóżmy, że porównujemy zarobki dwóch osób w dwóch punktach czasu i że dla każdej z tych osób jej zarobki wzrastały w analizowanym okresie proporcjonalnie do inflacji - w efekcie stosunek zarobków tych dwóch osób będzie cały czas ten sam, chociaż różnica zarobków się zwiększy (zakładając, że inflacja była niezerowa).
+
+
 
 # Na następne zajęcia
 
