@@ -1,0 +1,278 @@
+---
+title: "Statystyka I z R<br/>Warsztat 7. Listy i  ramki danych"
+author: "Tomasz Żółtak"
+date: "21 listopada 2016"
+output:
+  html_document:
+    css: ../styles.css
+    toc: TRUE
+    toc_depth: 3
+---
+
+# Listy
+
+Listy są strukturą danych w pewien sposób podobną do wektorów - mają postać ciągu elementów. Jednak o ile element wektora musiał być pojedynczą wartością (liczbą, ciągiem znaków), o tyle element listy może być zupełnie dowolnym obiektem, np. wektorem, lub listą. Co więcej, poszczególne elementy listy nie muszą być tego samego typu. Z tego powdu listy mają kapitalne znaczenie przy programowaniu w R - umożliwiają zwracanie przez funkcje, np. służące do estymowania modeli statystycznych potencjalnie dużej ilości różnych informacji zawartych w obiekcie o skomplikowanej strukturze.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+x = list(1:10, letters[1:10], c(TRUE, FALSE), list(21:25, LETTERS[11:15]))
+x
+str(x)
+# listę możemy też utworzyć przy pomocy funkcji vector()
+y = vector(mode = "list", length = 2)
+y  # domyślną wartością elementu listy jest NULL, czyli "nic"
+str(y)
+```
+
+Zauważmy, że gdybyśmy próbowali stworzyć wektor z elementów różnych typów, poskutkowałoby to dokonaniem w locie konwersji do bardziej *ogólnego* typu (przy czym najbardziej *ogólnym* typem, w tym sensie, że daje się w nim bez utraty precyzji reprezentować wszystkie pozostałe, jest ciąg znaków).
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+c(1, FALSE)  # otrzymamy wektor liczb
+c(1, FALSE, "tekst")  # otrzymamy wektor tekstowy
+# a w przypadku listy
+list(1, FALSE, "tekst")
+```
+
+## Indeksowanie list
+
+Składnia związana z indeksowaniem list jest nieco specyficzna. Jeśli wykorzystamy operator `[]`, w efekcie zawsze otrzymamy listę:
+
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+y = x[c(1, 3)]
+y
+str(y)
+z = x[2]
+z  # jednoelementowa lista
+str(z)
+z[1]  # cały czas jednoelementowa lista
+z[2]  # NULL - ta lista nie ma 2. elementu
+# możemy też indeksować przy pomocy wetorów wartości logicznych
+x[c(TRUE, FALSE, FALSE, FALSE)]
+x[c(TRUE, FALSE, TRUE, FALSE)]
+```
+
+Jeśli chcemy *dostać się* bezpośrednio do konkretnego elementu listy, aby móc z nim coś zrobić, musimy użyć operatora `[[]]`:
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+w = x[[2]]
+w  # wektor ciągów znaków
+# jeśli element listy też jest listą, musimy użyć [[]] dwukrotnie
+str(x[[4]][1])
+str(x[[4]][[1]])
+str(w)
+# operatorów [[]] i [] możemy użyć w jednym wyrażeniu
+x[[2]][1]  # 1. element wektora będącego 2. elementem listy x
+```
+
+Uwaga, jeśli jako argument operatora `[[]]` podamy ciąg liczb, możemy uzyskać (nie wywołując żadnego błędu czy ostrzeżenia) nieco niespodziewany efekt! Osobiście nie polecam stosowania tego typu składni, bo łatwo się w niej pogubić.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+x[[2:3]]  # 3. element wektora będącego 2. elementem listy x!
+# ale
+x[[2:2]]  # 2. elementem listy x
+# bo
+2:2  # wektor jednoelementowy
+```
+
+## Wybór elementów list poprzez nazwy
+
+Kolejną ważną własnością list odróżniającą ją od wektorów jest to, że elementy list można wybierać podając ich nazwę, wykorzystując operator `$`:
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+x = list(pierwszyElement = 1:10,
+         drugiElement = letters[1:10],
+         innaNazwa = c(TRUE, FALSE),
+         list(21:25, LETTERS[11:15])) # nie wszystkie elementy muszą mieć nazwy
+x
+str(x)
+# zauważmy, że nazwa 4. elementu też została zainicjalizowana, tyle że jest
+#   pustym ciągiem znaków
+names(x)
+# teraz możemy wybrać elementy, które posiadają nazwy korzystając z operatora `$`
+x$pierwszyElement  # to samo, co gdybyśmy wywołali x[[1]]
+x$drugiElement  # to samo, co gdybyśmy wywołali x[[2]]
+x$innaNazwa  # to samo, co gdybyśmy wywołali x[[3]]
+```
+
+## Operacje na listach
+
+### Listy nie zachowują się jak wektory
+
+Próba wykonania na listach typowych operacji, jakie wykonujemy na wektorach, w szczególności arytmetycznych będzie skutkować błędem. Zwróć uwagę, że jest to logiczne - jeśli używamy list, nie ma żadnej gwarancji, że obiekty, na których chcemy wykoncać takie operacje w sensowny sposób do siebie *pasują*.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+y = list(1:10)
+y
+z = list(rep(0, 10))
+z
+```
+```{r eval = FALSE, comment="", prompt=TRUE, collapse=TRUE}
+# to będzie błąd
+y + z
+y * z
+```
+
+### Przypisywanie wartości elementom listy
+
+Jeśli chcemy przypisać wartość wybranemu elementowi listy, możemy to zrobić w typowy sposób, wybierając interesujący nas element i używając operatora `=`. Jako wartość pojedynczego elementu listy możemy oczywiście przypisać dowolony obiekt.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+y = x
+y
+y[[4]] = rep(FALSE, 4)
+y$pierwszyElement = -5:5
+y
+```
+
+Jeśli po operatorze `$` podamy nazwę elementu, która nie występuje wśród nazw dotychczasowych elementów danej listy, efektem będzie dodanie na końcu listy nowego elementu.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+x$nowyElement = c(pi = pi, e = exp(1))
+x
+```
+
+Jeśli chcemy przypisać wartość jednocześnie kilku elementom lisy (lub ew. wybieramy pojedynczy element, ale przy pomocy operatora `[]`, a nie `[[]]`), musimy pamiętać, że po prawej stronie operatora przypisania (`=`) musimy podać listę (o liczbie elementów równej liczbie elementów, którym chcemy przypisać wartość).
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+y[c(3, 5)] = list(c("teraz", "to", "jest", "trzeci", "element"),
+              c("a", "to", "piąty"))
+y
+# co stanie się teraz?
+y[4] = rep("?", 10)
+y
+```
+
+### Funkcje unlist() i as.list()
+
+Jeśli mamy taką potrzebę, możemy przekształcić listę na wektor przy pomocy funkcji `unlist()`.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+y = list(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+y
+unlist(y)
+# przekształcana lista może mieć bardziej złożoną strukturę, jednak jeśli
+#   jej elementy są różnych typów, to zostaną one skonwertowane
+x
+unlist(x)
+```
+
+Z kolei wektor możemy przekształcić na listę w ten sposób, że każdy element wektora stanie się elementem listy (a więc każdy element listy będzie jednoelementowym wektorem) przy pomocy funkcji `as.list()`.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+as.list(1:10)
+```
+
+### Funkcja lapply()
+
+Operacją, którą często wykonuje się na listach jest wykonanie pewnej zadanej przez nas funkcji na każdym elemencie listy. Służy do tego funkcja `lapply()`, która przyjmuje dwa argumenty - listę oraz funkcję, która ma być wykonana na każdym z jej elementów.
+
+Np. możemy chcieć sprawdzić, czy elementy listy są wektorami typu `numeric`:
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+w = lapply(x, is.numeric)
+w  # lista o tej samej długości (i nazwach elementów) co `x`
+str(w)
+```
+
+Funkcja `lapply()` zwraca więc listę analogicznej postaci jak ta, która została jej przekazana jako pierwzy argument, z tym że każdy jej element został zastąpiony wynikiem zwróconym przez wywołanie na tym elemencie funkcji podanej jako drugi argument funkcji `lapply()`.
+
+Użyjmy teraz funkcji `lapply()`, aby obliczyć średnią dla tych poszczególnych elementów listy `x`, które są wektorami liczb. W tym celu będziemy musieli wykonać dwie operacje:
+
+  1. Najpierw zidentyfikować, które elementy są wektorami liczb - też zrobimy to przy pomocy funkcji `lapply()`.
+  2. Na wybranych elementach uruchomić funkjcą `lapply()` obliczenie średniej przy pomocy funkcji `mean()`.
+  
+```{r comment="", prompt=TRUE, collapse=TRUE}
+maska = lapply(x, is.numeric)
+maska = unlist(maska)
+srednie = lapply(x[maska], mean)
+srednie
+```
+
+# Ramki danych (data frame)
+
+Ramki danych (*data frame*) są podstawowymi strukturami wykorzystywanymi w R do przechowywania typowych zbiorów danych. Mają one kilka interesujących właściwości:
+
+  1. Od strony technicznej (tego, jak są przechowywane w pamięci przez R) są listami z nałożonym dodatkowym ograniczeniem, że każdy element listy musi mieć taką samą liczbę elementów.
+     - Elementy takiej listy zwykle określamy mianem *zmiennych*.
+     - W związku z tym na ramkach danych możemy wykonywać w dokładnie ten sam sposób wszystkie operacje, które zostały opisane powyżej w odniesieniu do list.
+     - W związku z tym, w odróżnieniu od macierzy, w tej samej ramce danych możemy przechowywać zmienne różnych typów (tekstowe, liczbowe, logiczne...).
+  2. Ze względu na wspomniane wyżej ograniczenie mówiące o równej liczbie elementów, ramka danych może też być traktowana, na potrzeby prezentacji jej struktury oraz indeksowania (wybierania jej elementów) tak, jak dwuwymiarowa tablica.
+     - *Zmienne* traktowane są jako kolumny. Odpowiednie elementy poszczególnych zmiennych tworzą wiersze.
+     - W związku z tym elementy ramki danych możemy indeksować w sposób analogiczny do macierzy: `[indeksy_wierszów, indeksy_kolumn]`.
+     - Na ramkach danych możemy też wykonywać pewne operacje w sposób analogiczny jak na macierzach - o ile fragment ramki danych, jakim będziemy się posługiwać zawiera tylko zmienne tego samego typu (lub różnych typów, ale w sensowny sposób poddających się konwersji, np. liczby całkowite i liczby zmiennoprzecinkowe, czy czasem również wartości logiczne).
+     - Ramki danych mają nazwy wierszy. Możemy też odwoływać się do nazw *zmiennych* jako do nazw kolumn (funkcją `colnames()`, przy czym taki sam skutek będzie miało używanie funkcji `names()`).
+     
+Pewne zbiory danych w postaci ramek danych instalują się razem z R.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+mtcars
+str(mtcars)
+is.data.frame(mtcars)  # 'mtcars' jest ramką danych
+is.list(mtcars)  # ale jednocześnie jest też pełnoprawną listą!
+?mtcars  # możemy się czegoś o tym zbiorze dowiedzieć
+# w istocie z podstawową instalacją R otrzymujemy cały pakiet zawierający
+#   klasyczne zbiory danych
+?datasets
+```
+
+Większość danych, które wczytujemy do R, aby je analizować, też ma postać ramek danych. Np. dane z badania *DNiP*, które na ostatnich zajęciach widzieli Państwo w postaci oddzielnych wektorów, typowo zapisywane są właśnie jako kolumny jednej ramki danych. W tej postaci są też zapisane w pliku danych, który wczytuje kod poniżej.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+try(setwd("warsztat 2016.11.21"), silent = TRUE)
+nazwyObiektow = load("dane_2016.11.21.RData")
+nazwyObiektow
+str(DNiP)
+str(varLabels)
+```
+
+## Zapoznawanie się z ramkami danych
+
+Jeśli ramka danych jest mała, możemy oczywiście obejrzeć ją sobie całą wyświetloną na konsoli.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+str(varLabels)  # 54 obserwacje, 2 kolumny - to się jeszcze da obejrzeć
+varLabels
+```
+
+Jeśli ramka danych jest duża, nie jest to jednak dobry pomysł.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+str(DNiP)  # 3796 obserwacji, 54 kolumny - trochę za dużo, jak na oglądanie na konsoli
+DNiP
+```
+
+W takiej sytuacji, oprócz używanej już powyżej funkcji `str()`, z pomocą przychodzą nam funkcje `summary()`, `head()` oraz `View()`.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# parametry poziomu wartości/rozkłady, jak to już widywaliśmy
+summary(DNiP)
+# kilka pierwszych wierszy
+head(DNiP)
+# jeśli chcemy poprzeglądać zawartość ramki danych
+View(DNiP)
+```
+
+---
+
+#### Zadania
+
+1. Jaka jest wartość zmiennej *KR18* dla 2301 wiersza w ramce danych `DNiP`?
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# to jest miejsce na Twój kod
+```
+
+2. Jaka jest średnia z wyników trzech testów PISA dla jednostki obserwacji opisanej w wierszu 504 ramki danych `DNiP`?
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# to jest miejsce na Twój kod
+```
+
+3. Oblicz wektor, w którym dla każdej z obserwacji z ramki danych `DNiP` podana będzie średnia wyników danej osoby z trzech testów PISA.
+
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# to jest miejsce na Twój kod
+```
+
+---

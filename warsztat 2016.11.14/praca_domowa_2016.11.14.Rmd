@@ -1,0 +1,105 @@
+---
+title: "Praca domowa na 21 listopada 2016"
+author: "Tomasz Żółtak"
+date: "18 listopada 2016"
+output: html_document
+---
+
+# Przygotowanie do pracy
+
+W odróżnieniu od dotychczasowych prac domowych, ta nie będzie wymagać robienia niczego w R, lecz liczenia *z kartką papieru i ołówkiem*. Zachęcam Państwa do tego, by przy jej rozwiązywaniu nie korzystać z kalkulatorów, bo wartości zostały dobrane tak, aby wszystkie operacje arytmetyczne pozostawały w dziedzinie liczb całkowitych (do tego niezbyt dużych). Przy tym oczywiście mogą Państwo wykorzystać R aby sprawdzić uzyskane wyniki.
+
+Część poniedziałkowej kartkówki odnosząca się do obliczania parametrów będzie mieć analogiczną postać (i trudność obliczeń), z tym że będzie krótsza.
+
+# Zadanie
+
+Poniżej opisane są wartości zmiennej `X` w czterech małych zbiorowościach. Dla każdej z tych zbiorowości oblicz (gdzieś na kartce) i podaj wartości poznanych parametrów poziomu wartości i rozproszenia rozkładu zmiennej `X`.
+
+## Zbiorowość A
+
+| nr obserwacji | wartość zm X |
+|:-------------:|-------------:|
+|             1 |            2 |
+|             2 |            7 |
+|             3 |            2 |
+|             4 |           12 |
+|             5 |            2 |
+
+  * modalna (dominanta): **WPISZ ODPOWIEDŹ**
+  * minimum: **WPISZ ODPOWIEDŹ**
+  * maksimum: **WPISZ ODPOWIEDŹ**
+  * mediana: **WPISZ ODPOWIEDŹ**
+  * średnia: **WPISZ ODPOWIEDŹ**
+  * rozstęp: **WPISZ ODPOWIEDŹ**
+  * odch. przec. od mediany: **WPISZ ODPOWIEDŹ**
+  * wariancja: **WPISZ ODPOWIEDŹ**
+  * odchylenie std.: **WPISZ ODPOWIEDŹ**
+
+## Zbiorowość B
+
+| nr obserwacji | wartość zm X |
+|:-------------:|-------------:|
+|             1 |            7 |
+|             2 |           10 |
+|             3 |            1 |
+|             4 |            7 |
+|             5 |            7 |
+|             6 |           10 |
+
+  * modalna (dominanta): **WPISZ ODPOWIEDŹ**
+  * minimum: **WPISZ ODPOWIEDŹ**
+  * maksimum: **WPISZ ODPOWIEDŹ**
+  * mediana: **WPISZ ODPOWIEDŹ**
+  * średnia: **WPISZ ODPOWIEDŹ**
+  * rozstęp: **WPISZ ODPOWIEDŹ**
+  * odch. przec. od mediany: **WPISZ ODPOWIEDŹ**
+  * wariancja: **WPISZ ODPOWIEDŹ**
+  * odchylenie std.: **WPISZ ODPOWIEDŹ**
+
+## Zbiorowość C
+
+| nr obserwacji | wartość zm X |
+|:-------------:|-------------:|
+|             1 |           12 |
+|             2 |           12 |
+|             3 |            1 |
+|             4 |           12 |
+|             5 |           10 |
+|             6 |            1 |
+
+  * modalna (dominanta): **WPISZ ODPOWIEDŹ**
+  * minimum: **WPISZ ODPOWIEDŹ**
+  * maksimum: **WPISZ ODPOWIEDŹ**
+  * mediana: **WPISZ ODPOWIEDŹ**
+  * średnia: **WPISZ ODPOWIEDŹ**
+  * rozstęp: **WPISZ ODPOWIEDŹ**
+  * odch. przec. od mediany: **WPISZ ODPOWIEDŹ**
+  * wariancja: **WPISZ ODPOWIEDŹ**
+  * odchylenie std.: **WPISZ ODPOWIEDŹ**
+
+## Zbiorowość D
+
+| nr obserwacji | wartość zm X |
+|:-------------:|-------------:|
+|             1 |            2 |
+|             2 |            8 |
+|             3 |            8 |
+|             4 |           12 |
+|             5 |            9 |
+|             6 |            9 |
+
+  * modalna (dominanta): **WPISZ ODPOWIEDŹ**
+  * minimum: **WPISZ ODPOWIEDŹ**
+  * maksimum: **WPISZ ODPOWIEDŹ**
+  * mediana: **WPISZ ODPOWIEDŹ**
+  * średnia: **WPISZ ODPOWIEDŹ**
+  * rozstęp: **WPISZ ODPOWIEDŹ**
+  * odch. przec. od mediany: **WPISZ ODPOWIEDŹ**
+  * wariancja: **WPISZ ODPOWIEDŹ**
+  * odchylenie std.: **WPISZ ODPOWIEDŹ**
+
+# Czynności końcowe
+
+  - Zapisz wyniki swojej pracy (tj. plik "praca_domowa_2016.11.14.Rmd").
+  - Zmień jego nazwę na "moje_imie_i_nazwisko_2016.11.07.Rmd".
+  - Wyślij go na adres email: **zoltakt@is.uw.edu.pl**
