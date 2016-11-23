@@ -1,5 +1,5 @@
 ---
-title: "Praca domowa na 7 listopada 2016"
+title: "Praca domowa na 14 listopada 2016"
 author: "Tomasz Żółtak"
 date: "7 listopada 2016"
 output: html_document
@@ -9,9 +9,9 @@ output: html_document
 
   1. Otwórz w RStudio plik "praca_domowa_2016.11.07.Rmd" (np. menu: File -> Open file...).
      * Mogło się zdarzyć, że przy zapisywaniu pliku "praca_domowa_2016.11.07.Rmd" z programu pocztowego na dysk Twojego komputera do jego nazwy zostało dopisane dodatkowo rozszerzenie ".txt". W takim przypadku po otwarciu go w RStudio kod nie będzie się kolorował (RStudio uzna go za zwykły plik tesktsowy, a nie plik raportu R). Aby rozwiązać problem, mając taki plik otwarty w RStudio wybierz z menu: File -> Save As... i w okienku, w którym ma być podana nazwa pliku wpisz "praca_domowa_2016.11.07.Rmd", po czym kliknij "zapisz". Możesz potem skasować wersję pliku z dodanym rozszerzeniem ".txt".
-  3. Otwórz w RStudio plik "dane_2016.11.07.RData" (np. menu: File -> Open file...).
+  2. Otwórz w RStudio plik "dane_2016.11.07.RData" (np. menu: File -> Open file...).
      * Pojawi się okno zawierające pytanie, czy chcesz wczytać obiekty z pliku danych do przestrzeni roboczej - klikamy "tak".
-  4. Otwórz w przeglądarce internetowej plik "warsztat_2016.11.07.html", żeby móc korzystać z niego jako pomocy.
+  3. Otwórz w przeglądarce internetowej plik "warsztat_2016.11.07.html", żeby móc korzystać z niego jako pomocy.
 
 # Wczytywanie danych
 

@@ -9,12 +9,18 @@ output:
     toc_depth: 3
 ---
 
+Na dzisiejszych zajęciach zapoznamy się z dwoma nowymi strukturami danych - listami i ramkami danych.
+
 # Listy
 
 Listy są strukturą danych w pewien sposób podobną do wektorów - mają postać ciągu elementów. Jednak o ile element wektora musiał być pojedynczą wartością (liczbą, ciągiem znaków), o tyle element listy może być zupełnie dowolnym obiektem, np. wektorem, lub listą. Co więcej, poszczególne elementy listy nie muszą być tego samego typu. Z tego powdu listy mają kapitalne znaczenie przy programowaniu w R - umożliwiają zwracanie przez funkcje, np. służące do estymowania modeli statystycznych potencjalnie dużej ilości różnych informacji zawartych w obiekcie o skomplikowanej strukturze.
 
 ```{r comment="", prompt=TRUE, collapse=TRUE}
-x = list(1:10, letters[1:10], c(TRUE, FALSE), list(21:25, LETTERS[11:15]))
+x = list(1:10,
+         letters[1:10],
+         c(TRUE, FALSE),
+         list(21:25,
+              LETTERS[11:15]))
 x
 str(x)
 # listę możemy też utworzyć przy pomocy funkcji vector()
@@ -72,11 +78,12 @@ x[[2:3]]  # 3. element wektora będącego 2. elementem listy x!
 x[[2:2]]  # 2. elementem listy x
 # bo
 2:2  # wektor jednoelementowy
+x[[2]][[2]]
 ```
 
 ## Wybór elementów list poprzez nazwy
 
-Kolejną ważną własnością list odróżniającą ją od wektorów jest to, że elementy list można wybierać podając ich nazwę, wykorzystując operator `$`:
+Utwórzmy listę, której elementy mają nazwy.
 
 ```{r comment="", prompt=TRUE, collapse=TRUE}
 x = list(pierwszyElement = 1:10,
@@ -88,7 +95,19 @@ str(x)
 # zauważmy, że nazwa 4. elementu też została zainicjalizowana, tyle że jest
 #   pustym ciągiem znaków
 names(x)
-# teraz możemy wybrać elementy, które posiadają nazwy korzystając z operatora `$`
+```
+
+Ważną własnością list, odróżniającą ją od wektorów, jest to, że elementy list można wybierać podając ich nazwy. Możemy to zrobić korzystając z operatora `[]`, wewnątrz którego umieścimy wektor ciągów znaków z nazwami. Warto zwrócić uwagę, że (podobnie jak wtedy, gdy używamy do indeksowania wektora liczb całkowitych wskazującego na nr elementów), możemy w ten sposób uzyskać elementy ułożone w dowolnej, odpowiadającej nam kolejności. Tak jak i w innych przypadkach, gdy używamy operatora `[]` do indeksowania list, w efekcie zawsze otrzymamy listę.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+x["pierwszyElement"]  # to samo, co gdybyśmy wywołali x[1]
+x[c("drugiElement", "innaNazwa")]  # to samo, co gdybyśmy wywołali x[2:3]
+x[c("drugiElement", "innaNazwa", "pierwszyElement")]  # to samo, co gdybyśmy wywołali x[c(2, 3, 1)]
+```
+
+Do wyboru elementu poprzez nazwę możemy też wykorzystać operator `$`. Działa on podobnie do operatora `[[]]` w tym sensie, że przy jego pomocy możemy odnieść się tylko do jednego elementu, który nie jest zwracany jako lista (jednoelementowa), ale jako *zawartość* tego elementu.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
 x$pierwszyElement  # to samo, co gdybyśmy wywołali x[[1]]
 x$drugiElement  # to samo, co gdybyśmy wywołali x[[2]]
 x$innaNazwa  # to samo, co gdybyśmy wywołali x[[3]]
@@ -131,15 +150,17 @@ x$nowyElement = c(pi = pi, e = exp(1))
 x
 ```
 
-Jeśli chcemy przypisać wartość jednocześnie kilku elementom lisy (lub ew. wybieramy pojedynczy element, ale przy pomocy operatora `[]`, a nie `[[]]`), musimy pamiętać, że po prawej stronie operatora przypisania (`=`) musimy podać listę (o liczbie elementów równej liczbie elementów, którym chcemy przypisać wartość).
+Jeśli chcemy przypisać wartość jednocześnie kilku elementom listy (lub ew. wybieramy pojedynczy element, ale przy pomocy operatora `[]`, a nie `[[]]`), musimy pamiętać, że po prawej stronie operatora przypisania (`=`) musimy podać listę (o liczbie elementów równej liczbie elementów, którym chcemy przypisać wartość).
 
 ```{r comment="", prompt=TRUE, collapse=TRUE}
 y[c(3, 5)] = list(c("teraz", "to", "jest", "trzeci", "element"),
-              c("a", "to", "piąty"))
+                  c("a", "to", "piąty"))
 y
 # co stanie się teraz?
 y[4] = rep("?", 10)
 y
+rep("?", 10)
+as.list(rep("?", 10))
 ```
 
 ### Funkcje unlist() i as.list()
@@ -236,7 +257,7 @@ varLabels
 
 Jeśli ramka danych jest duża, nie jest to jednak dobry pomysł.
 
-```{r comment="", prompt=TRUE, collapse=TRUE}
+```{r eval=FALSE, comment="", prompt=TRUE, collapse=TRUE}
 str(DNiP)  # 3796 obserwacji, 54 kolumny - trochę za dużo, jak na oglądanie na konsoli
 DNiP
 ```
@@ -260,19 +281,31 @@ View(DNiP)
 
 ```{r comment="", prompt=TRUE, collapse=TRUE}
 # to jest miejsce na Twój kod
+DNiP$KR18[2301]
+DNiP[2301, "KR18"]
+DNiP[2301, colnames(DNiP) == "KR18"]
 ```
 
 2. Jaka jest średnia z wyników trzech testów PISA dla jednostki obserwacji opisanej w wierszu 504 ramki danych `DNiP`?
 
 ```{r comment="", prompt=TRUE, collapse=TRUE}
 # to jest miejsce na Twój kod
+mean(DNiP$READ_2009[504], DNiP$MATH_2009[504], DNiP$SCIE_2009[504])
 ```
 
-3. Oblicz wektor, w którym dla każdej z obserwacji z ramki danych `DNiP` podana będzie średnia wyników danej osoby z trzech testów PISA.
+3. Oblicz wektor o nazwie `srednie`, w którym dla każdej z obserwacji z ramki danych `DNiP` podana będzie średnia wyników danej osoby z trzech testów PISA.
 
 
 ```{r comment="", prompt=TRUE, collapse=TRUE}
 # to jest miejsce na Twój kod
+srednie = rowMeans(DNiP[, c("READ_2009", "MATH_2009", "SCIE_2009")])
+summary(srednie)
 ```
 
 ---
+
+# Na następne zajęcia
+
+## Praca domowa
+
+Zostanie nadesłana mailem.

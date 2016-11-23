@@ -101,5 +101,5 @@ Poniżej opisane są wartości zmiennej `X` w czterech małych zbiorowościach. 
 # Czynności końcowe
 
   - Zapisz wyniki swojej pracy (tj. plik "praca_domowa_2016.11.14.Rmd").
-  - Zmień jego nazwę na "moje_imie_i_nazwisko_2016.11.07.Rmd".
+  - Zmień jego nazwę na "moje_imie_i_nazwisko_2016.11.14.Rmd".
   - Wyślij go na adres email: **zoltakt@is.uw.edu.pl**

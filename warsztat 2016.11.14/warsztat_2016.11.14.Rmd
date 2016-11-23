@@ -202,8 +202,6 @@ absolutna     liczba osób,           =, !=,     V*          V           V      
 
 ** W przypadku zmiennych mierzonych na skalach ilorazowych, które przyjmują tylko wartości nieujemne analizowanie różnic ma często mniejszy sens, niż analizowanie ilorazów (stosunków). Np. załóżmy, że porównujemy zarobki dwóch osób w dwóch punktach czasu i że dla każdej z tych osób jej zarobki wzrastały w analizowanym okresie proporcjonalnie do inflacji - w efekcie stosunek zarobków tych dwóch osób będzie cały czas ten sam, chociaż różnica zarobków się zwiększy (zakładając, że inflacja była niezerowa).
 
-
-
 # Na następne zajęcia
 
 ## Praca domowa

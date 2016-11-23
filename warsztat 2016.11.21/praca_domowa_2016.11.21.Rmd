@@ -1,0 +1,188 @@
+---
+title: "Praca domowa na 28 listopada 2016"
+author: "Tomasz Żółtak"
+date: "22 listopada 2016"
+output: html_document
+---
+
+# Przygotowanie do pracy
+
+  1. Otwórz w RStudio plik "praca_domowa_2016.11.21.Rmd" (np. menu: File -> Open file...).
+     * Mogło się zdarzyć, że przy zapisywaniu pliku "praca_domowa_2016.11.21.Rmd" z programu pocztowego na dysk Twojego komputera do jego nazwy zostało dopisane dodatkowo rozszerzenie ".txt". W takim przypadku po otwarciu go w RStudio kod nie będzie się kolorował (RStudio uzna go za zwykły plik tesktsowy, a nie plik raportu R). Aby rozwiązać problem, mając taki plik otwarty w RStudio wybierz z menu: File -> Save As... i w okienku, w którym ma być podana nazwa pliku wpisz "praca_domowa_2016.11.21.Rmd", po czym kliknij "zapisz". Możesz potem skasować wersję pliku z dodanym rozszerzeniem ".txt".
+  2. Otwórz w RStudio plik "praca_domowa_2016.11.21.RData" (np. menu: File -> Open file...).
+     * Pojawi się okno zawierające pytanie, czy chcesz wczytać obiekty z pliku danych do przestrzeni roboczej - klikamy "tak".
+
+# Wczytywanie danych
+
+Jeśli plik "praca_domowa_2016.11.21.RData" zapisałeś/aś w tym samym folderze, co plik "praca_domowa_2016.11.21.Rmd" (który właśnie edytujesz), to poniższa linijka kodu pozwoli wczytać dane na potrzeby "zknitowania" raportu (gdybyś chciał(a) to zrobić).
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+load("praca_domowa_2016.11.21.RData")
+```
+
+Powyższego polecenia możesz też użyć, żeby wczytać dane zamiast otwierania pliku metodą przez menu: File -> Open file... Jednakże aby operacja ta się udała, aktywny folder R musi być ustawiony na ten, w którym znajduje się ten plik. Aby sprawdzić, jaki jest folder roboczy, wywołaj w konsoli funkcję `getwd()`. Możesz go zmienić, używając funkcji `setwd("ścieżka_do_folderu")`.
+
+Plik zawiera dwa wektory opisujące zmienne z pewnego dużego zbioru danych (5334 zmienne) - jeden zawiera nazwy tych zmiennych, drugi etykiety opisujace nieco bardziej szczegółowo zapisane w nich informacje.
+
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+str(nazwy)
+str(etykiety)
+```
+
+# Wyrażenia regularne
+
+Ta praca domowa ma na celu (niezwykle powierzchowne) zapoznanie Państwa z tematem wyrażeń regularnych. W ogólności jest to niezwykle przydatny wynalazek, pozwalający sprawnie wyszukiwać oraz ewentualnie modyfikować ciągi znaków. Analogiczne rozwiązania służące konstruowaniu wyrażeń regularnych implementowane są w podstawowych bibliotekach do właściwie wszystkich języków programowania, a czasem nawet w oprogramowaniu biurowym (np. Libre Office/Open Office wspiera wyrażenia regularne w postaci niemal identycznej jak ta, z którą będą się Państwo zaraz zapoznawać w ramach opcji "znajdź i zamień").
+
+Jednym z prostszych zastosowań wyrażeń regularnych w procesie analizy danych jest używanie ich do wyboru interesujących nas (dosyć dużych) bloków zmiennych w ramach zbiorów danych o bardzo dużej liczbie kolumn (jak np. zbiór, z które pochodzą wczytane wcześniej nazwy zmiennych). Poniżej opisane zostaną absolutnie podstawowe sposoby konstruowania wyrażeń regularnych, użyteczne właśnie do takich zastosowań.
+
+## Funkcje grep() i grepl()
+
+Funkcje `grep()` i `grepl()` przyjmują dwa argumenty - pierwszym jest wyrażenie regularne (w postaci ciągu znaków), które opisuje strukturę ciągów znaków, których szukamy, a drugim wektor ciągów znaków, do których to wyrażenie ma zostać porównane. Obie funkcje różnią się jedynie sposobem zwracania wyników:
+
+  - `grep()` zwraca wektor liczb opisujący indeksy tych elementów wektora, do których pasowało wyrażenie regularne,
+    - (używając dodatkowego argumentu `value` można też sprawić, aby `grep()` zwróciła nie indeksy, ale wartości tych elementów),
+  - `grepl()` zwraca wektor wartości logicznych o długości równej długości wektora będącego argumentem `grepl()`, w którym elementom pasującym do wyrażenia przypisana została wartość `TRUE`, a niepasującym `FALSE`.
+
+**Uwaga, w wyrażeniach regularnych co do zasady rozróżnia się wielkie i małe litery!**
+
+### Wyrażenia typu "zawiera dany ciąg znaków"
+
+Najprostszą postacią wyrażenia regularnego jest podanie fragmentu tekstu, które mają zawierać (w dowolnym miejscu) poszukiwane przez nas ciągi znaków.
+
+  1. Znajdźmy takie nazwy zmiennych, które zawierają w sobie fragment "PISA":
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+grep("PISA", nazwy, value = TRUE)
+```
+
+  2. Znajdźmy takie nazwy zmiennych, które zawierają w sobie fragment "PSEUDOEAP":
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+grep("PSEUDOEAP", nazwy, value = TRUE)
+```
+
+  3. Znajdźmy takie etykiety zmiennych, które zawierają w sobie fragment "wynik":
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+etykietyWynik = grep("wynik", etykiety, value = TRUE)
+str(etykietyWynik)  # okazuje się, że jest ich sporo
+```
+
+### Wyrażenia typu "zaczyna się od" i "kończy się na"
+
+Znaczenie zmiennych w zbiorach często opisane jest zestawem przedrostków i przyrostków. Jednocześnie zdarza się, że fragmenty tekstu takie same jak te przedrostki i przyrostki występują też w innych miejscach przeszukiwanych ciągów tekstów. Np. skądinąd wiemy, że nazwy zmiennych opisujących wyniki zebrane w drugiej rundzie naszego badania (było to badanie panelowe - te same osoby badano kilkakrotnie w kilku punktach czasu) rozpoczynają się od "A_". Jednak jeśli spróbujemy je wyszukać opisaną wyżej metodą:
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# tych zmiennych jest bardzo dużo, obejrzyjmy tylko 100 pierwszych
+grep("A_", nazwy, value = TRUE)[1:100]
+```
+
+Jak widać wyszukaliśmy w ten sposób znacznie więcej zmiennych - również te, w których (niezby specyficzny) ciąg "A_" występuje w innymi miejscu, niż na początku, np. "PISA_ZZ", czy "RAV_A_01".
+
+W wyrażeniach regularnych możemy na szczęście oznaczyć, że dany tekst ma wystąpić na początku, lub na końcu przeszukiwanych ciągów znaków, stosując znaki specjalne: "^" i "$".
+
+  1. Znajdźmy takie nazwy zmiennych, które zaczynają się od "A_":
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+drugaRunda = grep("^A_", nazwy, value = TRUE)
+str(drugaRunda)  # sporo tych zmiennych
+```
+
+  2. Znajdźmy nazwy zmiennych opisujące dane zebarane kwestionariuszem rodzica - ich nazwy zaczynają się od "KR":
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+grep("^KR", nazwy, value = TRUE)
+# a gdybyśmy nie zaznaczyli, że "KR" ma być na początku
+grep("KR", nazwy, value = TRUE)
+```
+
+  3. Znajdźmy nazwy zmiennych opisujące wyniki uzyskane przez uczniów na maturze z przedmiotów na poziomie podstawowym - ich nazwy kończą się na "_P":
+  
+```{r comment="", prompt=TRUE, collapse=TRUE}
+grep("_P$", nazwy, value = TRUE)
+# a gdybyśmy nie zaznaczyli, że "_P" ma być na początku
+grep("_P", nazwy, value = TRUE)
+```
+
+### Łączenie ze sobą warunków - alternatywa
+
+Jeśli chcemy wyszukać takie ciągi znaków, które zawierają pewien teskt lub pewien inny tekst, możemy uzyskać to w ramach jednego wyrażenia regularnego korzystając ze znaku "|".
+
+  1. Znajdźmy nazwy zmiennych opisujące wyniki uzyskane przez uczniów na maturze z poszczególnych przedmiotów, zarówno tych zdawanych na poziomie podstawowym (ich nazwy kończą się na "_P"), jak i tych zdawanych na poziome rozszerzonym (ich nazwy kończą się na "_R"):
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+grep("_P$|_R$", nazwy, value = TRUE)
+```
+
+### Łączenie ze sobą warunków - koniunkcja
+
+Jeśli chcemy wyszukać takie ciągi znaków, które spełniają jednocześnie kilka warunków, najprościej jest to zrobić wykonując operacje na wynikach wywołańa funkcji `grepl()` lub `grep()` przeprowadzonych oddzielnie dla każdego z tych warunków.
+
+Przykładowo załóżmy, że chcemy znaleźć zmienne opisujące wyniki testów umiejętności PISA wyskalowane estymatorem *pseudoEAP* (ich nazwy kończą się na "_PSEUDOEAP"), ale tylko tych, które zostały przeprowadzone w drugiej rundzie badania (ich nazwy rozpoczynają się od "A_").
+
+  1. Najbardziej naturalne jest posłużenie się funkcją `grepl()` - jako że zwraca ona wartości logiczne. Z tym że potem musimy jeszcze użyć uzyskanego wektora wartości logicznych do wybrania interesujących nas nazw zmiennych z wektora, który je przechowuje:
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+zmPISA2R =
+  grepl("_PSEUDOEAP$", nazwy) &
+  grepl("^A", nazwy)
+# póki co to jest cały czas wektor wartości logicznych
+str(zmPISA2R)
+# a my chcemy uzyskać nazwy
+zmPISA2R = nazwy[zmPISA2R]
+zmPISA2R
+```
+
+  2. Alternatywnie możemy posłużyć się funkcją `grep()` i wykonać na wynikach jej wywołania operację zwracającą nam część wspólną zbiorów, na co pozwala funkcja `intersect()`:
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+zmPISA2R = intersect(grep("_PSEUDOEAP$", nazwy, value = TRUE),
+                     grep("^A", nazwy, value = TRUE))
+zmPISA2R
+```
+
+Zauważmy, że jeśli tego potrzebujemy, możemy też stosować konstrukcje oparte na wykluczeniu pewnych elementów z wcześniej określonego szerszego zbioru elementów: `grepl(WARUNEK1, nazwy) & !grepl(WARUNEK2, nazwy)`, czy też równoważnie `setdiff(grep(WARUNEK1, nazwy), grep(WARUNEK2, nazwy))`.
+
+## Wiedzieć więcej
+
+Wyrażenia regularne mogą dużo więcej, ale nie mamy teraz czasu, by się tym zajmować. Gdyby kiedyś mieli Państwo potrzebę lub ochotę  lepiej poznać ich możliwości, więcej informacji o sposobie ich konstruowania i używania można uzyskać wywołując:
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+?regex
+?grep
+```
+
+# Zadania
+
+Wśród zmiennych, których nazwy są zapisane w wektorze `nazwy` znajdź przy pomocy funkcji `grep()` lub `grepl()` takie, które:
+
+  1. Opisują znormalizowane ekwikwantylowo wyniki egzaminów zewnętrznych - ich nazwy zawierają fragment "_EKWIKWANT_" (są 3 takie zmienne).
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# to jest miejsce na Twój kod
+```
+
+  2. Opisują informacje zebrane przy pomocy kwestionariusza wypełnianego przez dyrektora szkoły - ich nazwy zaczynają się od "KS" (jest 251 takich zmiennych)
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# to jest miejsce na Twój kod
+```
+
+  3. Opisują wyniki egzaminu zawodowego - ich nazwy rozpoczynają się od "EGZ_ZAW_" - lub egzaminu na stopień tehnika - ich nazwy rozpoczynają się od "EGZ_TECH_" (jest 13 takich zmiennych).
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# to jest miejsce na Twój kod
+```
+
+  4. Zmienne opisujące wskaźniki EWD szkoły - ich nazwy rozpoczynają się od "EWD_" - w zakresie przedmiotów matematyczno-pryzrodniczy - ich nazwy kończą sią na "_MAT_PRZYR" (jest 10 takich zmiennych).
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# to jest miejsce na Twój kod
+```
+
+# Czynności końcowe
+
+  - Zapisz wyniki swojej pracy (tj. plik "praca_domowa_2016.11.21.Rmd").
+  - Zmień jego nazwę na "moje_imie_i_nazwisko_2016.11.21.Rmd".
+  - Wyślij go na adres email: **zoltakt@is.uw.edu.pl**
