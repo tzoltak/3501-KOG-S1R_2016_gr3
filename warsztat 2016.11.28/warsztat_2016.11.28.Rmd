@@ -1,0 +1,295 @@
+---
+title: "Statystyka I z R<br/>Warsztat 8. Czynniki, import i eksport danych"
+author: "Tomasz Żółtak"
+date: "28 listopada 2016"
+output:
+  html_document:
+    css: ../styles.css
+    toc: TRUE
+    toc_depth: 3
+---
+
+Na dzisiejszych zajęciach poznamy jeszcze jeden typ danych - tzw. czynniki (*factor*) oraz podstawowe sposoby importu i eksportu danych (o postaci tabelarycznej) do/z R.
+
+# Czynniki (factor)
+
+Czynnik (*factor*) to w R specyficzna struktura danych, która może być wykorzystana do przechowywania zmiennych mierzonych na skali nominalnej lub porządkowej. Charakteryzuje się ona tym, że:
+
+  - w wielu sytuacjach zachowuje się w taki sposób, jakby była wektorem tekstowym,
+    - (choć formalnie w ogóle nie jest wektorem!),
+  - ma ściśle określony - w sensie zdefiniowany w ramach danego obiektu typu *factor* - zestaw wartości, które może przyjmować,
+    - w ramach obiektu przechowywana jest też kolejność, w jakiej te wartości mają być (w różnych sytuacjach) wyświetlane.
+  - od strony technicznej jest wektorem liczb całkowitych (większych od 0), przy czym każda liczba jest powiązana z etykietą (określaną mianem "poziomu" - *level*), będącą ciągiem znaków,
+    - użyta do indeksowania innego wektora (czy obiektu) wewnątrz operatora `[]` zachowuje się jak wektor liczb.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+x = letters[1:3]
+x
+y = factor(x)
+y
+str(y)
+# czynnik formalnie nie jest wektorem
+is.vector(x)
+is.vector(y)
+is.factor(y)
+# niemieniej w wielu sytuacjach zachowuje się jak wektor tekstowy
+y[2]
+y == "a"
+# definiując czynnik możemy podać explicite zestaw możliwych wartości
+z = factor(x, levels = letters[1:5])
+z
+```
+
+Czynniki odgrywają ważną rolę w kontekście konstruowania modeli regresji zawierających predyktory mierzone na skali nominalnej czy porządkowej, jednak tym nie będziemy się teraz zajmować. Ogólnie rzecz biorąc czynniki są użyteczne, gdy mamy przechodzimy do etapu modelowania i prezentacji wyników. Niemniej wcześniej, na etapie przetwarzania (przygotowywania) danych, zwykle prościej i bezpieczniej jest wykrzystywać zamiast nich wektory tekstowe.
+
+W tej chwili ważne jest dla nas, że przy tworzeniu ramek danych, czy to przy pomocy funkcji `data.frame()`, czy to w wyniku użycia klasycznych funkcji służących do importu danych (np. `read.csv()`) zmienne zawierające ciągi tekstów domyślnie konwertowane są na czynniki (*factory*).
+
+## Czynniki w funkcjach zwracających rozkłady
+
+Ponieważ obiekt będący czynnikiem przechowuje informacje o wszystkich wartościach, które może przyjąć dana zmienna, tworząc rozkład możemy wskazać, że pewne wartości przyjmują zerową częstość:
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+z
+table(z)
+# gdy zrobimy to samo na wektorze 'x', z którego utworzyliśmy 'z'
+x
+table(x)
+```
+
+Tworząc czynnik możemy uporządkować zestaw wartości zgodnie z naszymi potrzebami:
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# jeśli utworzymy rozkład na podstawie wektora tekstowego poszczególne wartości
+#   zostaną ułożone w kolejności alfabetycznej
+w = c("bardzo niezadowolony", "raczej niezadowolony",
+      "raczej zadowolony", "bardzo zadowolony")
+table(w)
+# w przypadku czynnika zachowana zostanie kolejność elementów podanych
+#   argumentem 'levels', kiedy był on tworzony
+wF = factor(w, levels = w)
+table(wF)
+```
+
+## Problemy z czynnikami
+
+Fakt, że czynnik ma na stałe zdefiniowany zestaw wartości może też czasem sprawiać nam trudności - typowo w sytuacji, gdy chcemy ten zestaw zmienić.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# czynnik 'y' ma "poziomy": "a", "b" i "c"
+y
+# spróbujmy przypisać mu wartość inną, niż te poziomy
+y[1] = "d"
+y  # wygenerowaliśmy brak danych!
+```
+
+Taką wartość musimy najpierw dodać do zestawu możliwych do przyjęcia wartości:
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+y = factor(y, levels = letters[1:4])
+y[1] = "d"
+y  # teraz zadziałało
+```
+
+Podobny problem występuje, gdy chcemy zmienić wartości (*poziomy*), które przyjmuje zmienna. Np. załóżmy, że w zdefiniowanej wcześniej zmiennej `wF` chcemy skrócić wykorzystywane teskty, aby tabela z rozkładem mogła zajmować mniej miejsca.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# tak się nie uda
+wF[wF == "bardzo niezadowolony"] = "b. niezadow."
+```
+
+Musimy się do tego zabrać inaczej - wykonać operację zmiany nie na samym czynniku, ale na przypisanym do niego zestawie wartości.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+levels(wF)[levels(wF) == "bardzo niezadowolony"] = "b. niezadow."
+levels(wF)[levels(wF) == "raczej niezadowolony"] = "r. niezadow."
+levels(wF)[levels(wF) == "raczej zadowolony"] = "r. zadow."
+levels(wF)[levels(wF) == "bardzo zadowolony"] = "b. zadow."
+# zobaczmy efekt
+wF
+table(wF)
+```
+
+## Konwersja czynników na wektory tekstowe
+
+Czynnik zawsze można zamienić na wektor tekstowy korzystając z fukcji `as.character()`.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+y
+as.character(y)
+```
+
+Tworząc ramkę danych możemy też skorzystać z argumentu `stringsAsFactors`, aby uniknąć konwersji wektorów tekstowych na czynniki.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+df1 = data.frame(cyfry = 1:5, litery = letters[1:5])
+df2 = data.frame(cyfry = 1:5, litery = letters[1:5], stringsAsFactors = FALSE)
+str(df1)
+str(df2)
+```
+
+---
+
+#### Zadania
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+l = c("zdecydowanie tak", "raczej tak", "raczej nie", "zdecydowanie nie")
+set.seed(20161128)  # aby następna linijka zawsze zwracała to samo
+x = sample(l, 50, replace = TRUE)
+```
+
+1. Skonweruje wektor `x` na czynnik w ten sposób, aby jego poziomy miały sensowną kolejność, a następnie (oblicz i) wyświetl rozkład `x`.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# to jest miejsce na Twój kod
+```
+
+2. Na podstawie czynnika `x` stwórz czynniki `y`, tak aby ten drugi zawierał tylko dwie wartości: "tak" (obserwacje, które w `x` miały wartośći "zdecydowanie tak" i "raczej tak") i "nie" (obserwacje, które w `x` miały wartośći "zdecydowanie nie" i "raczej nie"). Zapewne najwygodniej będzie wykorzystać w toku tych przekształceń konwersję czynnika `x` na wektor tekstowy.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# to jest miejsce na Twój kod
+```
+
+---
+
+# Import i eksport danych
+
+Spośród bardzo wielu dostępnych obecnie metod importu i eksportu (bardzo różnych rodzajów) danych do R, omówimy tu na przykładach tylko dwa najbardziej podstawowe:
+
+  - Wczytywanie i zapis z/do natywnego formatu R - plików .RData.
+  - Wczytywanie i zapis z/do plików tekstowych w formacie CSV.
+
+Aby zaimportować pliki w innych formatach można skorzystać z:
+
+  - Pakietu *rio*, który w istocie jest interfejsem integrującym dostęp do większości niżej opisanych pakietów w ramach dwóch prostych w użyciu funkcji: `import()` i `export()` (na podstawie rozszerzenia nazwy pliku starają się one domyśleć, jakiego rodzaju plik chcemy wczytać/zapisać i odpowiednio dobierają do tego celu funkcje z innych pakietów).
+  - Pliki arkuszów kalkulacyjnych MS Excel: pakiet *readxl*.
+  - Pliki innych szeroko wykorzystywanych pakietów statystycznych (np. SPSS, Stata): pakiety *foreign* i *haven*.
+  - Współpraca z bazami danych:
+    - Pakiet *DBI* i powiązane z nim pakiety powiązane z poszczególnymi bazami danych, np. *RMySQL*, *ROracle*, *RPostgreSQL*, *RSQLite*, *RSQLServer*.
+    - Pakiety *RODBC* i *RODBCext*.
+  - Interfejsy sieciowe i webscrapping: pakiety *rjson*, *XML*, *curl*, *httr* i inne.
+  
+## Format .RData
+
+Różne obiekty R możemy zapisać w natywnym, binarnym formacie plików R, o rozszerzeniu .RData. Oczywistą zaletą korzystania z tego rozwiązania jest możliwość zapisania w jednym pliku wielu obiektów różnych typów - zarówno ramek danych czy macierzy, jak i wektorów czy list - w dokładnie takiej postaci, w jakiej mamy je w danej chwili w pamięci programu. Wada - zapisane w ten sposób dane możemy potem otworzyć tylko w R.
+
+Do zapisania danych w pliku formatu .RData służy funkcja `save()`, której jako argumenty przekazujemy obiekty, które mają zostać zapisane, a jako dodatkowy argument, o nazwie *file* podajemy ciąg znaków z nazwą pliku (nazwa powinna zawierać rozszerzenie!). Poniższa kod zapisuje obiekty `x`, `y` i `df1` do pliku "moje dane.RData".
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+save(x, y, df1, file = "moje dane.RData")
+```
+
+Nazwa pliku może być po prostu jego nazwą - zostanie wedy zapisany w aktywnym katalogu (można sprawdzić, jaki jest, wywołując funkcję `getwd()`) - nazwę uzupełnioną o ścieżkę relatywną (względem aktywnego katalogu), do katalogu, w którym ma zostać zapisany plik np. "../nazwa katalogu/nazwa pliku.RData", lub ścieżkę absolutną, np. "D:/dane/moje dane.RData" (Windows) czy "/home/ja/dane/moje dane.RData" (Linux).
+
+Dane z plików .RData wczytujemy przy pomocy funkcji `load()`, tak jak to już zdarzało nam się robić.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# ta linijka usuwa wszystkie obiekty z pamięci programu R
+rm(list = ls())
+# zobaczmy, że teraz w prawym gónym panelu RStudio, w zakładce "Environment"
+#   nie mamy żadnych obiektów
+# wczytajmy więc jakieś obiekty z pliku
+load("moje dane.RData")
+```
+
+## Pliki tekstowe w formacie CSV
+
+Pliki tekstowe w formacie CSV są dosyć szeroko wykorzystywanym sposobem zapisywania danych o strukturze tabelarycznej. Choć mają liczne ograniczenia (brak możliwości jakiegokolwiek adnotowania danych), ich niewątpliwą zaletą jest przenośność (choć i tu mogą występować pewne trudności, związane np. z kodowaniem znaków) i możliwości obejrzenia ich zawartości bez użycia żadnego specjalistycznego oprogramowania. Choć ogólnie przyjęta nazwa formatu wskazuje na wykorzystanie w roli separatora pól przecinka (*Comma Separated Values*), w praktyce wykorzystywane są różne konwencje zapisu. Dwie najczęściej wykorzystywane to:
+
+  1. Separator pól: ",", separator dziesiętny przy zapisie liczb: "." (typowo stosowany np. w krajach anglosaskich).
+     - Do wczytywania/zapisu daych z/do toakich plików służą funkcje `read.csv()` i `write.csv()`.
+  2. Separator pól: ";", separator dziesiętny przy zapisie liczb: "," (typowo stosowany np. w Polsce).
+     - Do wczytywania/zapisu daych z/do takich plików służą funkcje `read.csv2()` i `write.csv2()`.
+
+### Wczytywanie plików CSV
+
+Aby wczytać dane przy pomocy funkcji `read.csv()` czy `read.csv2()` zwykle wystarczy podanie jako argumentu nazwy pliku (razem z rozszerzeniem!). Efekt działania funkcji przypisujemy oczywiście do jakiegoś obiektu.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+dochody = read.csv2("warsztat 2016.11.28/dochody budżetowe gmin 2014.csv")
+str(dochody)
+```
+
+Zauważmy, że:
+
+  - Kolumna zawierający ciągi znaków została skonwertowana na czynnik (*factor*).
+  - Nazwy kolumn zostały zmodyfikowane - spacje zostały zastąpione kropkami.
+  - Najwyraźniej mamy problem z kodowaniem znaków.
+
+Problem z kodowaniem znaków typowo polega na tym, że pracując w systemie Windows próbujemy wczytać plik zapisany w kodowaniu "UTF-8" (tymczasem R domyślnie zakłada, że jest on zapisany w kodowaniu systemowym, a więc "windows-1250"), lub pracując w innym systemie operacyjnym próbujemy wczytać plik zapisany pod Windows w kodowaniu systemowym. W naszym przypadku mamy do czynienia z tą pierwszą możliwością.
+
+Zacowanie funkcji `read.csv2()` (i `read.csv()`) w każdym z trzech powyżej opisanych aspektów możemy zmienić wywołując ją z odpowiednimi argumentami:
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+dochody = read.csv2("warsztat 2016.11.28/dochody budżetowe gmin 2014.csv",
+                    stringsAsFactors = FALSE,
+                    check.names = FALSE,
+                    encoding = "UTF-8")
+str(dochody)
+```
+
+Zauważmy, że do zmiennych ramki danych, które mają *niekanoniczne* nazwy - np. zawierające spacje, cały czas możemy uzyskać dostęp, jednak korzystając w tym celu z operatora `$` musimy ująć te nazwy w cudzysłów:
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# polskie znaki nie muszą stanowić przeszkody
+summary(dochody$ogółem)
+# jeśli nazawa zawiera spację trzeba użyć cudzysłowu
+summary(dochody$"udział w PIT")
+```
+
+Niemniej generalnie używanie w nazwach zmiennych ramek danych spacji, polskich znaków, czy znaków specjalnych jest złym nawykiem i może prowadzić do problemów.
+
+### Zapis plików CSV
+
+Funkcje `write.csv()` czy `write.csv2()` wymagają wywołania z większą liczbą argumentów. Minimalnie są one dwa: nazwa obiektu (typowo ramki danych lub macierzy), który zawiera dane do zapisania oraz ciąg znaków z nazwą pliku. Co do zasady 
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# przygotujmy nieco zmieniony obiekt z danymi
+dochody2 = dochody[1:10, ]
+dochody2[1, 3:5] = NA
+# i zapiszmy go
+write.csv2(dochody2, "warsztat 2016.11.28/zapisany plik.csv")
+```
+
+Zwróćmy uwagę, że:
+
+  - Do zapisanego pliku dodana została na początku dodatkowa kolumna zawierająca nazwy wierszy (jej nazwa jest pusta).
+  - Braki danych zapisane zostały jako "NA".
+  - Domyślnie wszystkie ciągi znaków zostały ujęte w cudzysłowy.
+  - Plik został zapisany w kodowaniu systemowym (choć tego tak łatwo nie widać).
+  
+Zachowania te możemy zmienić (typowo chcemy zmienić pierwsze i drugie), używając odpowiednich argumentów:
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+write.csv2(dochody2, "warsztat 2016.11.28/zapisany plik.csv",
+           row.names = FALSE,
+           na = "",
+           quote = FALSE,
+           fileEncoding = "UTF-8")
+```
+
+
+---
+
+# Zadanie
+
+W zbiorze danych wczytanym z pliku "dochody budżetowe gmin 2014.csv" kolumna "nazwa gminy" zawiera również informację o jej rodzaju, tzn. czy jest to gmina miejska (1), wiejska (2), czy miejsko-wiejska (3). Informacja ta podana jest w postaci cyfry umieszczonej w nawiasie za nazwą gminy.
+
+Korzystając z wiadomości zdobytych na poprzednich zajęciach oraz przy rozwiązywaniu pracy domowej dodaj do ramki danych `dochody` nową kolumnę o nazwie "rodzaj", która będzie zawierać wartości "miejska", "wiejska", lub "miejsko-wiejska", przypisane na podstawie informacji zawartych w kolumnie "nazwa gminy".
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# to jest miejsce na Twój kod
+```
+
+Zapisz zawartość obiektu `dochody` do pliku CSV. Następnie sprawdź, czy możesz go otworzyć w arkuszu kalkulacyjnym i czy wszystko wyświetla się tam prawidłowo.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# to jest miejsce na Twój kod
+```
+
+---
+
+# Na następne zajęcia
+
+## Praca domowa
+
+Zostanie nadesłana mailem.
