@@ -141,12 +141,23 @@ x = sample(l, 50, replace = TRUE)
 
 ```{r comment="", prompt=TRUE, collapse=TRUE}
 # to jest miejsce na Twój kod
+x = factor(x, levels = l)
+table(x)
 ```
 
 2. Na podstawie czynnika `x` stwórz czynniki `y`, tak aby ten drugi zawierał tylko dwie wartości: "tak" (obserwacje, które w `x` miały wartośći "zdecydowanie tak" i "raczej tak") i "nie" (obserwacje, które w `x` miały wartośći "zdecydowanie nie" i "raczej nie"). Zapewne najwygodniej będzie wykorzystać w toku tych przekształceń konwersję czynnika `x` na wektor tekstowy.
 
 ```{r comment="", prompt=TRUE, collapse=TRUE}
 # to jest miejsce na Twój kod
+y = as.character(x)
+y[y == "zdecydowanie tak" | y == "raczej tak"] = "tak"
+y[y %in% c("zdecydowanie nie", "raczej nie")] = "nie"
+y = factor(y)
+
+y = x
+levels(y)[levels(y) %in% c("zdecydowanie tak", "raczej tak")] = "tak"
+levels(y)[levels(y) %in% c("zdecydowanie nie", "raczej nie")] = "nie"
+
 ```
 
 ---

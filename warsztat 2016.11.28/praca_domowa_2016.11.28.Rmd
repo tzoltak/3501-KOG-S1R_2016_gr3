@@ -1,0 +1,71 @@
+---
+title: "Praca domowa na 5 grudnia 2016"
+author: "Tomasz Żółtak"
+date: "3 grudnia 2016"
+output: html_document
+---
+
+# Przygotowanie do pracy
+
+Otwórz w RStudio plik "praca_domowa_2016.11.28.Rmd" (np. menu: File -> Open file...).
+
+  * Mogło się zdarzyć, że przy zapisywaniu pliku "praca_domowa_2016.11.28.Rmd" z programu pocztowego na dysk Twojego komputera do jego nazwy zostało dopisane dodatkowo rozszerzenie ".txt". W takim przypadku po otwarciu go w RStudio kod nie będzie się kolorował (RStudio uzna go za zwykły plik tesktsowy, a nie plik raportu R). Aby rozwiązać problem, mając taki plik otwarty w RStudio wybierz z menu: File -> Save As... i w okienku, w którym ma być podana nazwa pliku wpisz "praca_domowa_2016.11.28.Rmd", po czym kliknij "zapisz". Możesz potem skasować wersję pliku z dodanym rozszerzeniem ".txt".
+
+# Zadania
+
+## 1. Wczytanie danych
+
+Wczytaj do ramki danych o nazwie `dane` zawartość pliku "przeciętne miesięczne wynagrodzenia brutto.csv" (uwaga, plik jest zapisany w kodowaniu UTF-8).
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# to jest miejsce na Twój kod
+```
+
+##  2. Oznaczenie miast na prawach powiatu
+
+Wiersze wczytanego zbioru opisują poszczególne polskie powiaty. Wśród nich można wyróżnić specyficzną grupę: miasta na prawach powiatu. Są to powiaty składające się z tylko jednej gminy miejskiej (władze takich miast łączą w sobie kompetencje odpowiednich władz gminy i władz powiatu). Co do zasady obejmują one najWiększe miasta (oraz miasta, które przed 1998 r. były stolicami województw). We wczytanym zbiorze nie mamy zmiennej, która pozwoliłaby nam łatwo odróżnić miasta na prawach powiatu od *normalnych* powiatów, ale te pierwsze są wyróżnione poprzez sposób zapisu ich nazwy w zmiennej `nazwa_powiatu`. Nazwy miast na prawach powiatu zaczynają się od ciągu znaków "m. ".
+  
+Korzystając z wyrażeń regularnych lub z funkcji `substr()` dołącz do ramki danych `dane` nową zmienną o nazwie `mnpp`, która będzie czynnikiem (*factor*) o dwóch poziomiach: "N" (*normalne* powiaty) i "T" (miasta na prawach powiatu).
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# to jest miejsce na Twój kod
+```
+
+## 3. Obliczenie średnich w podgrupach
+
+Oblicz średnie miesięczne wynagrodzenie brutto w miastach na prawach powiatu w poszczególnych latach oraz średnie miesięczne wynagrodzenie brutto w pozostałych powiatach w poszczególnych latach, i przypisz wyniki do ramki danych, która będzie się składać z pięciu kolumn: "mnpp", "rok2003", "rok2007", "rok2011", "rok2015" i z dwóch wierszy, z których w pierwszym podane będą odpowiednie wartości (zmiennej "mnpp" i odpowiednich średnich) dla miast na prawach powiatu, a w drugim dla pozostałych powiatóW.
+  
+Pomocne może być przygotowanie najpierw macierzy zawierającej odpowiednie średnie, poprzez połączenie ze sobą wyników działania funkcji `colMeans` uruchomionej na odpowiednio wybranych częściach ramki danych `dane`, a dopiero następnie utworzenie ramki danych z dwuelementowego wektora `mnpp` i obliczonej przed chwilą macierzy. 
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# to jest miejsce na Twój kod
+```
+
+## 4. Analiza wyników
+
+Oblicz:
+
+  1. różnice pomiędzy średnimi miesięcznymi wynagrodzeniami brutto w miastach na prawach powiatu a średnimi miesięcznymi wynagrodzeniami brutto w pozostałych powiatach dla poszczególnych lat,
+  2. stosunek średnich miesięcznych wynagrodzeń brutto w miastach na prawach powiatu w porównaniu do średnich miesięcznych wynagrodzeń brutto w pozostałych powiatach dla poszczególnych lat.
+
+Następnie zmodyfikuj opis wyników poniżej, usuwając nieadekwatne sformułowania.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# to jest miejsce na Twój kod
+```
+
+Różnica pomiędzy średnimi miesięcznymi wynagrodzeniami brutto w miastach na prawach powiatu a średnimi miesięcznymi wynagrodzeniami brutto w pozostałych powiatach w latach 2003-2015 **zwiększała się/zmniejszała się/pozostawała na w przybliżeniu takim samym poziomie**.
+
+Jednocześnie stosunek tych dwóch średnich w tym samym okresie **zwiększał się/zmniejszał się/pozostawał na w przybliżeniu takim samym poziomie**.
+
+##  5. Refleksja metodologiczna
+
+Zastanów się, który z dwóch obliczonych przed chwilą wskaźników - różnica, czy stosunek średnich wynagrodzeń - Twoim zdaniem bardziej adekwatnie opisuje to, jak duża jest siła nabywcza mieszkańców miast na prawach powiatu w porównaniu do mieszkańców pozostałych powiatów? Jeśli jesteś w stanie, poniżej napisz krótko, dlaczego tak uważasz.
+
+Lapeszym wskaźnikiem jest **różnica/stosunek**.
+
+# Czynności końcowe
+
+  - Zapisz wyniki swojej pracy (tj. plik "praca_domowa_2016.11.28.Rmd").
+  - Zmień jego nazwę na "moje_imie_i_nazwisko_2016.11.28.Rmd".
+  - Wyślij go na adres email: **zoltakt@is.uw.edu.pl**

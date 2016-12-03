@@ -49,37 +49,31 @@ c(-1, 1, NA) > 0
 
 ## Braki danych a wybieranie elementów wektora (macierzy)
 
-Jeśli wybieramy elementy wektora (macierzy, innego rypu obiektu) wykorzystując porównanie (czy ogólnie rzecz biorąc wektor wartości logicznych), musimy mieć na uwadze, że zwrócone zostaną **nie** te elementy, dla których wektor użyty do indeksowania (wyboru) przyjmuje wartości `TRUE` (choć zapewne tego właśnie byśmy oczekiwali) ale te, dla których nie przyjmuje on wartości `FALSE`. Tak więc zwrócone zostaną wszystkie elementy, dla których wekotr indeksujący przyjmuje wartości `TRUE` lub `NA`.
+Jeśli wybieramy elementy wektora (macierzy, innego rypu obiektu) wykorzystując porównanie (czy ogólnie rzecz biorąc wektor wartości logicznych), musimy mieć na uwadze, że zwrócone zostaną **nie** tylko te elementy, dla których wektor użyty do indeksowania (wyboru) przyjmuje wartości `TRUE` (choć zapewne tego właśnie byśmy oczekiwali). Elementy, dla których wektor wykorzystany do indeksowania zawierał braki danych, również zostaną wybrane i zwrócone, z tym że ich wartości zostaną zmienione na braki danych!
 
 ```{r comment="", prompt=TRUE, collapse=TRUE}
-x = c(1:10, NA)
+x = c(1:10, NA, 12)
 x
-x > 5
-x[x > 5]  # zwraca również element z brakie danych!
+x > 6
+y = 1:12
+y[x > 6]  # zwraca 6 elementów, ale jede jest brakiem danych!
 ```
 
-Ponieważ typowo (a przynajmniej tak wynika z mojego osobistego doświadczenia) nie prowadzi to do wyniku, który chcielibyśmy osiągnąć, musimy pamiętać o zastosowaniu w takim przypadku środków zaradczych: użycia funkcji `is.na()` lub `na.omit()`, albo operatora `%in%`.
+Ponieważ często może to prowadzić do osiągnięcia w toku dalszych analiz nie tego, czego chcemy, musimy pamiętać o zastosowaniu w takim przypadku środków zaradczych: użycia funkcji `is.na()`, albo operatora `%in%`.
 
   1. Użycie funkcji `is.na()` w ramach składni postaci `x[warunek_odnoszący_się_do_x & !is.na(x)]`:
 ```{r comment="", prompt=TRUE, collapse=TRUE}
 x
 is.na(x)
-x[x > 5 & !is.na(x)]  # teraz dostajemy to, czego typowo oczekujemy
+y[x > 6 & !is.na(x)]  # teraz dostajemy to, czego typowo oczekujemy
 ```
 
-  2. Użycie funkcji `na.omit()` w celu usunięcia z wektora elementów z brakami danych.
-```{r comment="", prompt=TRUE, collapse=TRUE}
-x
-y = na.omit(x)
-y
-y[y > 5]
-```
+  2. Użycie operatora `%in%`. Operator `%in%` dla każdej wartości wektora podanego przed operatorem zwraca `TRUE`, jeśli występuje ona wśród elementów wektora podanego po operatorze lub `FALSE` w przeciwnym wypadku. Widać jednak, że aby móc postąpić w ten sposób, musimy być w stanie podać wyczerpujący zbiór wartości, które mogą przyjąć te elementy wektora, które chcemy wybrać.
 
-  3. Użycie operatora `%in%`. Operator `%in%` dla każdej wartości wektora podanego przed operatorem zwraca `TRUE`, jeśli występuje ona wśród elementów wektora podanego po operatorze lub `FALSE` w przeciwnym wypadku. Widać jednak, że aby móc postąpić w ten sposób, musimy być w stanie podać wyczerpujący zbiór wartości, które mogą przyjąć te elementy wektora, które chcemy wybrać.
 ```{r comment="", prompt=TRUE, collapse=TRUE}
 x
-x %in% 6:10  # po operatorze musimy podać zbiór konkretnych wartości
-x[x %in% 6:10]
+x %in% 7:12  # po operatorze musimy podać zbiór konkretnych wartości
+y[x %in% 7:12]
 ```
 
 ## Specjalne wartości liczbowe
@@ -186,9 +180,15 @@ Różnica średnich wyników pomiędzy badanymi posiadającymi lepiej a badanymi
 
 ```{r comment="", prompt=TRUE, collapse=TRUE}
 # to jest miejsce na Twój kod
+m = median(parEdu, na.rm = TRUE)
+mean(scorePISAMath[parEdu <= m & !is.na(parEdu)], na.rm = TRUE)
 
+maska = is.na(parEdu)
+parEdu = na.omit(parEdu) # parEdu = parEdu[!maska]
+scorePISAMath = scorePISAMath[!maska]
 
-
+m = median(parEdu)
+mean(scorePISAMath[parEdu <= m])
 ```
 
 # Czynności końcowe
