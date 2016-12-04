@@ -1,0 +1,275 @@
+---
+title: "Statystyka I z R<br/>Warsztat 9. Przekształcanie danych przy pomocy pakietu dplyr"
+author: "Tomasz Żółtak"
+date: "28 listopada 2016"
+output:
+  html_document:
+    css: ../styles.css
+    toc: TRUE
+    toc_depth: 3
+---
+
+Na dzisiejszych zajęciach poznamy sposoby przekształcania danych - w tym różnorodnych metod ich agregacji - przy pomocy pakietu *dplyr*.
+
+# Wczytywanie danych
+
+Wracamy do znanych już nam danych z badania *DNiP*, które wczytamy z pliku w formacie RData.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+try(setwd("warsztat 2016.12.05"), silent = TRUE)
+nazwyObiektow = load("dane_2016.12.05.RData")
+```
+
+Załadujmy też pakiet *dplyr* (a wcześniej upewnijmy się, że jest zainstalowany i ew. go doinstalujmy).
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+if (!("dplyr" %in% installed.packages()[, 1])) {
+  install.packages("dplyr")
+}
+library(dplyr)
+```
+
+# Pakiet dplyr - najważniejsze informacje
+
+  - Element [*tidyverse*](https://github.com/tidyverse/tidyverse).
+    - Dobrze zintegrowany z innymi pakietami, pomocnymi przy imporcie, czyszczeniu i przekształcaniu danych w R (np.może być wykorzystany jako backend do SQLowej bazy danych).
+  - Oferuje bardzo duże możliwości przekształcania danych przechowywanych w postaci tabelarycznej (ramek danych, macierzy).
+    - Wykorzystuje przy tym swoją własną strukturę danych, tzw. *tibble*. Na nasze potrzeby możemy o nim myśleć jako o ramce danych (choć w pewnych sytuacjach - np. gdy poprosimy o jego wyświetlenie na konsoli - zachowuje się nieznacznie inaczej i oferuje pewen dodatkowe możliwości). W materiałach do dzisiejszego warsztatu będę zwykle - formalnie niepoprawnie - pisał o obiektach typu *tibble* po prostu jako o ramkach danych.
+    - Funkcje pakietu *dplyr* zaakceptują jako argument zarówna obiekt typu *tibble*, jak i ramkę danych, czy macierz, jednak zwrócą zawsze obiekt typu *tibble*.
+    - Obiekt typu *tibble* zawsze możemy skonwertować na całkiem typową ramkę danych używając funkcji `as.data.frame()`.
+  - Wykorzystuje spójną konwencję nazewniczą i składniową.
+    - Pewne elementy składni nieco odmienne niż w typowych funkcjach R (ale można się łatwo przyzwyczaić).
+  - Umożliwia wykorzystanie operatora `%>%` do tworzenia ciągów przekształceń (tzw. *pipe*) wykonywanych na jednej ramce danych.
+  - *Ściąga* zawierające skrótowy opis funkcjonalności pakietu *dplyr* znajduje się [tu](https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf).
+
+# Funkcja summarise()
+
+Jedną z zasadniczych funkcjonalności, jakie oferuje pakiet *dplyr* jest łatwe tworzenie zestawień statystyk, charakteryzujących analizowane przez nas dane. Podstawową funkcją, która do tego służy jest `summarise()`. W najprostszej sytuacji zwróci ona *tibble* (ramkę danych) zawierającą jeden wiersz i zmiennymi opisującymi wartości tych parametrów tych zmiennych, które nakazaliśmy obliczyć przy pomocy następnych argumentów:
+
+```{r eval=FALSE, comment="", prompt=TRUE, collapse=TRUE}
+summarise(ramka_danych, nazwa_zmiennej_w_wynikowej_ramce_danych = funcja(zmienna_w_przekazywanej_ramace_danych))
+```
+
+Np. chcąc obliczyć średnią i odchylenie standardowe zmiennej `MATH_2009` (użyjemy tu funkcji `sd()`, co jest o tyle uzasadnione, że analizowany zbiór opisuje wyniki badania na próbie losowej) możemy użyć wywołania:
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+parametry = summarise(DNiP, średnia = mean(MATH_2009), odch.std. = sd(MATH_2009))
+parametry
+```
+
+## Obliczanie tych samych parametrów dla wielu zmiennych jednocześnie
+
+Jeśli ten sam zestaw parametrów chcemy obliczyć dla wielu zmiennych jednocześnie, możemy wię w tym celu posłużyć funkcją `summarise_all()`. Jako pierwszy argument podajemy jej ramkę danych, a jako drugi argument wywołanie specjalnej funkcji `funs()`, do której przekazujemy funkcje służące do obliczenia interesujących nas parametrów. Jeśli podamy kolejne argumenty, zostaną one przekazane do funkcji obliczjących parametry, a więc np. przy wywołaniu kodu poniżej funkcje `mean()` i `sd()` będą wywoływane z argumentem `na.rm = TRUE`.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+summarise_all(DNiP, funs(srednia = mean, odch.std. = sd), na.rm = TRUE)
+```
+
+Zauważmy, że w zwracanej ramce dnaych nazwy zmiennych zostały stworzone przez doklejenie do nazwy zmiennej, dla której obliczony został parametr nazwy podanej przy funkcji obliczającej ten parametr w ramach wywołania funkcji `funs()`.
+
+Jeśli nie chcemy użyć wszystkich zmiennych, lecz tylko niektóre z nich (powyżej mogliśmy zobaczyć, że niektóre zmienne w ramach ramki danych `DNiP` nie nadają się do obliczania na nich średniej, czy odchylenia standardowego), możemy z kolei wukorzystać funkcję `summarise_at()`, której jako dodatkowy - drugi w kolejności - argument podajemy wyrażenie pozwalające określić, o które zmienne nam chodzi. Możemy to zrobić na kilka sposóbów:
+
+  1. Podając nazwy zmiennych w postaci wektora:
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+summarise_at(DNiP, c("MATH_2009", "READ_2009", "SCIE_2009"),
+             funs(srednia = mean, odch.std. = sd), na.rm = TRUE)
+```
+
+  2. Korzystając z funkcji `var()`, której jako argumenty podajemy nazwy kolumny, tak jakby były one obiektami (nie jako ciągi znaków - ujęte w cudzysłowy -  ale jak obiekty):
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+summarise_at(DNiP, vars(MATH_2009, READ_2009, SCIE_2009),
+             funs(srednia = mean, odch.std. = sd), na.rm = TRUE)
+```
+
+  3. Korzystając z funkcji `var()` w połączeniu ze specjalnymi funkcjami apkietu *dplyr*, które  pozwalają łatwo wybrać zmienne w ramce danych na podstawie ich nazw:
+     - `contains("tekst")` - wszystkie zmienne, których nazwa zawiera ciąg znaków "tekst",
+     - `ends_with("tekst")` - wszystkie zmienne, których nazwa kończy się ciągiem znaków "tekst",
+     - `starts_with("tekst")` - wszystkie zmienne, których nazwa kończy się ciągiem znaków "tekst",
+     - `matches("wyrażenie regularne")` - wszystkie zmienne, których nazwa pasuje do podanego wyrażenia regularnego.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+summarise_at(DNiP, vars(ends_with("_2009")),
+             funs(srednia = mean, odch.std. = sd), na.rm = TRUE)
+```
+
+## Analizy w podgrupach
+
+Bardzo użyteczną cechą pakietu *dplyr* jest możliwość bardzo łatwego obliczenia takich statystyk opisowych w ramach podgrup obserwacji. Jest to możliwe dzięki temu, że obiektom typu *tibble* mogą zostać przypisane pogrupowanie.
+
+Aby podzielić ramkę danych na podgrupy wykorzystujemy funkcję `group_by()`, która jako pierwszy argument przyjmuje ramkę danych, a jako kolejne zmienne, na podstawie których ma zostać dokonane pogrupowanie (możemy podać je jako nazwy ujęte w cudzysłowy, lub tak, jakby były obiektami). Np. poniższy kod przypisuje do obiektu `DNiP` pogrupowanie ze względu na typ szkoły. Jeśli na takim pogrupowanym obiekcie wywołamy funkcję `summarise()` (lub pokrewnych, opisanych powyżej), parametry zostaną obliczone oddzielnie dla każdej grupy.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+DNiP = group_by(DNiP, SCHOOL_TYPE)
+parametry = summarise_at(DNiP, c("MATH_2009", "READ_2009", "SCIE_2009"),
+                         funs(srednia = mean, odch.std. = sd), na.rm = TRUE)
+parametry
+# jeśli chcemy obejrzeć wyniki jako klasyczną ramkę danych
+as.data.frame(parametry)
+```
+
+Jeśli chcemy zdjąć z obiektu grupowanie, możemy użyć funkcji `ungroup()`.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+DNiP = ungroup(DNiP)
+```
+
+# Operator %>%
+
+Operator %>% pozwala w łatwy i wygodny sposób łączyć ze sobą kolejne operacje wykonywane na tym samym obiekcie - typowo ramce danych (lub *tibble'u*). Działa on w ten spsób, że:
+
+```{r eval=FALSE, comment="", prompt=TRUE, collapse=TRUE}
+x %>% f(y)
+# jest równoważne
+f(x, y)
+# a więc
+g(x) %>% f(y)
+# jest równoważne
+f(g(x), y)
+```
+
+Np. przeprowadzoną przed chwilą operację grupowania i obliczenia statystyk opisowych moglibyśmy zapisać przy użyciu operatora `%>%` jako:
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+group_by(DNiP, SCHOOL_TYPE) %>%
+  summarise_at(c("MATH_2009", "READ_2009", "SCIE_2009"),
+               funs(srednia = mean, odch.std. = sd), na.rm = TRUE) %>%
+  as.data.frame()
+```
+
+Chociaż przy prostych operacjach, jakie tutaj wykonujemy, nie widać w pełni zalet używania operatora `%>%`, jednak w przypadku skomplikowanych ciągów operacji przekształcania danych jego wykorzystanie bardzo pozytywnie wpływa na czytelność kodu i łatwość zrozumienia, jakie operacje na danych są wykonywane.
+
+# Sortowanie obserwacji i wybieranie obserwacji na podstawie pozycji
+
+Powyżej przy użyciu funkcji `summarise()` (i pokrewnych) obliczaliśmy parametry rozkładu wybranych zmiennych, ale w podobny sposób możemy dokonywać również szeregu innych operacji. Załóżmy, że chcemy uzyskać ramkę danych, w której dla każdej szkoły podana będzie płeć ucznia o najwyższym w ramach tej szkoły wyniku testu PISA w dziedzinie matematyki. W tej samej ramce chcielibyśmy też mieć informację, jakiego typu była dana szkoła. W tym celu będziemy musieli:
+
+  1. Posortować zbiór danych ze względu na wyniki testu PISA w dziedzinie matematyki.
+     - Posłużymy się w tym celu funkcją `arrange()`.
+  2. Przypisać do zbioru danych pogrupowanie ze względu na zmienną `SCHOOL_ID` oraz - aby nie utracić informacji o wartościach tej zmiennej przy wywoływaniu funkcji `summarise()` - ze względu na zmienną `SCHOOL_TYPE`.
+     - Analogicznie jak już to robiliśmy, skorzystamy tu z funkcji `group_by()`.
+  3. Dla każdej szkoły zwrócić wartość zmiennej `SEX` dla ostatniego w kolejności (są pogrupowani rosnąco według wyników testu PISA w dziedzinie matematyki) ucznia z danej szkoły.
+     - W ogólności wykorzystamy tu funcję `summarise()`.
+     - Aby otrzymać wartość konkretnej osoby możemy się z kolei posłużyć funkcjami: `first()`, `last()` lub `nth()` - w naszym przypadku adekwatna będzie oczywiście druga z nich.
+     
+```{r comment="", prompt=TRUE, collapse=TRUE}
+najlepsi = arrange(DNiP, MATH_2009) %>%
+  group_by(SCHOOL_ID, SCHOOL_TYPE) %>%
+  summarise(SEX = last(SEX)) %>%
+  ungroup()
+```
+
+# Przekształcanie zmiennych przy zachowaniu struktury zbioru
+
+Często chcemy dokonać pewnych przekształceń zmiennych, czy obliczyć nowe zmienne, jednakże bez zmieniania struktury zbioru - zachowując ten sam zestaw wierszy (jednostek obserwacji) i ten sam zestaw zmiennych. W ramach pakietu *dplyr* pozwala na to funkcja `mutate()`. Używa się jej w analogiczny sposób jak `summarise()`, z tym że:
+
+  1. `mutate()` zwraca obiekt zawierający wszystkie zmienne, którezawierała przekazana te funkcji ramka danych oraz dodatkowo doklejone do nich te, które w ramach wywołania `mutate()` utworzyliśmy,
+  2. jeśli nazwy tworzonych przez nas zmiennychpokrywają się z nazwami zmiennych już istniejącymi w ramce danych, to pierwotne wartości tych zmiennych zostaną nadpisane.
+
+Poniższy kod dodaje do ramki danych `DNiP` zmienne opisującą logarytm dochodów i wycentrowane (tj. przekształcone tak, by ich średnia była równa 0) wyniki Testu Matryc Ravena.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+str(DNiP)
+DNiP = mutate(DNiP, log_income = log(income), RAVEN_centr = RAVEN_WYN - mean(RAVEN_WYN, na.rm = TRUE))
+str(DNiP)
+```
+
+Gdybyśmy mieli potrzebę ich użyć, istnieją też funkcje `mutate_all()` i `mutate_at()`, działające w sposób analogiczny do omówionych wcześniej funkcji `summarise_all()` i `summarise_at()`.
+
+## Funkcja ifelse()
+
+Przekstałcając zmienne przy pomocy funkcji `mutate()` nie możemy niestety zastosować użytecznej techniki polegającej na przypisaniu pewnych wartości tylko wybranym elementom (obserwacjom) bez modyfikowania pozostałych, korzystając ze składni `zmienne[wybieramy_elementy] = nowa_wartość`. Analogiczny skutek możemy jednak osiągnąć wykorzystując w ramach funkcji `mutate()` funkcję `ifelse()`. Przyjmuje ona trzy argumenty: pierwszym jest wektor wartości logicznych, decydują one o tym, z którego spośród dwóch kolejnych wektorów przekazanych jako argumenty wzięte będą kolejne elementy, które utworzą nowy wektor, zwracany jako wynik działania funkcji. Dla elementów, dla których wektor będący pierwszym argumentem funkcji `ifelse()` przyjmuje wartość `TRUE` wykorzystane zostaną odpowiednie elementy wektora podanego jako drugi argument, a dla tych, dla których przyjmuje wartość `FALSE`, odpowiednie elementy wektora podanego jako trzeci argument. Np.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+ifelse(c(TRUE, FALSE, TRUE), c(1, 2, 3) , c(10, 11, 12))
+```
+
+Załóżmy, że chcemy przekształcić zmienną `KR18`, opisującą liczbę osób w gospodarstwie domowym ucznia, tak aby wszystkie wartości większe od 7 zostały zamienione na 7. *Klasycznie* zrobilibyśmy to w ten sposób:
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+DNiP$KR18[DNiP$KR18 > 7 & !is.na(DNiP$KR18)] = 7
+```
+
+Jednak to samo możemy osiągnąć również korzystając z funkcji `mutate()` i `ifelse()` (kolejne argumenty funkcji umieściłem w kolejnych wierszach, by łatwiej było je od siebie odróżnić):
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+DNiP = mutate(DNiP,
+              KR18 = ifelse(KR18 > 7 & !is.na(KR18),
+                            7,
+                            KR18))
+```
+
+Sens powyższego kodu jest następujący: w ramach ramki danych `DNiP` zmodyfikuj wartości zmiennej `KR18` w ten sposób, że elementom, ktorych wartość jest większa niż 7, przypisz 7, a pozostałe pozostaw bez zmian.
+
+## Wykorzystanie informacji w ramach podgrup
+
+Przy obliczaniu wartości zmiennych możemy też wykorzystać informacje o tym, co się dzieje w ramach poszczególnych podgrup. W tym celu musimy po prostu wywołać funkcję `mutate()` na obiekcie, do którego przypisaliśmy pogrupowanie. Np. poniższy kod dopisuje do ramki danych `DNiP` nowe zmienne, z których jedna opisuje średni wynik Testu Matryc Ravena w danej szkole (wszystkim uczniom danej szkoły zostanie przypisana ta sama wartość), a druga opisująe wynik Testu Matryc Ravena zrelatywizowany do średniego wyniku tego testu w ramach szkoły.
+
+Proszę zwrócić uwagę, że w przekształceniach, które podajemy jako dalsze argumenty funkcji `mutatate()` możemy odwoływać się do zmiennych, które obliczamy w ramach wcześniej podanych argumentów (tutaj: możemy wykorzystać zmienną `RAVEN_school_mean` obliczając zmienną `RAVEN_school_mean_centr`, gdyż ta pierwsza została zdefiniowana w argumencie, który poprzedza argument zawierający definicję tej drugiej).
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+str(DNiP)
+DNiP = group_by(DNiP, SCHOOL_ID) %>%
+  mutate(RAVEN_school_mean = mean(RAVEN_WYN, na.rm = TRUE),
+         RAVEN_school_mean_centr = RAVEN_WYN - RAVEN_school_mean) %>%
+  ungroup()
+str(DNiP)
+```
+
+## Zmiana nazw zmiennych
+
+Stosując podobną składanię, jak w przypadku funkcji `summarise()` i `mutate()` możemy też zmieniać nazwy zmiennych korzystając z funkcji `rename()`. Np. kod poniżej powoduje zmianę nazwy zmiennej `KR18` na `l_osob_gosp_dom`.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+str(DNiP)
+DNiP = rename(DNiP, l_osob_gosp_dom = KR18)
+str(DNiP)
+```
+
+# Wybieranie obserwacji i zmiennych
+
+Jeśli chcemy usunąć z analizowanego zbioru jakieś obserwacje, możemy to zrobić korzystając z funkcji `filter()`. Jako pierwszy argument przyjmuje ona ramkę danych, a jako drugi warunek, który muszą spełniać obserwacje, które mają pozostać w zbiorze (przy opisywaniu warunku do nazwa zmiennych odnosimy się tak, jakby były one obiektami). Np. kod prowadzi do usunięcia ze zbioru obserwacji, które nie spełniają warunku, że wartość zmiennej `correction` jest mniejsza niż 50.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+nrow(DNiP)
+DNiP = filter(DNiP, correction < 50)
+# usunęliśmy 3 obserwacje
+nrow(DNiP)
+```
+
+Jeśli chcemy wybrać tylko niektóre zmienne, w innym kontekście niż w ramach wywołania funkcji `summarise_at()`, możemy to osiągnąć używając funkcji `select()`. Jako pierwszy argument podajemy ramkę danych, a jako następne zmienne (tak, jakby były obiektami), lub wywołanie jednej z omówionych wcześniej funkcji `contains()`, `ends_with()`, `starts_with()` lub `matches()`.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+summary(select(DNiP, MATH_2009, READ_2009, SCIE_2009))
+summary(select(DNiP, ends_with("_2009")))
+```
+
+#### Zadanie
+
+Korzystając z funkcji pakietu *dplyr* napisz poniżej ciąg przekształceń, w ramach którego kolejno:
+
+  1. Z ramki danych `DNiP` zostaną wybrani tylko uczniowie liceów ogólnokształcących.
+  2. Zostanie w niej utworzona nowa zmienna `escs_pow_sr_szk`, przyjmująca wartość 1 dla tych uczniów, których indeks statusu społeczno-ekonomicznego rodziny (zmienna `escs`) jest większy lub równy średniej tego indeksu w szkole, w której uczył się dany uczeń i wartość 0 dla uczniów, których indeks *escs* jest mniejszy niż średnia tego indeksu w ich szkole (oraz wartość `NA` dla uczniów, którzy nie mają przypisanej wartośc indeksu). Do konwersji wartości logicznych na liczby możesz wykorzystać funkcję `as.numeric()`. Pamiętaj o pogrupowaniu!
+  3. Zwrócona zostanie ramka danych zawierające średnie wartości indeksu opisującego ocenę relacji pomiędzy nauczycielami a uczniami (zmienna `studrel`; wyższe wartości wskazują na bardziej pozytywną ocenę relacji) wśród uczniów, dla których zmienna `escs_pow_sr_szk` przyjmuje wartość 0 i dla ucznióW, dla których zmienna `escs_pow_sr_szk` przyjmuje wartość 1.
+  
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# to jest miejsce na Twój kod
+
+
+
+
+
+
+```
+
+Skomentuj (opisz krótko) uzyskane wyniki:
+
+**To jest miejsce na Twój opis.**
+
+---
+
+# Na następne zajęcia
+
+## Praca domowa
+
+Zostanie nadesłana mailem.
