@@ -1,0 +1,40 @@
+---
+title: "Praca domowa na 12 grudnia 2016"
+author: "Tomasz Żółtak"
+date: "5 grudnia 2016"
+output: html_document
+---
+
+# Przygotowanie do pracy
+
+Otwórz w RStudio plik "praca_domowa_2016.12.05.Rmd" (np. menu: File -> Open file...).
+
+  * Mogło się zdarzyć, że przy zapisywaniu pliku "praca_domowa_2016.12.05.Rmd" z programu pocztowego na dysk Twojego komputera do jego nazwy zostało dopisane dodatkowo rozszerzenie ".txt". W takim przypadku po otwarciu go w RStudio kod nie będzie się kolorował (RStudio uzna go za zwykły plik tesktsowy, a nie plik raportu R). Aby rozwiązać problem, mając taki plik otwarty w RStudio wybierz z menu: File -> Save As... i w okienku, w którym ma być podana nazwa pliku wpisz "praca_domowa_2016.12.05.Rmd", po czym kliknij "zapisz". Możesz potem skasować wersję pliku z dodanym rozszerzeniem ".txt".
+
+# Zadania
+
+Korzystając z funkcji pakietu *dplyr* napisz poniżej ciąg przekształceń, w ramach którego kolejno:
+
+  1. Z ramki danych `DNiP` zostaną wybrani tylko uczniowie liceów ogólnokształcących (uwaga: wybieramy obserwacje, nie zmienne).
+  2. Zostanie w niej utworzona nowa zmienna `escs_pow_sr_szk`, przyjmująca wartość 1 dla tych uczniów, których indeks statusu społeczno-ekonomicznego rodziny (zmienna `escs`) jest większy lub równy średniej tego indeksu w szkole, w której uczył się dany uczeń i wartość 0 dla uczniów, których indeks *escs* jest mniejszy niż średnia tego indeksu w ich szkole (oraz wartość `NA` dla uczniów, którzy nie mają przypisanej wartośc indeksu). Do konwersji wartości logicznych na liczby możesz wykorzystać funkcję `as.numeric()`. Pamiętaj o pogrupowaniu!
+  3. Zwrócona zostanie ramka danych zawierające średnie wartości indeksu opisującego ocenę relacji pomiędzy nauczycielami a uczniami (zmienna `studrel`; wyższe wartości wskazują na bardziej pozytywną ocenę relacji) wśród uczniów, dla których zmienna `escs_pow_sr_szk` przyjmuje wartość 0 i dla ucznióW, dla których zmienna `escs_pow_sr_szk` przyjmuje wartość 1.
+  
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# to jest miejsce na Twój kod
+
+
+
+
+
+
+```
+
+Skomentuj (opisz krótko) uzyskane wyniki:
+
+**To jest miejsce na Twój opis.**
+
+# Czynności końcowe
+
+  - Zapisz wyniki swojej pracy (tj. plik "praca_domowa_2016.12.05.Rmd").
+  - Zmień jego nazwę na "moje_imie_i_nazwisko_2016.12.05.Rmd".
+  - Wyślij go na adres email: **zoltakt@is.uw.edu.pl**

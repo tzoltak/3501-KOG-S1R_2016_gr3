@@ -83,7 +83,7 @@ summarise_at(DNiP, vars(MATH_2009, READ_2009, SCIE_2009),
              funs(srednia = mean, odch.std. = sd), na.rm = TRUE)
 ```
 
-  3. Korzystając z funkcji `var()` w połączeniu ze specjalnymi funkcjami apkietu *dplyr*, które  pozwalają łatwo wybrać zmienne w ramce danych na podstawie ich nazw:
+  3. Korzystając z funkcji `vars()` w połączeniu ze specjalnymi funkcjami apkietu *dplyr*, które  pozwalają łatwo wybrać zmienne w ramce danych na podstawie ich nazw:
      - `contains("tekst")` - wszystkie zmienne, których nazwa zawiera ciąg znaków "tekst",
      - `ends_with("tekst")` - wszystkie zmienne, których nazwa kończy się ciągiem znaków "tekst",
      - `starts_with("tekst")` - wszystkie zmienne, których nazwa kończy się ciągiem znaków "tekst",
