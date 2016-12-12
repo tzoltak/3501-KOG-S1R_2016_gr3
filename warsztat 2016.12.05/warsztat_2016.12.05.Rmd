@@ -1,7 +1,7 @@
 ---
-title: "Statystyka I z R<br/>Warsztat 9. Przekształcanie danych przy pomocy pakietu dplyr"
+title: "Statystyka I z R<br/>Warsztat 9. Przekształcanie danych przy pomocy pakietu dplyr cz. I"
 author: "Tomasz Żółtak"
-date: "28 listopada 2016"
+date: "5 grudnia 2016"
 output:
   html_document:
     css: ../styles.css
@@ -243,6 +243,8 @@ Jeśli chcemy wybrać tylko niektóre zmienne, w innym kontekście niż w ramach
 summary(select(DNiP, MATH_2009, READ_2009, SCIE_2009))
 summary(select(DNiP, ends_with("_2009")))
 ```
+
+---
 
 #### Zadanie
 

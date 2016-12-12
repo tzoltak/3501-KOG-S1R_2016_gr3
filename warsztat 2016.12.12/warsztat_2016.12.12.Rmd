@@ -1,0 +1,138 @@
+---
+title: "Statystyka I z R<br/>Warsztat 10. Przekształcanie danych przy pomocy pakietu dplyr cz. II"
+author: "Tomasz Żółtak"
+date: "12 grudnia 2016"
+output:
+  html_document:
+    css: ../styles.css
+    toc: TRUE
+    toc_depth: 3
+---
+
+Na dzisiejszych zajęciach będziemy ćwiczyć posługiwanie się pakietem *dplyr*.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+library(dplyr)
+```
+
+# Wczytywanie danych
+
+Na dzisiejszych zajęciach będziemy analizować dane dotyczące kandydatów startujących w polskich wyborach samorządowych (dokładniej do rad gmin oraz na urzędy wójta/burmistrza/przezydenta miasta) w latach 2010-2014. Dane zapisane zostały w pliku "kandydaci 2010-2014.RData", w folderze "warsztat 2016.12.12" (w ramach folderu zawierającego Twój projekt). W bloku kodu poniżej wpisz kod, który spowoduje wczytanie tych danych do R (i wykonaj go).
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# to jest miejsce na Twój kod
+```
+
+# Rozkłady jednej zmiennej z dplyr
+
+Warto zauważyć, że posługując się funkcjami pakietu *dplyr* możemy też całkiem wygodnie tworzyć ramki danych opisujące rozkład jednej zmiennej. Wymaga to zastosowania kolejno funkcji `group_by()` i `summarise()`. Np. kod poniżej tworzy ramkę danyc zawierającą rozkłady liczebności i częstości zmiennej `organ`, wskazującej na rodzaj organu, o obsadzenie którego ubiegali się kandydaci:
+
+```{r eval=FALSE, comment="", prompt=TRUE, collapse=TRUE}
+group_by(dane, organ) %>%
+  summarise(N = n(),  # zmienna "N" będzie opisywać rozkład liczebności
+            P = N / nrow(dane))  # zmienna "P" będzie opisywać rozkład częstości
+```
+
+Skróty występujące w zmiennej `organ` oznaczają:
+
+  - "RGM" - wybory do rad gmin,
+  - "WBP" - wybory wójtów/burmistrzów/prezydentów miast.
+
+Możemy jeszcze chcieć nieco *upiększyć* sposób wyświetlania naszego rozkładu, zmieniając nazwy kolumn i konwertując obiekt na *normalną* ramkę danych.
+
+```{r eval=FALSE, comment="", prompt=TRUE, collapse=TRUE}
+group_by(dane, organ) %>%
+  summarise(N = n(),
+            P = N / nrow(dane)) %>%
+  rename(x_i = organ, "N(X = X_i)" = N, "P(X = x_i)" = P) %>%  # estetyka
+  as.data.frame()  # estetyka
+```
+
+---
+
+#### Zadanie
+
+Zmodyfikuj kod z poniżej tak, aby uzyskać ramkę danych obrazującą rozkład liczby kandydatów w wyborach do poszczególnych typów organów w poszczególnych latach oraz rozkład częstości obrazujący, jaki odsetek wszystkich kandydatów znajdujących się w zbiorze stanowią te liczebności (podpowiedź: musisz jedynie wpisać w jedno miejsce nazwę jednej zmiennej).
+
+```{r eval=FALSE, comment="", prompt=TRUE, collapse=TRUE}
+# zmodyfikuj kod poniżej
+group_by(dane, organ) %>%
+  summarise(N = n(),
+            P = N / nrow(dane)) %>%
+  as.data.frame()  # estetyka
+```
+
+---
+
+# Ćwiczenia z dplyr
+
+Dosyć dobrze znanym faktem jest to, że kobiety są niedoreprezentowane wśród osób zajmujących stanowiska publiczne, w szczególności w organach władzy politycznej. Przeanalizuj, jak kształtował się odsetek kobiet ubiegających się o stanowiska radnych oraz o stanowiska wójtów/burmistrzów/prezydentów (dalej: wbp) miast w wyborach samorządowych w 2010 i w 2014 r. Analogicznie przeanalizuj, jaki jest odsetek kobiet wśród kandydatów, którzy zostali wybrani (zmienna `mandat` przyjmuje dla nich wartość "T"). W tym celu uzupełnij kod poniżej wpisując odpowiednie argumenty funkcji.
+
+
+```{r eval=FALSE, comment="", prompt=TRUE, collapse=TRUE}
+# zmodyfikuj kod poniżej
+group_by(TU_COŚ_WPISZ) %>%
+  summarise("% kobiet - kandydaci" = round(100 * sum(TU_COŚ_WPISZ) / n(), 1),
+            "% kobiet - wybrani" = round(100 * sum(TU_COŚ_WPISZ) / sum(TU_COŚ_WPISZ), 1))
+```
+
+  * Czy w polskich wyborach samorządowych również widać niedoreprezentowanie kobiet?
+
+*OPISZ UZYSKANE WYNIKI*
+
+  * Czy skala tego zjawiska jest większa w wyborach do rad gmin, czy w wyborach wbp?
+
+*OPISZ UZYSKANE WYNIKI*
+  
+---
+
+Warto przy tym wziąć pod uwagę, że wybory do rad gmin były/są w Polsce przeprowadzane w dwóch różnych ordynacjach. W mniejszych gminach stosowana jest ordynacja większościowa, w ramach której mandaty otrzymuje założona liczba kandydatów, którzy uzyskali najwięcej głosów. W większych gminach (i miastach na prawach powiatu) stosuje się ordynację proporcjonalną, analogiczną jak w wyborach do Sejmu, i głosy najpierw rozdzielane są pomiędzy listy (komitety wyborcze), a dopiero w ramach list pomiędzy kandydatów. W ordynacji proporcjonalnej stosuje się większe okręgi wyborcze (tzn. jest więcej mandatów do zdobycia w okręgu) i ogólnie rzecz biorąc wiąże się ona z tym, że w ramach jednego okręgu startuje znacznie więcej kandydatów.
+
+Fakt, że w przypadku ordynacji proporcjonalnej poszczególne komitety wystawiają w ramach każdego okręgu dosyć dużą liczbę kandydatów daje pole do wprowadzenia pewnych rozwiązań instytucjonalnych mających na celu zmniejszenie zjawiska niedoreprezentowania kobiet. Przykładem takiego rozwiązania jest wprowadzenie parytetów płci: nałożenie na komitety wyborcze ograniczenia, że kobiety mają stanowić nie mniej niż pewien założony odsetek kandydatów.
+
+W Polsce parytet płci, określony na poziomie 40% kandydatów, został wprowadzony w wyborach do Sejmu i w wyborach samorządowych odbywających się pod ordynacją proporcjonalną w 2011 r. Tak więc jedne z analizowanych przez nas wyborów odbyły się przed, a drugie już po wprowadzeniu parytetów. Przeanalizuj wpływ ich wprowadzenia na odsetek kobiet wśród kandydatów i wybranych na radnych, biorąc pod uwagę tylko te gminy, w których wybory odbywały się pod ordynacją proporcjonalną (zmienna `ordynacja` równa "P").
+
+```{r ecomment="", prompt=TRUE, collapse=TRUE}
+# wklej tu kod z poprzedniego bloku i odpowiednio go zmodyfikuj
+# aby wyniki dotyczyły tylko kandydatów startujących w gminach z ordynacją proprcjonalną
+```
+
+  * Jak wprowadzeie kwot na listach wpłynęło na reprezentację kobiet w polskich wyborach do rad gmin?
+
+*OPISZ UZYSKANE WYNIKI*
+
+---
+
+Specyfiką stosowanej w Polsce ordynacji proporcjonalnej jest to, że chociaż wyborcy mogą w ramach listy swobodnie wybrać najlepszego ich zdaniem kandydata, to jednak w praktyce bardzo często sugerują się kolejnością, w jakiej kandydaci są umieszczeni na liście (inna sprawa, że zwykle na pierwszych pozycjach znajdują się osoby i tak skądinąd najbardziej znane). W związku z tym osoby umieszczone na dalszych pozycjach na liście mają raczej niewielkie szanse uzyskania mandatu. Sprawdź, czy pozycje, na których umieszczane były kobiety na listach wyborczych (w wyborach odbywających się pod ordynacją proporcjonalną) w 2014 r. może mieć coś wspólnego z tym, że były one rzadziej wybierane, niż mężczyźni.
+
+   1. Ogranicz się w analizach do wyborów z 2014 r. przeprowadzanych pod ordynacją proporcjonalną.
+   2. Sprawdź, jaki był odsetek kobiet wśród osób zajmujących pierwsze miejsca na liście.
+   3. Dołącz do zbioru (wykorzytsując funkcję `mutate()`) nową zmienną, która będzie opisywać liczbę mandatów zdobytą przez poszczególne listy w poszczególnych okręgach wyborczych (w poszczególnych gminach).
+   4. Sprawdź, jak wiele jest kobiet wśród kandydatów, których pozycja na liście (zmienna `pozycja`) jest nie większa niż liczba zdobytych mandatów (zakładamy, dosyć zgrubnie, że osoby z tych miejsc są niejako predysponowane do zdobycia mandatu, biorąc pod wagę poziom poparcia dla danego komitetu).
+   
+```{r ecomment="", prompt=TRUE, collapse=TRUE}
+# to jest miejsce na Twój kod
+
+
+
+
+
+
+
+```
+
+  * Czy wprowadzenie kwot wiązało się z umieszczaniem kobiet na "biorących" pozycjach na listach wyborczych? Czy wprowadzenie kwot płci w polskich wyborach możemy uznać za skuteczne rozwiązanie problemu niedoreprezentowania kobiet w polityce?
+
+*OPISZ UZYSKANE WYNIKI*
+
+# Na następne zajęcia
+
+Znaleźć i zapoznać się z definicjami terminów:
+
+  - dystrybuanta zmiennnej losowej,
+  - funkcja odwrotna do dystrybuanty zmiennej losowej,
+  - funkcja gęstości prawdopodobieństwa zmiennej losowej.
+
+## Praca domowa
+
+Zostanie nadesłana mailem.

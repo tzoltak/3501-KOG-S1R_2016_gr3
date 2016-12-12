@@ -138,8 +138,16 @@ $(document).ready(function () {
 <li>Zostanie w niej utworzona nowa zmienna <code>escs_pow_sr_szk</code>, przyjmująca wartość 1 dla tych uczniów, których indeks statusu społeczno-ekonomicznego rodziny (zmienna <code>escs</code>) jest większy lub równy średniej tego indeksu w szkole, w której uczył się dany uczeń i wartość 0 dla uczniów, których indeks <em>escs</em> jest mniejszy niż średnia tego indeksu w ich szkole (oraz wartość <code>NA</code> dla uczniów, którzy nie mają przypisanej wartośc indeksu). Do konwersji wartości logicznych na liczby możesz wykorzystać funkcję <code>as.numeric()</code>. Pamiętaj o pogrupowaniu!</li>
 <li>Zwrócona zostanie ramka danych zawierające średnie wartości indeksu opisującego ocenę relacji pomiędzy nauczycielami a uczniami (zmienna <code>studrel</code>; wyższe wartości wskazują na bardziej pozytywną ocenę relacji) wśród uczniów, dla których zmienna <code>escs_pow_sr_szk</code> przyjmuje wartość 0 i dla ucznióW, dla których zmienna <code>escs_pow_sr_szk</code> przyjmuje wartość 1.</li>
 </ol>
-<pre class="r"><code>&gt; # to jest miejsce na Twój kod
-&gt; 
+<pre class="r"><code>&gt; library(dplyr)
+
+Attaching package: 'dplyr'
+The following objects are masked from 'package:stats':
+
+    filter, lag
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+&gt; # to jest miejsce na Twój kod
 &gt; 
 &gt; 
 &gt; 

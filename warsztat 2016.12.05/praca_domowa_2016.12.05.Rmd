@@ -20,6 +20,7 @@ Korzystając z funkcji pakietu *dplyr* napisz poniżej ciąg przekształceń, w 
   3. Zwrócona zostanie ramka danych zawierające średnie wartości indeksu opisującego ocenę relacji pomiędzy nauczycielami a uczniami (zmienna `studrel`; wyższe wartości wskazują na bardziej pozytywną ocenę relacji) wśród uczniów, dla których zmienna `escs_pow_sr_szk` przyjmuje wartość 0 i dla ucznióW, dla których zmienna `escs_pow_sr_szk` przyjmuje wartość 1.
   
 ```{r comment="", prompt=TRUE, collapse=TRUE}
+library(dplyr)
 # to jest miejsce na Twój kod
 
 
