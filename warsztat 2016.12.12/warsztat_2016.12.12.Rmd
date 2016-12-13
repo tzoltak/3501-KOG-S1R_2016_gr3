@@ -19,8 +19,10 @@ library(dplyr)
 
 Na dzisiejszych zajęciach będziemy analizować dane dotyczące kandydatów startujących w polskich wyborach samorządowych (dokładniej do rad gmin oraz na urzędy wójta/burmistrza/przezydenta miasta) w latach 2010-2014. Dane zapisane zostały w pliku "kandydaci 2010-2014.RData", w folderze "warsztat 2016.12.12" (w ramach folderu zawierającego Twój projekt). W bloku kodu poniżej wpisz kod, który spowoduje wczytanie tych danych do R (i wykonaj go).
 
-```{r comment="", prompt=TRUE, collapse=TRUE}
+```{r eval=FALSE, comment="", prompt=TRUE, collapse=TRUE}
 # to jest miejsce na Twój kod
+setwd("warsztat 2016.12.12")
+load("kandydaci 2010-2014.RData")
 ```
 
 # Rozkłady jednej zmiennej z dplyr
@@ -56,7 +58,7 @@ Zmodyfikuj kod z poniżej tak, aby uzyskać ramkę danych obrazującą rozkład 
 
 ```{r eval=FALSE, comment="", prompt=TRUE, collapse=TRUE}
 # zmodyfikuj kod poniżej
-group_by(dane, organ) %>%
+group_by(dane, organ, rok) %>%
   summarise(N = n(),
             P = N / nrow(dane)) %>%
   as.data.frame()  # estetyka
@@ -71,9 +73,9 @@ Dosyć dobrze znanym faktem jest to, że kobiety są niedoreprezentowane wśród
 
 ```{r eval=FALSE, comment="", prompt=TRUE, collapse=TRUE}
 # zmodyfikuj kod poniżej
-group_by(TU_COŚ_WPISZ) %>%
-  summarise("% kobiet - kandydaci" = round(100 * sum(TU_COŚ_WPISZ) / n(), 1),
-            "% kobiet - wybrani" = round(100 * sum(TU_COŚ_WPISZ) / sum(TU_COŚ_WPISZ), 1))
+group_by(dane, organ) %>%
+  summarise("% kobiet - kandydaci" = round(100 * sum(plec == "K") / n(), 1),
+            "% kobiet - wybrani" = round(100 * sum(plec == "K" & mandat == "T") / sum(mandat == "T"), 1))
 ```
 
   * Czy w polskich wyborach samorządowych również widać niedoreprezentowanie kobiet?
@@ -92,9 +94,13 @@ Fakt, że w przypadku ordynacji proporcjonalnej poszczególne komitety wystawiaj
 
 W Polsce parytet płci, określony na poziomie 40% kandydatów, został wprowadzony w wyborach do Sejmu i w wyborach samorządowych odbywających się pod ordynacją proporcjonalną w 2011 r. Tak więc jedne z analizowanych przez nas wyborów odbyły się przed, a drugie już po wprowadzeniu parytetów. Przeanalizuj wpływ ich wprowadzenia na odsetek kobiet wśród kandydatów i wybranych na radnych, biorąc pod uwagę tylko te gminy, w których wybory odbywały się pod ordynacją proporcjonalną (zmienna `ordynacja` równa "P").
 
-```{r ecomment="", prompt=TRUE, collapse=TRUE}
+```{r eval=FALSE, comment="", prompt=TRUE, collapse=TRUE}
 # wklej tu kod z poprzedniego bloku i odpowiednio go zmodyfikuj
 # aby wyniki dotyczyły tylko kandydatów startujących w gminach z ordynacją proprcjonalną
+group_by(dane, rok) %>%
+  filter(ordynacja == "P") %>%
+  summarise("% kobiet - kandydaci" = round(100 * sum(plec == "K") / n(), 1),
+            "% kobiet - wybrani" = round(100 * sum(plec == "K" & mandat == "T") / sum(mandat == "T"), 1))
 ```
 
   * Jak wprowadzeie kwot na listach wpłynęło na reprezentację kobiet w polskich wyborach do rad gmin?
@@ -110,7 +116,7 @@ Specyfiką stosowanej w Polsce ordynacji proporcjonalnej jest to, że chociaż w
    3. Dołącz do zbioru (wykorzytsując funkcję `mutate()`) nową zmienną, która będzie opisywać liczbę mandatów zdobytą przez poszczególne listy w poszczególnych okręgach wyborczych (w poszczególnych gminach).
    4. Sprawdź, jak wiele jest kobiet wśród kandydatów, których pozycja na liście (zmienna `pozycja`) jest nie większa niż liczba zdobytych mandatów (zakładamy, dosyć zgrubnie, że osoby z tych miejsc są niejako predysponowane do zdobycia mandatu, biorąc pod wagę poziom poparcia dla danego komitetu).
    
-```{r ecomment="", prompt=TRUE, collapse=TRUE}
+```{r comment="", prompt=TRUE, collapse=TRUE}
 # to jest miejsce na Twój kod
 
 

@@ -147,7 +147,9 @@ The following objects are masked from 'package:base':
 <div id="wczytywanie-danych" class="section level1">
 <h1>Wczytywanie danych</h1>
 <p>Na dzisiejszych zajęciach będziemy analizować dane dotyczące kandydatów startujących w polskich wyborach samorządowych (dokładniej do rad gmin oraz na urzędy wójta/burmistrza/przezydenta miasta) w latach 2010-2014. Dane zapisane zostały w pliku “kandydaci 2010-2014.RData”, w folderze “warsztat 2016.12.12” (w ramach folderu zawierającego Twój projekt). W bloku kodu poniżej wpisz kod, który spowoduje wczytanie tych danych do R (i wykonaj go).</p>
-<pre class="r"><code>&gt; # to jest miejsce na Twój kod</code></pre>
+<pre class="r"><code>&gt; # to jest miejsce na Twój kod
+&gt; setwd(&quot;warsztat 2016.12.12&quot;)
+&gt; load(&quot;kandydaci 2010-2014.RData&quot;)</code></pre>
 </div>
 <div id="rozkady-jednej-zmiennej-z-dplyr" class="section level1">
 <h1>Rozkłady jednej zmiennej z dplyr</h1>
@@ -171,7 +173,7 @@ The following objects are masked from 'package:base':
 <h4>Zadanie</h4>
 <p>Zmodyfikuj kod z poniżej tak, aby uzyskać ramkę danych obrazującą rozkład liczby kandydatów w wyborach do poszczególnych typów organów w poszczególnych latach oraz rozkład częstości obrazujący, jaki odsetek wszystkich kandydatów znajdujących się w zbiorze stanowią te liczebności (podpowiedź: musisz jedynie wpisać w jedno miejsce nazwę jednej zmiennej).</p>
 <pre class="r"><code>&gt; # zmodyfikuj kod poniżej
-&gt; group_by(dane, organ) %&gt;%
+&gt; group_by(dane, organ, rok) %&gt;%
 +   summarise(N = n(),
 +             P = N / nrow(dane)) %&gt;%
 +   as.data.frame()  # estetyka</code></pre>
@@ -182,9 +184,9 @@ The following objects are masked from 'package:base':
 <h1>Ćwiczenia z dplyr</h1>
 <p>Dosyć dobrze znanym faktem jest to, że kobiety są niedoreprezentowane wśród osób zajmujących stanowiska publiczne, w szczególności w organach władzy politycznej. Przeanalizuj, jak kształtował się odsetek kobiet ubiegających się o stanowiska radnych oraz o stanowiska wójtów/burmistrzów/prezydentów (dalej: wbp) miast w wyborach samorządowych w 2010 i w 2014 r. Analogicznie przeanalizuj, jaki jest odsetek kobiet wśród kandydatów, którzy zostali wybrani (zmienna <code>mandat</code> przyjmuje dla nich wartość “T”). W tym celu uzupełnij kod poniżej wpisując odpowiednie argumenty funkcji.</p>
 <pre class="r"><code>&gt; # zmodyfikuj kod poniżej
-&gt; group_by(TU_COŚ_WPISZ) %&gt;%
-+   summarise(&quot;% kobiet - kandydaci&quot; = round(100 * sum(TU_COŚ_WPISZ) / n(), 1),
-+             &quot;% kobiet - wybrani&quot; = round(100 * sum(TU_COŚ_WPISZ) / sum(TU_COŚ_WPISZ), 1))</code></pre>
+&gt; group_by(dane, organ) %&gt;%
++   summarise(&quot;% kobiet - kandydaci&quot; = round(100 * sum(plec == &quot;K&quot;) / n(), 1),
++             &quot;% kobiet - wybrani&quot; = round(100 * sum(plec == &quot;K&quot; &amp; mandat == &quot;T&quot;) / sum(mandat == &quot;T&quot;), 1))</code></pre>
 <ul>
 <li>Czy w polskich wyborach samorządowych również widać niedoreprezentowanie kobiet?</li>
 </ul>
@@ -198,7 +200,11 @@ The following objects are masked from 'package:base':
 <p>Fakt, że w przypadku ordynacji proporcjonalnej poszczególne komitety wystawiają w ramach każdego okręgu dosyć dużą liczbę kandydatów daje pole do wprowadzenia pewnych rozwiązań instytucjonalnych mających na celu zmniejszenie zjawiska niedoreprezentowania kobiet. Przykładem takiego rozwiązania jest wprowadzenie parytetów płci: nałożenie na komitety wyborcze ograniczenia, że kobiety mają stanowić nie mniej niż pewien założony odsetek kandydatów.</p>
 <p>W Polsce parytet płci, określony na poziomie 40% kandydatów, został wprowadzony w wyborach do Sejmu i w wyborach samorządowych odbywających się pod ordynacją proporcjonalną w 2011 r. Tak więc jedne z analizowanych przez nas wyborów odbyły się przed, a drugie już po wprowadzeniu parytetów. Przeanalizuj wpływ ich wprowadzenia na odsetek kobiet wśród kandydatów i wybranych na radnych, biorąc pod uwagę tylko te gminy, w których wybory odbywały się pod ordynacją proporcjonalną (zmienna <code>ordynacja</code> równa “P”).</p>
 <pre class="r"><code>&gt; # wklej tu kod z poprzedniego bloku i odpowiednio go zmodyfikuj
-&gt; # aby wyniki dotyczyły tylko kandydatów startujących w gminach z ordynacją proprcjonalną</code></pre>
+&gt; # aby wyniki dotyczyły tylko kandydatów startujących w gminach z ordynacją proprcjonalną
+&gt; group_by(dane, rok) %&gt;%
++   filter(ordynacja == &quot;P&quot;) %&gt;%
++   summarise(&quot;% kobiet - kandydaci&quot; = round(100 * sum(plec == &quot;K&quot;) / n(), 1),
++             &quot;% kobiet - wybrani&quot; = round(100 * sum(plec == &quot;K&quot; &amp; mandat == &quot;T&quot;) / sum(mandat == &quot;T&quot;), 1))</code></pre>
 <ul>
 <li>Jak wprowadzeie kwot na listach wpłynęło na reprezentację kobiet w polskich wyborach do rad gmin?</li>
 </ul>

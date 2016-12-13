@@ -1,0 +1,122 @@
+---
+title: "Praca domowa na 19 grudnia 2016"
+author: "Tomasz Żółtak"
+date: "13 grudnia 2016"
+output:
+  html_document:
+    css: ../styles.css
+    toc: TRUE
+    toc_depth: 3
+---
+
+# Przygotowanie do pracy
+
+Otwórz w RStudio plik "praca_domowa_2016.12.12.Rmd" (np. menu: File -> Open file...).
+
+  * Mogło się zdarzyć, że przy zapisywaniu pliku "praca_domowa_2016.12.12.Rmd" z programu pocztowego na dysk Twojego komputera do jego nazwy zostało dopisane dodatkowo rozszerzenie ".txt". W takim przypadku po otwarciu go w RStudio kod nie będzie się kolorował (RStudio uzna go za zwykły plik tesktsowy, a nie plik raportu R). Aby rozwiązać problem, mając taki plik otwarty w RStudio wybierz z menu: File -> Save As... i w okienku, w którym ma być podana nazwa pliku wpisz "praca_domowa_2016.12.12.Rmd", po czym kliknij "zapisz". Możesz potem skasować wersję pliku z dodanym rozszerzeniem ".txt".
+  
+Załaduj pakiet *dplyr*:
+  
+```{r comment="", prompt=TRUE, collapse=TRUE}
+library(dplyr)
+```
+
+Wczytaj dane z pliku "kandydaci 2010-2014.RData" (taką metodą, jaką to dla Ciebie wygodne).
+
+# Ćwiczenia z zajęć
+
+Dla ułatwienia poniżej znajdują się ćwiczenia, które robiliśmy na zajęciach wraz z rozwiązaniami.
+
+Dosyć dobrze znanym faktem jest to, że kobiety są niedoreprezentowane wśród osób zajmujących stanowiska publiczne, w szczególności w organach władzy politycznej. Przeanalizuj, jak kształtował się odsetek kobiet ubiegających się o stanowiska radnych oraz o stanowiska wójtów/burmistrzów/prezydentów (dalej: wbp) miast w wyborach samorządowych w 2010 i w 2014 r. Analogicznie przeanalizuj, jaki jest odsetek kobiet wśród kandydatów, którzy zostali wybrani (zmienna `mandat` przyjmuje dla nich wartość "T"). W tym celu uzupełnij kod poniżej wpisując odpowiednie argumenty funkcji.
+
+
+```{r eval=FALSE, comment="", prompt=TRUE, collapse=TRUE}
+# zmodyfikuj kod poniżej
+group_by(dane, organ) %>%
+  summarise("% kobiet - kandydaci" = round(100 * sum(plec == "K") / n(), 1),
+            "% kobiet - wybrani" = round(100 * sum(plec == "K" & mandat == "T") / sum(mandat == "T"), 1))
+```
+
+  * Czy w polskich wyborach samorządowych również widać niedoreprezentowanie kobiet?
+
+*OPISZ UZYSKANE WYNIKI*
+
+  * Czy skala tego zjawiska jest większa w wyborach do rad gmin, czy w wyborach wbp?
+
+*OPISZ UZYSKANE WYNIKI*
+  
+---
+
+Warto przy tym wziąć pod uwagę, że wybory do rad gmin były/są w Polsce przeprowadzane w dwóch różnych ordynacjach. W mniejszych gminach stosowana jest ordynacja większościowa, w ramach której mandaty otrzymuje założona liczba kandydatów, którzy uzyskali najwięcej głosów. W większych gminach (i miastach na prawach powiatu) stosuje się ordynację proporcjonalną, analogiczną jak w wyborach do Sejmu, i głosy najpierw rozdzielane są pomiędzy listy (komitety wyborcze), a dopiero w ramach list pomiędzy kandydatów. W ordynacji proporcjonalnej stosuje się większe okręgi wyborcze (tzn. jest więcej mandatów do zdobycia w okręgu) i ogólnie rzecz biorąc wiąże się ona z tym, że w ramach jednego okręgu startuje znacznie więcej kandydatów.
+
+Fakt, że w przypadku ordynacji proporcjonalnej poszczególne komitety wystawiają w ramach każdego okręgu dosyć dużą liczbę kandydatów daje pole do wprowadzenia pewnych rozwiązań instytucjonalnych mających na celu zmniejszenie zjawiska niedoreprezentowania kobiet. Przykładem takiego rozwiązania jest wprowadzenie parytetów płci: nałożenie na komitety wyborcze ograniczenia, że kobiety mają stanowić nie mniej niż pewien założony odsetek kandydatów.
+
+W Polsce parytet płci, określony na poziomie 40% kandydatów, został wprowadzony w wyborach do Sejmu i w wyborach samorządowych odbywających się pod ordynacją proporcjonalną w 2011 r. Tak więc jedne z analizowanych przez nas wyborów odbyły się przed, a drugie już po wprowadzeniu parytetów. Przeanalizuj wpływ ich wprowadzenia na odsetek kobiet wśród kandydatów i wybranych na radnych, biorąc pod uwagę tylko te gminy, w których wybory odbywały się pod ordynacją proporcjonalną (zmienna `ordynacja` równa "P").
+
+```{r eval=FALSE, coment="", prompt=TRUE, collapse=TRUE}
+# wklej tu kod z poprzedniego bloku i odpowiednio go zmodyfikuj
+# aby wyniki dotyczyły tylko kandydatów startujących w gminach z ordynacją proprcjonalną
+group_by(dane, rok) %>%
+  filter(ordynacja == "P") %>%
+  summarise("% kobiet - kandydaci" = round(100 * sum(plec == "K") / n(), 1),
+            "% kobiet - wybrani" = round(100 * sum(plec == "K" & mandat == "T") / sum(mandat == "T"), 1))
+```
+
+  * Jak wprowadzeie kwot na listach wpłynęło na reprezentację kobiet w polskich wyborach do rad gmin?
+
+*OPISZ UZYSKANE WYNIKI*
+
+---
+
+# Zadanie do rozwiązania
+
+Specyfiką stosowanej w Polsce ordynacji proporcjonalnej jest to, że chociaż wyborcy mogą w ramach listy swobodnie wybrać najlepszego ich zdaniem kandydata, to jednak w praktyce bardzo często sugerują się kolejnością, w jakiej kandydaci są umieszczeni na liście (inna sprawa, że zwykle na pierwszych pozycjach znajdują się osoby i tak skądinąd najbardziej znane). W związku z tym osoby umieszczone na dalszych pozycjach na liście mają raczej niewielkie szanse uzyskania mandatu. Sprawdź, czy pozycje, na których umieszczane były kobiety na listach wyborczych (w wyborach odbywających się pod ordynacją proporcjonalną) w 2014 r. może mieć coś wspólnego z tym, że były one rzadziej wybierane, niż mężczyźni.
+
+   1. Ogranicz się w analizach do wyborów z 2014 r. przeprowadzanych pod ordynacją proporcjonalną.
+   2. Sprawdź, jaki był odsetek kobiet wśród osób zajmujących pierwsze miejsca na liście.
+   3. Dołącz do zbioru (wykorzytsując funkcję `mutate()`) nową zmienną, która będzie opisywać liczbę mandatów zdobytą przez poszczególne listy w poszczególnych okręgach wyborczych (w poszczególnych gminach).
+   4. Sprawdź, jak wiele jest kobiet wśród kandydatów, których pozycja na liście (zmienna `pozycja`) jest nie większa niż liczba zdobytych mandatów (zakładamy, dosyć zgrubnie, że osoby z tych miejsc są niejako predysponowane do zdobycia mandatu, biorąc pod wagę poziom poparcia dla danego komitetu).
+   
+```{r coment="", prompt=TRUE, collapse=TRUE}
+# to jest miejsce na Twój kod
+
+
+
+
+
+
+
+```
+
+  * Czy wprowadzenie kwot wiązało się z umieszczaniem kobiet na "biorących" pozycjach na listach wyborczych? Czy wprowadzenie kwot płci w polskich wyborach możemy uznać za skuteczne rozwiązanie problemu niedoreprezentowania kobiet w polityce?
+
+*OPISZ UZYSKANE WYNIKI*
+
+# I jeszcze jedno zadanie
+
+W pliku "liczba mieszkańców gmin.csv" zapisane są informacje o liczbie mieszkańców gmin (występujących w analizowanym powyżej zbiorze danych), które chcielibyśmy dołączyć do zbioru znajdującego się w obiekcie `dane` (tak aby pojawiła się w nim nowa kolumna opisująca liczbę mieszkańców gminy, w której odbywały się wybory, w których startował dany kandydat).
+
+  1. Wczytaj dane z pliku "liczba mieszkańców gmin.csv".
+  2. Znajdź funkcję pakietu *dplyr*, która pozwoli Ci przyłączyć wczytaną ramkę danych z ramką danych `dane` (być może najprościej będzie przejrzeć [cheatsheet](https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf)).
+  3. Przy pomocy tej funkcji przyłącz dane o liczbie mieszkańców do danych o kandydatach.
+
+```{r coment="", prompt=TRUE, collapse=TRUE}
+# to jest miejsce na Twój kod
+
+
+```
+
+# Czynności końcowe
+
+  - Zapisz wyniki swojej pracy (tj. plik "praca_domowa_2016.12.12.Rmd").
+  - Zmień jego nazwę na "moje_imie_i_nazwisko_2016.12.12.Rmd".
+  - Wyślij go na adres email: **zoltakt@is.uw.edu.pl**
+
+# Do przeczytania na następne zajęcia
+
+Znaleźć i zapoznać się z definicjami terminów:
+
+  - zmienna losowa (dyskretna, ciągła),
+  - dystrybuanta zmiennnej losowej,
+  - funkcja odwrotna do dystrybuanty zmiennej losowej,
+  - funkcja gęstości prawdopodobieństwa zmiennej losowej.
