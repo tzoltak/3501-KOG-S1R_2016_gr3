@@ -1,0 +1,299 @@
+---
+title: "Statystyka I z R<br/>Warsztat 11. Wprowadzenie do wnioskowania statystycznego cz. I"
+author: "Tomasz Żółtak"
+date: "19 grudnia 2016"
+output:
+  html_document:
+    css: ../styles.css
+    toc: TRUE
+    toc_depth: 3
+---
+
+Na dzisiejszych zajęciach zapoznamy się z podstawowymi pojęciami wykorzystywanymi we wnioskowaniu statystycznym.
+
+# Doświadczenie losowe i zmienna losowa
+
+## Doświadczenie losowe
+
+**Doświadczenie losowe** to, najogólniej rzecz biorąc taka procedura którą cechuje to, że:
+
+  1. można ją wielokrotnie powtarzać w ten sam sposób (replikować),
+  2. wiemy, jakie wyniki możemy otrzymać w wyniku jej przeprowadzenia,
+     - i takie wyniki są co najmniej dwa,
+  3. dopóki jej nie przeprowadzimy, nie wiemy, który z tych możliwych wyników zostanie (tym razem) wygenerowany.
+
+Przykłady bardzo prostych doświadczeń losowych:
+
+  - rzut monetą: może wypaść *orzeł* lub *reszka*;
+  - rzut kostką sześcienną: mogą wypaść, 1, 2, 3, 4, 5, lub 6 oczek;
+  - wylosowanie karty ze standardowej talii do gry: możemy wylosować jedną z 54 kart opisanych przez swoją wartość i kolor.
+  
+Doświadczenia losowe możemy też definiować w sposób nieco bardziej skomplikowany, np.:
+
+  - sprawdzenie, czy wynik rzutu kością sześcienną jest parzysty,
+    - możliwe wyniki to *tak* i *nie*;
+  - sprawdzenie, czy w wyniku rzutu kosćią sześcienną wypadło 5 oczek,
+    - możliwe wyniki to *tak* i *nie*;
+  - kolor karty wylosowanej ze standardowej talii do gry,
+    - możliwe wartości to *karo*, *kier*, *pik* i *trefl*;
+  - liczba *orłów* uzyskana po wykonaniu 10 rzutów monetą,
+    - możliwe wyniki to liczby całkowite od 0 do 10;
+  - reszta z dzielenia przez 3 liczby *orłów* uzyskanych w 10 rzutach monetą,
+    - możliwe wyniki to 0, 1, 2;
+
+Jako doświadczenia losowe możemy też traktować różne zdarzenia mające więcej wspólnego z *prawdziwym życiem*, choć w ich przypadku zbiór możliwych do otrzymania wartości przyjmujemy często z pewnym przybliżeniem (naddatkiem), np.
+
+  - liczba samochodów przejeżdzających w ciągu godziny przez skrzyżowanie ulic Marszałkowskiej i Świętokrzyskiej w Warszawie,
+    - jako możliwe wyniki możemy rozsądnie przyjąć zbiór liczb naturalnych;
+  - liczba osób, które w ciągu tygodnia zgłosiły się do lekarzy pracujących w województwie mazowieckim i zostały zdiagnozowane jako chore na grypę,
+    - jako możliwe wyniki możemy rozsądnie przyjąć zbiór liczb naturalnych;
+  - stwierdzenie, czy chory, który właśnie przyszedł na wizytę do pewnego (wybranego przez nas) lekarza internisty zostanie zdiagnozowany jako chory na grypę,
+    - możliwe wyniki: *tak* i *nie*;
+  - wzrost *losowo wybranej* osoby mieszkającej w Polsce,
+    - jako możliwe wyniki możemy rozsądnie przyjąć zbiór dodatnich liczb rzeczywistych;
+  - średnia wzrostu 10 *losowo wybranych* osób mieszkającej w Polsce
+    - jako możliwe wyniki możemy rozsądnie przyjąć zbiór dodatnich liczb rzeczywistych;
+  - odpowiedź na pytanie "Czy uważa Pan/Pani, że ostatnie rok był udany?", udzielona na skali *zdecydowanie tak* - *raczej tak* - *raczej nie* - *zdecydowanie nie*, przez pierwszą napotkaną osobę,
+    - możliwe wyniki to: *zdecydowanie tak*, *raczej tak*, *raczej nie*, *zdecydowanie nie* (i może jeszcze *odmowa odpowiedzi*);
+  - najczęściej wskazywana odpowiedź na pytanie "Czy uważa Pan/Pani, że ostatnie rok był udany?" (j.w.), spośród odpowiedzi udzielonych przez 10 pierwszych napotkanych osób,
+    - możliwe wyniki to: *zdecydowanie tak*, *raczej tak*, *raczej nie*, *zdecydowanie nie* (i może jeszcze *odmowa odpowiedzi*).
+
+## Zmienna losowa
+
+Od strony formalnej (acz nie wchodząc w szczegóły) **zmienna losowa** to funkcja przypisująca wynikom doświadczenia losowego liczby. W praktyce dużą rolę odgrywa rozróżnienie na dwa rodzaje zmiennych losowych:
+
+  - *zmienne losowe dyskretne* jako przeciwdziedzinę mają przeliczalny zbiór liczb - zwykle zbiór liczb naturalnych, lub wręcz skończony podzbiór liczb naturalnych;
+  - *zmienne losowe ciągłe* jako przeciwdziedzinę mają nieprzeliczalny zbiór liczb - zwykle zbiór liczb rzeczywistych (lub nieprzeliczalny podzbiór zbioru liczb rzeczywistych, np. dodatnie liczby reczywiste, albo wszystkie liczby rzeczysiste z przedziału [0;1]).
+
+Widać tutaj, że w przypadku pewnych doświadczeń losowych tworzenie powiązanych z nimi zmiennych losowych jest dosyć *naturalne* - dzieje się tak, jeśli możliwe wyniki doświadczenia daje się rozsądnie opisać jako tworzące pewne uporządkowanie (odnoszą się do cech mierzonych na skali co najmniej porządkowej). W przypadku doświadczeń losowych, w których możliwe do uzyskania wyniki nie tworzą uporządkowania (odnoszą się do cech mierzonych na skali nominalnej), dokonanie *mapowania* wyników doświadczenia na zbiór liczb jest oczywiście możliwe, jednak duża część operacji, jakie możemy chcieć potem wykonywać na takich zmiennych losowych (analogicznie do zmiennych wcześniej wspomnianego typu) nie będzie miała zbyt wielkiego sensu.
+
+# Rozkład zmiennej losowej
+
+Jak już zostało wspomniane, definicyjną cechą doświadczeń losowych jest to, że przed przeprowadzeniem doświadczenia nie możemy być pewni, który spośród możliwych wyników uzyskamy. Otwarta pozostaje jednak kwestia, czy wystąpienie każdego z nich jest równie *prawdopodobne*, a jeśli nie, to jak bardzo jedne są bardziej/mniej *prawdopodobne* od innych. Aby opisać tą własność doświadczenia losowego używamy pojęcia **rozkładu zmiennej losowej**.
+
+Dlaczego mówimy o rozkładzie zmiennej losowej, a nie o rozkładzie wyników doświadczenia losowego? Dzieje się tak, gdyż do opisania tego, jak wygląda taki rozkład używamy pewnych narzędzi matematycznych, które odwołują się do własności zbiorów liczb, w szczególności zbioru liczb rzeczywistych. Wynikiem *użycia* zmiennej losowej (do wyników doświadczenia losowego) zawsze jest liczba, co umożliwia nam wykorzystanie tych narzędzi. Wynikiem samego doświadczenia losowego może być (jak widzieliśmy powyżej) właściwie cokolwiek, a to uniemożliwia nam zastosowanie do nich bezpośrednio narzędzi matematycznych opisujących rozkłady.
+
+## Skąd wiemy, jakie są rozkłady zmiennych losowych?
+
+####  1.
+
+W przypadku bardzo prostych doświadczeń losowych, takich jak rzut (*dobrze wyważoną*) monetą, czy rzut (*dobrze wyważoną*) kostką wywodzimy *de facto* wywodzimy je logicznie: zakładamy, że nie ma podstaw by twierdzić, że którekolwiek z nich jest bardziej prawdopodobne, niż inne. Zwróćmy uwagę, że określenia *rzut monetą* czy *rzut kostką*, tak jak są używane w nauczaniu rachunku prawdopodobieństwa i statystyki, w istocie są po prostu łatwymi do zrozumienia operaconalizacjami pewnych matematycznych abstrakcji (losowania z równym prawdopodobieństwem jednego elementu mało z licznego zbioru). Np. nie mamy żadnej(!) metody, która pozwalałaby niezawodnie (z całą pewnością) stwierdzić, że monetą, którą mam w kieszeni jest *(doskonale) dobrze wyważona* (choć mamy metody, które pozwalają nam uzyskać całkiem solidne przekonanie, że taka ona jest, lub wprost przeciwnie).
+  
+####  2.
+
+W przypadku bardziej złożonych doświadczeń losowych możemy postarać się przedstawić je jako złożenie wielu bardzo prostych doświadczeń losowych. Następnie na podstawie wiedzy o tym, jak wyniki tych prostszych doświadczeń przekładają się na wynik analizowanego, bardziej złożonego, doświadczenia losowego możemy postarać się analitycznie (korzystając z twierdzeń matematycznych) wyprowadzić rozkład zmiennej losowej opisującej bardziej złożone doświadczenie z rozkładów zmiennych losowych opisujących te prostsze zdarzenia. Przydają się do tego matematycy (statystycy matematyczni), choć do podejmowania tego wysiłku skłania się również studentów matematyki (i czasem statystki).
+
+Np. rozkład zmiennej losowej opisujący wyniki doświadczenia losowego *liczba "orłów" uzyskana w 10 (niezależnych) rzutach (dobrze wyważoną) monetą* możemy wywieść z rozkładu zmiennej losowej opisującej wyniki doświadczenia losowego *rzut (dobrze wyważoną) monetą*, korzystając z twierdzenia o tym, że prawdopodobieństwo jednoczesnego zajścia dwóch zdarzeń losowych wzajemnie niezależnych jest równe iloczynowi prawdopodobieństwa zajścia każdego z nich oraz twierdzenia o prawdopodobieństwei całkowitym.
+
+Istnieje duża liczba twierdzeń mówiących o tym, że np. suma kilku zmiennych losowych o danym rozkładzie (i pewnych parametrach) daje zmienną losową o pewnym rozkładzie (i pewnych parametrach, będących funkcjami parametrów tamtych zmiennych).
+
+  - Tego typu twierdzeniem, z którym już się może Państwo zetknęli, jest to, które mówi, że iloraz zmiennej losowej o rozkładzie normalnym standaryzownym i zmiennej losowej o rozkładzie chi-kwadrat o `n` stopniach swobody pomnożony przez piewiastek z `n` daje zmienną losową o rozkłądzie *t Studenta* o `n` stopniach swobody.
+
+Duże znaczenie w tym podejściu odgrywają też tzw. **twierdzenia graniczne**, w których stwierdza się, że jeśli wartości pewnych parametrów opisujących rozkład pewnej zmiennej losowej (a więc i doświadczenie losowe, które dana zmienna opisuje) zbiegają do określonej granicy (zwykle do nieskończoności), to dany rozkład prawdopodobieństwa zbiega (w pełni poprawnie formalnie mówi się tu o zbieżności ich dystrybuant - p. niżej) do pewnego innego, dobrze znanego rozkładu. W praktyce oznacza to, że przy wystarczająco dużych wartościach pewnych parametrów rozkładu różnice pomiędzy tym rozkładem, a rozkładem, do którego on zbiega można uznać za zaniedbywalnie małe.
+
+  - Najszerzej znanym twierdzeniem granicznym jest tzw. *Centralne Twierdzenie Graniczne*, które mówi, że dla `n` dążącego do nieskończoności średnia `n` niezależnych od siebie zmiennych losowych (tzn. suma tych zmiennych podzielona przez `n`), z których każda ma taki sam rozkład o skończonej wariancji, zbiega do rozkładu normalnego o wartości oczekiwanej i wariancji równych odpowiednio wartości oczekiwanej rozkładu każdej z tych zmiennych i wariancji rozkładu każdej z tych zmiennych, podzielonej przez `n`. Nie ma przy tym znaczenia, jaki właściwie jest rozkład tych zmiennych (bynajmniej nie musi być normalny)!
+  
+####  3.
+
+W przypadku niektórych, szczególnie skomplikowanych doświadczeń losowych nie jesteśmy w stanie wywieść rozkładów opisujących je zmiennych losowych analitycznie (na podstawie twierdzeń matematycznych). W takich przypadkach możemy użyć symulacji, aby empirycznie przybliżyć sobie kształt takich rozkładów. Aby to osiągnąć wielokrotnie (tysiące i więcej) razy powtarzamy dane doświadczenie losowe (w praktyce, co do zasady, reprezentację tego doświadczenia w postaci programu komputerowego) notując jego wyniki i na ich podstawie budujemy rozkład częstości, który traktujemy jako **przybliżenie** rozkładu odpowiedniej zmiennej losowej.
+
+  - Oczywiście możemy w ten sposób wywodzić również rozkłady tych zmiennych losowych, które jesteśmy w stanie wyprowadzić analitycznie (w istocie głównie tym będziemy się zajmować do końca tego kursu). przez matematyków jest to oczywiście uważane za bez porównania mniej eleganckie, niemniej jest nieco prostsze do zrozumienia, niż dowody matematyczne.
+  
+#### 4.
+
+W przypadku doświadczeń losowych opisujących bardziej złożone *życiowe* sytuacje (w rodzaju tych, których przykłady zostały podane powyżej) zwykle postępujemy dwutorowo. Po pierwsze, na podstawie przedmiotowej wiedzy o badanym zjawisku staramy się przeprowadzić pewną analogię wnioskowania opisanego powyżej w pkt. 2., a więc staramy się zrozumieć strukturę danego zjawiska i rozbić je na prostsze procesy, z którymi będziemy mogli rozsądnie powiązać jakiś już znany rozkład zmiennej losowej. Następnie na tej podstawie staramy się wywieść rozkład interesującej nas zmiennej losowej. Po drugie, zbieramy dane empiryczne o wynikach możliwie dużej liczby powtórzeń danego doświadczenia losowego i sprawdzamy, czy uzyskany w ten sposób empiryczny rozkład przypomina ten, który wywiedliśmy w sposób teoretyczny (jeśli nie przypomina, możemy też spróbować wykorzystać uzyskany rozkład empiryczny jako podpowiedź, do jakiego rodzaju rozkładu powinniśmy dojść na drodze rozważań teoretycznych). Takie działania określa się mianem *modelowania statystycznego*. Ciekawy opis takiego działania można znaleźć np. [tutaj](http://smarterpoland.pl/index.php/2016/08/statystyk-na-wakacjach/).
+
+## Dystrybuanta rozkładu zmiennej losowej
+
+Dystrybuanta jest (a jakże!) funkcją, której dziedziną jest zbiór liczb rzeczywistych, a przeciwdziedziną zbiór liczb rzeczywistych mieszczących się w przedziale [0;1] (ściślej rzecz biorąc, prawdopodobieństwo). Jest to funkcja niemalejąca. Wskazuje ona, jakie jest prawdopodobieństwo uzyskania w wyniku przeprowadzenia doświadczenia losowego wartości zmiennej losowej mniejszej niż dana wartość.
+
+Wzory na dystrybuanty ważnych rozkładów zmiennych losowych zostały wyprowadzone analitycznie, przy czym często mają one dosyć złożoną postać (np. [dystrybuanta rozkładu normalnego](https://pl.wikipedia.org/wiki/Rozk%C5%82ad_normalny)). Historycznie (i niejednokrotnie wciąż do celów dydaktycznych) ich wartości odczytywało się z tablic statystycznych. Współcześnie w ramach oprorgamowania statystycznego (w tym R; niemniej są one dostępne nawet w arkuszach kalkulacyjnych) istnieją funkcje, które zwracają ich wartości.
+
+### Dystrybuanta dyskretnej zmiennej losowej
+
+Przykładowo, dystrybuanta zmiennej losowej, nazwijmy ją `X`, która wynikom rzutu (dobrze wyważoną) monetą przypisuje wartości: *reszce* 0, a *orłowi* 1 wygląda następująco (warto jeszcze odnotować, że formalnie ciągnie się ona również poza obszarem objętym wykresem, do minus nieskończoności i plus nieskończoności na osi poziomej).
+
+```{r echo=FALSE, comment="", prompt=TRUE, collapse=TRUE}
+plot(NA, NA, xlim = c(-2, 3), ylim = c(0, 1),
+     main = "Dystrybuanta zm. losowej X, opisującej\nwynik rzutu monetą: 0 - reszka, 1 - orzeł",
+     xlab = "r", ylab = "P(X < r)")
+grid()
+lines(c(-3, 0), c(0, 0), lwd = 3, col = 2)
+lines(c(0, 0), c(0, 0.5), lty = 2, lwd = 3, col = 2)
+lines(c(0, 1), c(0.5, 0.5), lwd = 3, col = 2)
+lines(c(1, 1), c(0.5, 1), lty = 2, lwd = 3, col = 2)
+lines(c(1, 4), c(1, 1), lwd = 3, col = 2)
+points(c(0, 1), c(0, 0.5), pch = 13, cex = 2, lwd = 2, col = 2)
+points(c(0, 1), c(0.5, 1), pch = 16, cex = 2, col = 2)
+```
+
+Warto zwrócić uwagę, że dystrybuanta zmiennej `X` nie jest ciągła (ma tzw. **punkty skokowe** w wartościach 0 i 1), Jest to cecha charakterystyczna dystrybuant dyskretnych zmiennych losowych.
+
+Widać tu, że w przypadku dyskretnych zmiennych losowych dystrybuanta niesie analogiczne informacje, jak **skumulowany (brzegowy) rozkład częstości** w przypadku zmiennych statystycznych.
+
+### Dystrybuanta ciągłej zmiennej losowej
+
+Na początek rozpatrzmy zmienną `W`, o bardzo prostym typie rozkładu ciągłego. Niech będzie to zmienna o rozkładzie jednostajnym na przedziale [-1;3], tzn. taka, że:
+  - zmienna losowa `W` może przyjąć wartość równą dowolnej liczbie rzeczywistej z przedziału [-1;3],
+  - i każda z tych wartości jest *równie prawdopodobna* (co to dokładnie znaczy - później).
+
+```{r echo=FALSE, comment="", prompt=TRUE, collapse=TRUE}
+plot(NA, NA, xlim = c(-5, 5), ylim = c(0, 1),
+     main = "Dystrybuanta zm. losowej W\no rozkładzie jednostajnym na przedziale [-1, 3]",
+     xlab = "r", ylab = "P(W < r)")
+grid()
+lines(c(-6, -1, 3, 6), c(0, 0, 1, 1), lwd = 3, col = 5)
+```
+
+Z kolei dystrybuanta zmiennej losowej `Y` o rozkładzie normalnym standaryzowanym wygląda tak:
+
+```{r echo=FALSE, comment="", prompt=TRUE, collapse=TRUE}
+plot(NA, NA, xlim = c(-5, 5), ylim = c(0, 1),
+     main = "Dystrybuanta zm. losowej Y\no rozkładzie normalnym standaryzowanym",
+     xlab = "r", ylab = "P(Y < r)")
+grid()
+siatka = seq(-6, 6, 0.05)
+lines(siatka, pnorm(siatka), lwd = 3, col = 3)
+```
+
+Niektóre zmienne losowe mogą przyjmować tylko wartości nieujemne. Przykładem rozkładu typowego dla takich zmiennych jest rozkłada chi-kwadrat. Poniżej widoczna jest dystrybuanta rozkładu zmiennej losowej `Z`, powstałej poprzez podniesienie do kwadratu opisanej wyżej zmiennej `Y` - jest to właśnie rozkład chi-kwadrat o jednym stopniu swobody.
+
+```{r echo=FALSE, comment="", prompt=TRUE, collapse=TRUE}
+plot(NA, NA, xlim = c(-5, 5), ylim = c(0, 1),
+     main = "Dystrybuanta zm. losowej Z\no rozkładzie chi-kwadrat o jednym stopniu swobody",
+     xlab = "r", ylab = "P(Z < r)")
+grid()
+siatka = seq(-6, 6, 0.05)
+lines(siatka, pchisq(siatka, 1), lwd = 3, col = 4)
+```
+
+## Funkcja odwrotna do dystrybuanty zmiennej losowej
+
+Dystrybuanta (jeśli ją znamy) pozwala nam odpowiedzieć na pytanie, jakie jest prawdopodobieństwo, że zmienna losowa przyjmie wartość mniejszą, niż dana. Przy prowadzeniu wnioskowania statystycznego bardzo często interesuje nas jednak odpowiedź na odwrotne pytanie, a mianowicie, jaka jest taka wartość zmiennej losowej, że prawdopodobieństwo uzyskania wartości mniejszej od niej wynosi określoną wartość (np. jaka jest taka *progowa wartość*, że prawdopodobieństwo uzyskania na opisanej powyżej zmiennej `Y` wartości mniejszej od tej *wartości progowej* wynosi 0,95). Aby znaleźć odpowiedź na tego typu pytania, musimy posłużyć się **funkcją odwrotną do dystrybuanty** rozkładu danej zmiennej losowej.
+
+Należy jeszcze zaznaczyć, że dziedziną funkcji odwrotnej do dystrybuanty jest zawsze przedział **otwarty** (0;1).
+
+**Nie każda dystrybuanta posiada funkcję do siebie odwrotną.** Aby takowa istniała, dystrybuanta musi być funkcją różnowartościową, a więc ściśle rosnącą. W związku z tym funkcje odwrotnych nie posiadają dystrybuanty dyskretnych zmiennych losowych.
+
+Poniżej przedstawione zostały wykresy funkcji odwrotnych do dystrybuant opisanych wyżej zmiennych `W`, `Y` i `Z`.
+
+```{r echo=FALSE, comment="", prompt=TRUE, collapse=TRUE}
+plot(NA, NA, xlim = c(0, 1), ylim = c(-4, 4),
+     main = "Fn. odwrotna do dystrybuanty zm. losowej W\no rozkładzie jednostajnym na przedziale [-1, 3]",
+     xlab = "P(W < r)", ylab = "r")
+grid()
+lines(c(0, 1), c(-1, 3), lwd = 3, col = 5)
+points(c(0, 1), c(-1, 3), pch = 13, cex = 2, lwd = 2, col = 5)
+```
+
+```{r echo=FALSE, comment="", prompt=TRUE, collapse=TRUE}
+plot(NA, NA, xlim = c(0, 1), ylim = c(-4, 4),
+     main = "Fn. odwrotna do dystrybuanty zm. losowej Y\no rozkładzie normalnym standaryzowanym",
+     xlab = "P(Y < r)", ylab = "r")
+grid()
+siatka = c(seq(0.00001, 0.01, 0.00001),
+           seq(0.015, 0.985, 0.005),
+           seq(0.99, 0.99999, 0.00001))
+lines(siatka, qnorm(siatka), lwd = 3, col = 3)
+```
+
+```{r echo=FALSE, comment="", prompt=TRUE, collapse=TRUE}
+plot(NA, NA, xlim = c(0, 1), ylim = c(-1, 7),
+     main = "Fn. odwrotna do dystrybuanty zm. losowej Z\no rozkładzie chi-kwadrat o jednym stopniu swobody",
+     xlab = "P(Z < r)", ylab = "r")
+grid()
+siatka = c(seq(0.001, 0.986, 0.005),
+           seq(0.99, 0.99999, 0.00001))
+lines(siatka, qchisq(siatka, 1), lwd = 3, col = 4)
+points(0, 0, pch = 13, cex = 2, lwd = 2, col = 4)
+```
+
+## Rozkład prawdopodobieństwa a funkcja gęstości prawdopodobienstwa rozkładu
+
+Jeśli dystrybuanta jest w pewnym sensie analogiem skumulowanego rozkładu częstości, to czy w przypadku zmiennych losowych posługujemy się również czymś analogicznym do *normalnych* (nie skumulowanych) rozkładów częstości? Odpowiedź na to pytanie jest twierdząca, tyle że w zależności od rodzaju zmiennej losowej - tego czy jest ona dyskretna, czy ciągła - używamy tu nieco innych narzędzi.
+
+### Rozkład prawdopodobieństwa dyskretnej zmiennej losowej
+
+Jeśli rozpatrywana przez nas zmienna losowa jest dyskretna, to możemy opisać jej rozkład prawdopodobieństwa, będący analogiem znanego nam już (brzegowego) rozkładu częstości zmiennej statystycznej.
+
+W przypadku opisanej wyżej zmiennej `X`, opisującej wyniki rzutu (dobrze wyważoną) monetą, będzie on wyglądał następująco:
+
+x_i | P(X = x_i)
+--- | ----------
+0   | 0,5
+1   | 0,5
+
+Ogólnie rzecz biorąc, dla każdej wartości, w której występuje nieciągłość dystrybuanty dyskretnej zmiennej losowej, prawdopodobieństwo wystąpienia danej wartości można odczytać z wykresu dystrybuanty jako *wysokość tego skoku* (bardziej formalnie jest to różnica granicą, do której w danym punkcie zbiega dystrybuanta od góry, a granicą, do której w tym punkcie zbiega ona od dołu).
+
+Możemy zilustrować to graficznie:
+
+```{r echo=FALSE, comment="", prompt=TRUE, collapse=TRUE}
+plot(c(0, 1), c(0.5, 0.5), type = "h", xlim = c(-2, 3), ylim = c(0, 1),
+     main = "Rozkład prawdopodobieństwa zm. losowej X, opisującej\nwynik rzutu monetą: 0 - reszka, 1 - orzeł",
+     xlab = "r", ylab = "P(X = r)")
+grid()
+points(c(0, 1), c(0.5, 0.5), pch = 16, cex = 2, col = 2)
+```
+
+### Funkcja gęstości ciągłej zmiennej losowej
+
+Tego samego aparatu pojęciowego nie daje się niestety (produktywnie) zastosować w odniesieniu do ciągłych zmiennych losowych. Rozpatrzmy w tym kontekście opisaną wyżej zmienną `W`. Wiemy, że może ona przyjmować wszyskie wartości rzeczywiste z przedziału [-1;3] i że każda z nich jest *równie prawdopodobna*. Wychodząc od tego drugiego stwierdzenia moglibyśmy chcieć określić wartość prawdopodobieństwa dla każdej pojedynczej wartości jako 1 (nasze prawdopodobieństwa muszą sumować się do jedności) podzielone przez moc (liczbę elementów) zbioru możliwych do przyjęcia wartości.
+
+Jednak zbiór liczb rzeczywistych zawartych w przedziale [-1;3] (jak i w każdym innym przedziale o niezerowej szerokości) jest równolicznych ze zbiorem liczb rzeczywistych! Ponieważ nie możemy bezpośrednio wykonać działania podzielenia jedności przez nieskończoność, ucieknijmy się do typowego w takich przypadkach rozwiązania i rozpatrzmy granicę wyrażenia `1 / n` przy `n` zbiegającym do nieskończoności. Jak powszechnie wiadomo, granicą tą jest 0.
+
+Doszliśmy więc do wniosku, że prawdopodobieństwo uzyskania każdej poszczególnej wartości, spośród tych, które może przyjąć zmienna `W` jest równe 0. Jest więc takie samo, jak dla wartości, co do których wiemy, że zmienna `W` w ogóle nie może ich przyjąć (czyli dowolnych spoza przedziału [-1;3]). Co ciekawe, jest to wniosek zupełnie poprawny formalnie! Pokazuje to jednak, że w przypadku zmiennej `W` (i problem ten dotyczy wszystkich ciągłych zmiennych losowych) mówienie o prawdopodobieństwie uzyskania poszczególnych wartości nie jest użytecznym sposobem opisywania jej rozkładu.
+
+W związku z tym w przypadku ciągłych zmiennych losowych posługujemy się **funkcją gęstości prawdopodobieństwa**, która jest **pochodną dystrybuanty**. Tak więc w miejscach, gdzie wartości dystrybuanty rosną szybciej, wartość funkcji gęstości jest większa, a w miejscach, gdzie wartości dystrybuanty rosną wolniej, wartość funkcji gęstości jest mniejsza. Przy tym:
+  - funkcja gęstości przyjmuje tylko wartości nieujemne (bo dystrybuata jest funkcją niemalejącą),
+  - pole powierzchni pod wykresem dystrybuanty jest zawsze równe 1,
+  - może się zdarzyć, że w niektórych punktach funkcja gęstości prawdopodobieństwa jest nieokreślona (jeśli dystrybuanta jest w danym punkcie nieróżniczkowalna, np. dlatego, bo jest nieciągła, nie da się w tym punkcie określić wartości funkcji gęstości).
+
+Funkcja gęstości prawdopodobieństwa pozwala nam w wygodny i łatwy do zauważenia na wykresie sposób pokazać, że wartości z pewnych przedziałów mają większe szanse pojawienia się jako opisane daną zmienną losową wyniki doświadczenia losowego, niż wartości z innych przedziałów. W związku z tym rozkłady ciągłych zmiennych losowych zwykle wizualizowane są właśnie przy pomocy wykresóW funkcji gęstości (z szeroko rozpoznawanym dzwonowatym wykresem funkcji gęstości rozkładu normalnego na czele). 
+Po odpowiedim przeskalowaniu osi pionowej wykresu, wykresy funkcji gęstości mogą być porównywane z wykresami obrazującymi rozkłądy zmiennych dyskretnych (w szczególności rozkładami zarejestrowanymi empirycznie, które zawsze są dyskretne). Ważne miejsce w instrumentarium praktycznie stosowanych technik statystycznych stanowią też metody estymacji przebiegu (ciągłej) funkcji gęstości na podstawie (dyskretnego) rozkładu danych empirycznych.
+
+Poniżej przedstawione zostały wykresy funkcji gęstości opisanych wyżej zmiennych `W`, `Y` i `Z`.
+
+Ponieważ dystrybuanta zmiennej `W` nie jest gładka, funkcja gęstości prawdopodobieństwa `W` ma nieciągłości, a do tego w punktach -1 i 3 jej wartość jest nieokreślona:
+
+```{r echo=FALSE, comment="", prompt=TRUE, collapse=TRUE}
+plot(NA, NA, xlim = c(-5, 5), ylim = c(0, 0.8),
+     main = "Fn. gęstości prawdopodobieństwa zm. losowej W\no rozkładzie jednostajnym na przedziale [-1, 3]",
+     xlab = "r", ylab = "f(r)")
+grid()
+lines(c(-6, -1), c(0, 0), lwd = 3, col = 5)
+lines(c(-1, -1), c(0, 0.25), lwd = 3, lty = 2, col = 5)
+lines(c(-1, 3), c(0.25, 0.25), lwd = 3, col = 5)
+lines(c(3, 3), c(0.25, 0), lwd = 3, lty = 2, col = 5)
+lines(c(3, 6), c(0, 0), lwd = 3, col = 5)
+points(c(-1, -1, 3, 3), c(0, 0.25, 0, 0.25), pch = 13, cex = 2, lwd = 2, col = 5)
+```
+
+Krztałt funkcji gęstości zmiennej `Y` jest szeroko rozpoznawany:
+
+```{r echo=FALSE, comment="", prompt=TRUE, collapse=TRUE}
+plot(NA, NA, xlim = c(-5, 5), ylim = c(0, 0.8),
+     main = "Fn. gęstości prawdopodobieństwa zm. losowej Y\no rozkładzie normalnym standaryzowanym",
+     xlab = "r", ylab = "f(r)")
+grid()
+siatka = seq(-6, 6, 0.05)
+lines(siatka, dnorm(siatka), lwd = 3, col = 3)
+```
+
+Zauważmy, że funkcja gęstości zmiennej `Z` przyjmuje tym większe wartości, im bardziej zbliża się od góry do 0. W istocie granicą, do której zbiega od góry w punkcie 0 wartość funkcji gęstości rozkładu chi-kwadrat **o jednym stopniu swobody** jest nieskończoność.
+
+```{r echo=FALSE, comment="", prompt=TRUE, collapse=TRUE}
+plot(NA, NA, xlim = c(-5, 5), ylim = c(0, 0.8),
+     main = "Fn. gęstości prawdopodobieństwa zm. losowej Z\no rozkładzie chi-kwadrat o jednym stopniu swobody",
+     xlab = "r", ylab = "f(r)")
+grid()
+siatka = seq(-6, 6, 0.05)
+lines(siatka, dchisq(siatka, 1), lwd = 3, col = 4)
+points(0, 0, pch = 13, cex = 2, lwd = 2, col = 4)
+```
+
+# Na następne zajęcia
+
+
+## Praca domowa
+
+Zostanie nadesłana mailem tuż po Nowym Roku.
