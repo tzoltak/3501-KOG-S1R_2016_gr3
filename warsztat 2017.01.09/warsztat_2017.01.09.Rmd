@@ -1,0 +1,354 @@
+---
+title: "Statystyka I z R<br/>Warsztat 12. Własności rozkładu normalnego; rozkład statystyki z próby"
+author: "Tomasz Żółtak"
+date: "9 stycznia 2017"
+output:
+  html_document:
+    css: ../styles.css
+    toc: TRUE
+    toc_depth: 3
+---
+
+Na dzisiejszych zajęciach...
+
+
+# Korzystanie z funkcji charakteryzujących rozkłady
+
+## Dystrybuanta
+
+Jak zostało to opisane na poprzednich zajęciach, w przypadku ciągłych rozkładów prawdopodobieństwa nie ma sensu zajmowanie się prawdopodobieństwem, że zmienna losowa przyjmie jakąś konkretną, jedną wartość (prawdopodobieństwo takie jest zawsze równe 0). Niemniej możemy - co w praktyce jest też znacznie bardziej użyteczne - zajmować się problemem, jakie jest prawdopodobieństwo, że zmienna losowa przyjmie wartość z pewnego określonego przedziału (o niezerowej szerokości).
+
+  - Jeśli interesuje nas prawdopodobieństwo, że zmienna losowa przyjmie wartości (nie)mniejsze niż dana:
+    - po prostu sprawdzamy wartość dystrybuanty w sanym punkcie: $P(X < r) = F_X(r)$.
+  - Jeśli interesuje nas prawdopodobieństwo, że zmienna losowa przyjmie wartości (nie)większe niż dana:
+    - musimy odjąć od 1 wartość dystrybuanty w danym punkcie: $P(X >= r) = 1 - P(X < r) = 1 - F_X(r)$
+
+```{r echo=FALSE, comment="", prompt=TRUE, collapse=TRUE}
+x = seq(156, 200, 0.2)
+y = pnorm(x, 178.7, 6.4)
+plot(x, y, col = 2, lwd = 2,
+     xlim = range(x) + c(2, -2), type = "l",
+     xlab = "X", ylab = "P(X < r)",
+     main = "Wartości przykładowej dystrybuanty\ni jej dopełnienie do 1 dla r = 185")
+grid(col = grey(0.5))
+arrows(c(187, 183), rep(pnorm(185, 178.7, 6.4), 2),
+       c(187, 183), c(0, 1), code = 3, lwd = 2, length = 0.1, col = 4)
+abline(v = 185, lwd = 2, lty = 2)
+abline(h = pnorm(185, 178.7, 6.4), lwd = 2, lty = 2)
+text(c(187, 183), c(0.5, 0.92), c("P(X < 185)", "P(X >= 185)"), pos = c(4, 2))
+```
+
+  - Jeśli interesuje nas prawdopodobieństwo, że zmienna losowa przyjmie wartości z przedziału $[r_1, r_2)$:
+    - musimy od wartości dystrybunaty w $r_2$ odjąć wartość dystrybuanty w $r_1$: $P(r_1 <= X < r_2) = P(X < r_2) - P(X < r_1) = F_X(r_2) - F_X(r_1)$.
+    - Zwróćmy uwagę, że to, czy przedział jest otwarty z jednego lub drugiego końca nie robi nam w praktyce żadnej różnicy, bo $P(X = r_1) = P(X = r_2) = 0$.
+  
+```{r echo=FALSE, comment="", prompt=TRUE, collapse=TRUE}
+x = seq(165, 209, 0.2)
+y = pnorm(x, 178.7, 6.4)
+plot(x, y, col = 2, lwd = 2,
+     xlim = range(x) + c(2, -2), type = "l",
+     xlab = "X", ylab = "P(X < r)",
+     main = "P(175 < X < 185)\n(przykładowa dystrybuanta)")
+grid(col = grey(0.5))
+arrows(c(177, 187, 195), pnorm(c(175, 185, 185), 178.7, 6.4),
+       c(177, 187, 195), c(0, 0, pnorm(175, 178.7, 6.4)),
+       code = 3, lwd = 2, length = 0.1, col = 4)
+abline(v = c(175, 185), lwd = 2, lty = 2)
+abline(h = pnorm(c(175, 185), 178.7, 6.4), lwd = 2, lty = 2)
+text(c(177, 187, 195), c(0.15, 0.5, 0.65),
+     c("P(X < 175)", "P(X < 185)", "P(175 <= X < 185)"), pos = 4)
+```
+
+### Interpretacja na wykresie funkcji gęstości
+
+Na wykresie funkcji gęstości to, co na wykresie dystrybuanty było różnicą wysokości, wyraża się polem (co jest prostą konsekwencją faktu, że funkcja gęstości prawdopodobobieństwa jest pochodną dystrybunaty). Poniżej przedstawione zostały graficzne ilustracje omówionych przed chwilą przypadków przy pomocy wykresów funkcji gęstości.
+
+  - Prawdopodobieństwo, że zmienna losowa przyjmie wartości (nie)mniejsze/(nie)większe niż dana.
+  
+```{r echo=FALSE, comment="", prompt=TRUE, collapse=TRUE}
+x = seq(156, 200, 0.2)
+y = dnorm(x, 178.7, 6.4)
+x1 = x[x <= 185]
+y1 = y[x <= 185]
+x2 = x[x >= 185]
+y2 = y[x >= 185]
+plot(NA, NA, xlim = range(x) + c(2, -2), ylim = range(y),
+     xlab = "X", ylab = "gęstość prawdopodobieństwa",
+     main = "P(X < 185) i P(X >=185)\nilustracja na wykresie funkcji gęstości")
+polygon(c(x1, 185, x1[1]), c(y1, 0, 0), col = 2)
+polygon(c(x2, 200, x2[1]), c(y2, 0, 0), col = 3)
+abline(v = 185, lwd = 2, lty = 2)
+grid(col = grey(0.5))
+legend("topright", legend = c("P(X < 185)", "P(X >= 185)"), fill = c(2, 3))
+```
+
+  - Prawdopodobieństwo, że zmienna losowa przyjmie wartość z danego przedziału.
+  
+```{r echo=FALSE, comment="", prompt=TRUE, collapse=TRUE}
+x = seq(156, 200, 0.2)
+y = dnorm(x, 178.7, 6.4)
+x1 = x[x <= 175]
+y1 = y[x <= 175]
+x2 = x[x <= 185]
+y2 = y[x <= 185]
+plot(NA, NA, xlim = range(x) + c(2, -2), ylim = range(y),
+     xlab = "X", ylab = "gęstość prawdopodobieństwa",
+     main = "P(175 <= X < 185)\nilustracja na wykresie funkcji gęstości")
+polygon(c(x2, 185, x2[1]), c(y2, 0, 0), col = 4)
+polygon(c(x1, 175, x1[1]), c(y1, 0, 0), col = 5)
+lines(x, y)
+abline(v = c(175, 185), lwd = 2, lty = 2)
+abline(h = 0)
+grid(col = grey(0.5))
+legend("topright", legend = c("P(X < 175)", "P(175 <= X < 185)"), fill = c(5, 4))
+```
+
+## Funkcja odwrotna do dystrybuanty
+
+Funkcji odwrotnej do dystrybuanty musimy użyć, kiedy chcemy się dowiedzieć, jaka jest wartość zmiennej, która spełnia warunek, że prawdopodobieństwo uzyskania wartości (nie)mniejszej/(nie)większej od niej przy losowaniu spod danego rozkładu jest równe pewnej konkretnej liczbie.
+
+  - Jeśli interesuje nas warunek, że prawdodpodobieństwo uzyskania wartości (nie)mniejszej od szukanej jest dane, tzn. $P(X < r) = p$, gdzie *p* jest dane, a *r* szukane:
+    - po prostu sprawdzamy wartość funkcji odwrotnej do dystrybuanty dla *p*: $F_X^{-1}(p)$.
+  - Jeśli interesuje nas warunek, że prawdodpodobieństwo uzyskania wartości (nie)większej od szukanej jest dane, tzn. $P(X >= r) = p$, gdzie *p* jest dane, a *r* szukane:
+    - trzeba sprawdzić wartość funkcji odwrotnej do dystrybuanty dla *1 - p*: $F_X^{-1}(1 - p)$.
+
+Np. jeśli szukamu takiej wartości *r*, że prawdopodobieństwo uzyskania wartości niemniejszej od niej jest równe 0,2, musimy sprawdzić (wartość dystrybunaty interesującej nas zmiennej losowej `X`): $F_X^{-1}(1 - 0,2) = F_X^{-1}(0,8)$.
+
+```{r echo=FALSE, comment="", prompt=TRUE, collapse=TRUE}
+x = seq(160, 204, 0.2)
+y = pnorm(x, 178.7, 6.4)
+plot(x, y, col = 2, lwd = 2,
+     xlim = range(x) + c(2, -2), type = "l",
+     xlab = "X", ylab = "P(X < r)",
+     main = "Wartości przykładowej dystrybuanty\ni jej dopełnienie do 1 dla r = 185")
+grid(col = grey(0.5))
+arrows(c(170, 190), c(0, 1), c(170, 190), c(0.8, 0.8),
+       code = 2, lwd = 2, lty = 1, length = 0.1, col = 4)
+abline(h = 0.8, lwd = 2, lty = 2, col = 4)
+arrows(qnorm(0.8, 178.7, 6.4), 0.8,
+       qnorm(0.8, 178.7, 6.4), -0.04, code = 2, lwd = 2, length = 0.1)
+text(c(170, 190, qnorm(0.8, 178.7, 6.4)), c(0.7, 0.9, 0), pos = 4,
+     labels = c("p = 1 - 0,2 = 0,8", "p = 0,2",
+                expression(paste(F[X], "(1 - 0,2) = 184,1"))))
+```
+
+# Rozkład normalny
+
+## Najważniejsze własności
+
+Rozkład normalny opisuje się tylko **dwoma parametrami** (znając ich wartości możemy zrekonstruować cały rozkład):
+
+  - **wartością oczekiwaną** (średnią),
+  - **odchyleniem standardowym** (lub równoważnie wariancją).
+
+Fakt, że zmienna losowa `X` ma rozkład normalny o średniej $\mu$ i odchyleniu standardowym $\sigma$ zapisujemy konwencjonalnie jako: $X: N(\mu; \sigma)$.
+
+**Wzór funkcji gęstości prawdopodobieństwa:** $f_x (x) = \frac{1}{\sigma \sqrt{2 \pi}} e^{\frac{(x - \mu)^2}{2\sigma^2}}$
+
+**Wzór dystrybunaty:** $F_x (x) = \int_{-\infty}^x \frac{1}{\sigma \sqrt{2 \pi}} e^{\frac{(x - \mu)^2}{2\sigma^2}} dx$
+
+**Uwaga na marginesie:** Można zwrócić uwagę, że dystrybuanta rozkładu normalnego nie ma wzoru jawnego - jej wartości muszą być obliczane jako wynik całkowania. Jest to akurat niezbyt przyjemna własność, która stanowi pewne wyzwanie np. przy implementowaniu w programie statystycznym funkcji mającej zwracać wartości tej dystrybuanty.
+
+#### Ponadto:
+
+  - Rozkład normalny **jest symetryczny** (względem wartości oczekiwanej).
+  - Rozkład normalny jest jednomodalny, tzn. jego funkcja gęstości prawdopodobieństwa posiada tylko jedno lokalne maksimum.
+  - W związku z powyższymi dwoma **wartość oczekiwana, mediana i modalna są takie same**.
+  - **Suma dwóch (lub więcej) zmiennych losowych o rozkładzie normalnym też jest zmienną losową o rozkładzie normalnym.**
+
+#### Nieco mniej ważne własności:
+
+  - Wiele własności badanych obiektów, jakie obserwuje się w naukach empirycznych (zwłaszcza związanych z fizyką i biologią) ma rozkład bardzo zbliżony do rozkładu normalnego.
+  - **Reguła *trzech sigm* **: jeśli zmienna losowa `X` ma rozkład normalny, to:
+    - w odległości nie większej niż 1 odchylnie standardowe od wartości oczekiwanej zawiera się ~68,3% obserwacji,
+    - w odległości nie większej niż 2 odchylnia standardowe od wartości oczekiwanej zawiera się ~95,4% obserwacji,
+    - w odległości nie większej niż 3 odchylnia standardowe od wartości oczekiwanej zawiera się ~99,7% obserwacji (czyli niemal wszystkie - przynajmniej, jeśli losujemy niezbyt dużą próbę).
+  - Dystrybuanty Wielu innych rozkładów statystycznych zbiegają do dystrybuanty rozkładu normalnego, w szczególności:
+    - rozkładu dwumianowego (w granicy przy dążącej do nieskończoności liczbie powtórzeń doświadczenia),
+    - rozkładu chi-kwadrat (w granicy przy dążącej do nieskończoności liczbie stopni swobody),
+    - rozkładu t-Studenta (w granicy przy dążącej do nieskończoności liczbie stopni swobody),
+    - rozkładu Poissona (w granicy przy dążącej do nieskończoności wartości oczekiwanej).
+
+## Dwa słowa o historii i zastosowaniach
+
+  - Wyprowadzenie i pierwsze zastosowania w astronomii, przy analizie własności błędów pomiaru - prace Gaussa (stąd rozkłąda normalny bywa też określany mianem *rozkładu Gaussa*) i Laplace'a (przełom XVIII i XIX w.).
+  - Spopularyzowany w drugiej połowie XIX w. w dziedzinie badań antropometrycznych, za sprawą prac Francisa Galtona i jego uczniów na temat dziedziczenie.
+    - Duży entuzjazm - np. W.F.R. Weldon sformułował tezę (nieco na wyrost), że wszystkie charakterystyki jednorodnych populacji zwierząt mają rozkład normalny, a K. Pearson powiadał wręcz, że *gdyby Grecy znali prawo [normalnego rozkładu błędów], zostałoby spersonifikowane i uznane za bóstwo*.
+  - Na przełomie XIX i XX w. coraz powszechniej stosowany w kontekścia analiz danych z dziedziny biologii i nauk o człowieku.
+    - Duża popularność np. w psychologii (rozkład inteligencji).
+    
+#### Ważne zastrzeżenie w kontekście powszechności występowania rozkładu normalnego
+
+Rozkłady zbliżone do normalnych występują dosyć powszechnie w badaniach empirycznych (choć nie aż tak, jak zdawało się niektórym naukowcom pod koniec XIX w.), jednak trzeba tu sformułować ważne zastrzeżenie, że dzieje się tak wyłącznie w ramach dosyć homogenicznych populacji.
+
+Rozpatrzmy np. wzrost. Na podstawie [badań przeprowadzonych w latach 2007-2009](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3078309/) wiemy, że rozkład wzrostu polskich 18-latków jest w Polsce w przybliżeniu normalny **oddzielnie** wśród mężczyzn (średnia 178,7 cm, odchylenie standardowe około 6,4 cm) i w przybliżeniu normalny **oddzielnie** wśród kobiet (średnia 165,1 cm, odchylenie standardowe około 5,9 cm). Jednak w związku z tym **w populacji wszystkich 18-latków w Polsce rozkład wieku bynajmniej nie będzie normalny** i generalnie będzie miał dosyć skomplikowany *kształt*, co ilustruje wykres poniżej (założono przy tym - nieco nieprecyzyjnie - równy rozkład płci w populacji).
+
+```{r echo=FALSE, comment="", prompt=TRUE, collapse=TRUE}
+x = seq(145, 200, 0.2)
+k = dnorm(x, 165.1, 5.9)
+m = dnorm(x, 178.7, 6.4)
+plot(x, k, col = 2, lwd = 2,
+     xlim = range(x) + c(2, -2), type = "l",
+     xlab = "wzrost [cm]", ylab = "gęstość prawdopodobieństwa",
+     main = "Rozkłady wieku wśród polskich 18-latków")
+lines(x, m, col = 4, lwd = 2)
+lines(x, (m + k) / 2, col = 1, lwd = 2)
+grid(col = grey(0.5))
+legend("topright", legend = c("K", "M", "ogółem"), col = c(2, 4, 1), lwd = 2)
+```
+
+## Rozkład normalny w R
+
+Wartości odpowiednich funkcji rozkładu normalnego można uzyskać w R:
+
+  - Dystrybuanty - wywołując funkcję `pnorm(x)`.
+  - Funkcji gęstości prawdopodobieństwa - wywołując funkcję `dnorm(x)`.
+  - Funkcji odwrotnje do dystrybuanty - wywołując funkcję `qnorm(p)`.
+
+Jako pierwszy (i jedyny wymagany) argument każdej z tych funkcji należy podać wartość (lub wektor wielu wartości), dla których ma zostać zwrócona wartość dystrybuanty lub funkcji gęstości (dowolna wartość ze zbioru liczb rzeczywistych - oczywiście dająca się reprezentować w R), albo wartość prawdopodobieństwa (musi być większa od 0, a mniejsza od 1) - w przypadku funkcji odwrotnej do dystrybuanty.
+
+  - Funkcja `rnorm(n)` pozwala z kolei wylosować próbę złożoną z `n` obserwacji, wartości których zostaną wygenerowane spod rozkładu normalnego (uwaga, jeśli `n` jest wektorem składającym się z wielu elementów, wciąż wygenerowana zostanie tylko jedna próba, za to jej liczebność będzie równa długości wektora `n`).
+
+Domyślnie wszystkie powyższe funkcje zwracają odpowiednie wartości dla rozkładu normalnego standaryzowanego. Jeśli chcemy wykorzystać rozkład o innej wartości oczekiwanej lub odchyleniu standardowym, możemy podać interesujące nas wartości tych parametrów jako odpowiednio drugi i trzeci argument tych funkcji.
+
+### Przykłady
+
+Przyjmijmy, że: X: N(0, 1), a Y: N(10, 15).
+
+  - Jaki odsetek obserwacji ma wartości zm. X mniejsze niż 2?
+```{r comment="", prompt=TRUE, collapse=TRUE}
+pnorm(2)
+```
+
+  - Jaki odsetek obserwacji ma wartości zm. X większe niż 0?
+```{r comment="", prompt=TRUE, collapse=TRUE}
+1 - pnorm(0, mean = 10, sd = 15)
+```
+
+  - Jaka jest wartość funkcji gęstości zm. Y w punktach 0, 1, ..., 19, 20?
+```{r comment="", prompt=TRUE, collapse=TRUE}
+dnorm(0:20, mean = 10, sd = 15)
+```
+
+  - Jaka jest wartość, taka że odsetek obserwacji mających wartości zm. X mniejsze od niej jest równy 0,05?
+```{r comment="", prompt=TRUE, collapse=TRUE}
+qnorm(0.05)
+```
+
+  - Jaka jest wartość, taka że odsetek obserwacji mających wartości zm. Y większą od niej jest równy 0,01?
+```{r comment="", prompt=TRUE, collapse=TRUE}
+qnorm(1 - 0.01, mean = 10, sd = 15)
+```
+
+  - Wylosujmy 10-cio elementową próbę spod rozkładu normalnego o wartości oczekiwanej 100 i odchyleniu standardowym 10:
+```{r comment="", prompt=TRUE, collapse=TRUE}
+proba = rnorm(10, mean = 100, sd = 10)
+proba
+```
+
+# Funkcje dla innych typowych rozkładów
+
+Wartości dystrybuant, funkcji odwrotnych do dystrybuant i funkcji gęstości prawdopodobieństwa dla innych typowych rozkładów, a także losowanie prób spod tych rozkładów umożliwiają w R funkcję, których nazwy mają strukturę: *[pqdr]nazwa_rozkładu*. Pierwsza litera oznacza rodzaj funkcji (p. opis dla rozkłądu normalnego powyżej), a kody opisujące nazwy rozkładów to:
+
+  - *unif* - rozkład jednostajny;
+  - *lnorm* - rozkład log-normalny;
+  - *chisq* - rozkład chi-kwadrat;
+  - *t* - rozkład t-Studenta;
+  - *f* - rozkład F (Fishera-Snecdora);
+  - *pois* - rozkład Poissona;
+  - *binom* - rozkład dwumianowy;
+  - i jescze kilka innych... (patrz pomoc do pakietu *stats*).
+  
+Np. sprawdźmy wartość dystrybuanty rozkładu jednostajnego na przedziale [-1, 2] w punkcie 0,2:
+```{r comment="", prompt=TRUE, collapse=TRUE}
+punif(0.2, -1, 2)
+```
+
+# Zadania
+
+Dane są następujące zmienne losowe:
+
+  - X: N(0; 1);
+  - Y: N(-1; 0,5);
+  - Z: rozkład jednostajny na przedziale [0; 1].
+
+Korzystając z odpowiednich funkcji programu R udziel odpowiedzi na następujące pytania:
+
+#### Zadania wymagajace użycia dystrybuanty
+
+  1. Jakie jest P(X < -2,5)?
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# to jest miejsce na Twój kod
+```
+
+  2. Jakie jest P(2,5 < X)?
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# to jest miejsce na Twój kod
+```
+
+  3. Jakie jest P(-0,5 < X < 1,5)?
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# to jest miejsce na Twój kod
+```
+
+  4. Jakie jest P(Y > -1.8)?
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# to jest miejsce na Twój kod
+```
+
+  4. Ile wynosi: P(Y < -2) + P(Y > 0)?
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# to jest miejsce na Twój kod
+```
+
+  5. Jakie jest P(Z > 1)?
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# to jest miejsce na Twój kod
+```
+
+  6. Jakie jest P(0,25 < Z < 0,75)?
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# to jest miejsce na Twój kod
+```
+
+#### Zadania wymagajace użycia funkcji odwrotnej do dystrybuanty
+
+Jaka jest taka wartość *r*, że:
+
+  1. P(x > r) = 0,95
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# to jest miejsce na Twój kod
+```
+
+  2. P(x < r) = 0,05
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# to jest miejsce na Twój kod
+```
+
+  3. P(-r < X < r) = 0,98
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# to jest miejsce na Twój kod
+```
+
+  4. P(r > Y) = 0,2
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# to jest miejsce na Twój kod
+```
+
+  5. P(r < Z) = 0,8
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# to jest miejsce na Twój kod
+```
+
+# Na następne zajęcia
+
+Na następnych zajęciach odbędzie się kartkówka, sprawdzająca:
+
+  1. Umiejętność rozróżniania od siebie dystrybuanty i funkcji gęstości prawdopodobieństwa (na podstawie wykresów).
+  2. Rozpoznawanie pytań, na które pozwala odpowiedzieć dystrybunta od pytań, na które pozwala odpowiedzieć funkcja odwrotna do dystrybuanty.
+  2. Umiejętność odpowiadania na ww. pytania na podstawie odpowiednio anotowanego wykresu dystrybuanty lub funkcji gęstości prawdopodobieństwa.
+  3. Znajomość najważniejszych własności rozkładu normalnego.
+
+## Praca domowa
+
+Zostanie nadesłana pocztą.
