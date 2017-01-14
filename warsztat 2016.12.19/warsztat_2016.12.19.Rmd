@@ -77,7 +77,7 @@ Dlaczego mówimy o rozkładzie zmiennej losowej, a nie o rozkładzie wyników do
 
 ####  1.
 
-W przypadku bardzo prostych doświadczeń losowych, takich jak rzut (*dobrze wyważoną*) monetą, czy rzut (*dobrze wyważoną*) kostką wywodzimy *de facto* wywodzimy je logicznie: zakładamy, że nie ma podstaw by twierdzić, że którekolwiek z nich jest bardziej prawdopodobne, niż inne. Zwróćmy uwagę, że określenia *rzut monetą* czy *rzut kostką*, tak jak są używane w nauczaniu rachunku prawdopodobieństwa i statystyki, w istocie są po prostu łatwymi do zrozumienia operaconalizacjami pewnych matematycznych abstrakcji (losowania z równym prawdopodobieństwem jednego elementu mało z licznego zbioru). Np. nie mamy żadnej(!) metody, która pozwalałaby niezawodnie (z całą pewnością) stwierdzić, że monetą, którą mam w kieszeni jest *(doskonale) dobrze wyważona* (choć mamy metody, które pozwalają nam uzyskać całkiem solidne przekonanie, że taka ona jest, lub wprost przeciwnie).
+W przypadku bardzo prostych doświadczeń losowych, takich jak rzut (*dobrze wyważoną*) monetą, czy rzut (*dobrze wyważoną*) kostką *de facto* wywodzimy je logicznie: zakładamy, że nie ma podstaw by twierdzić, że którekolwiek z nich jest bardziej prawdopodobne, niż inne. Zwróćmy uwagę, że określenia *rzut monetą* czy *rzut kostką*, tak jak są używane w nauczaniu rachunku prawdopodobieństwa i statystyki, w istocie są po prostu łatwymi do zrozumienia operaconalizacjami pewnych matematycznych abstrakcji (losowania z równym prawdopodobieństwem jednego elementu mało z licznego zbioru). Np. nie mamy żadnej(!) metody, która pozwalałaby niezawodnie (z całą pewnością) stwierdzić, że moneta, którą mam w kieszeni jest *(doskonale) dobrze wyważona* (choć mamy metody, które pozwalają nam uzyskać całkiem solidne przekonanie, że taka ona jest, lub wprost przeciwnie).
   
 ####  2.
 
@@ -171,7 +171,7 @@ lines(siatka, pchisq(siatka, 1), lwd = 3, col = 4)
 
 Dystrybuanta (jeśli ją znamy) pozwala nam odpowiedzieć na pytanie, jakie jest prawdopodobieństwo, że zmienna losowa przyjmie wartość mniejszą, niż dana. Przy prowadzeniu wnioskowania statystycznego bardzo często interesuje nas jednak odpowiedź na odwrotne pytanie, a mianowicie, jaka jest taka wartość zmiennej losowej, że prawdopodobieństwo uzyskania wartości mniejszej od niej wynosi określoną wartość (np. jaka jest taka *progowa wartość*, że prawdopodobieństwo uzyskania na opisanej powyżej zmiennej `Y` wartości mniejszej od tej *wartości progowej* wynosi 0,95). Aby znaleźć odpowiedź na tego typu pytania, musimy posłużyć się **funkcją odwrotną do dystrybuanty** rozkładu danej zmiennej losowej.
 
-Należy jeszcze zaznaczyć, że dziedziną funkcji odwrotnej do dystrybuanty jest zawsze przedział **otwarty** (0;1).
+Należy jeszcze zaznaczyć, że dziedziną funkcji odwrotnej do dystrybuanty jest zawsze przedział **otwarty** (0;1), lub jego podzbiór. W punktach 0, 1, a w przypadku zmiennych losowych, których dystrybuanty mają *punkty skokowe* również na przedziałach odpowidających tym skokom, funkcja odwrotna do dystrybuanty jest nieokreślona.
 
 **Nie każda dystrybuanta posiada funkcję do siebie odwrotną.** Aby takowa istniała, dystrybuanta musi być funkcją różnowartościową, a więc ściśle rosnącą. W związku z tym funkcje odwrotnych nie posiadają dystrybuanty dyskretnych zmiennych losowych.
 
@@ -210,7 +210,7 @@ points(0, 0, pch = 13, cex = 2, lwd = 2, col = 4)
 
 ## Rozkład prawdopodobieństwa a funkcja gęstości prawdopodobienstwa rozkładu
 
-Jeśli dystrybuanta jest w pewnym sensie analogiem skumulowanego rozkładu częstości, to czy w przypadku zmiennych losowych posługujemy się również czymś analogicznym do *normalnych* (nie skumulowanych) rozkładów częstości? Odpowiedź na to pytanie jest twierdząca, tyle że w zależności od rodzaju zmiennej losowej - tego czy jest ona dyskretna, czy ciągła - używamy tu nieco innych narzędzi.
+Jeśli dystrybuanta jest w pewnym sensie analogiem skumulowanego rozkładu częstości, to czy w przypadku zmiennych losowych posługujemy się również czymś analogicznym do *zwykłych* (nie skumulowanych) rozkładów częstości? Odpowiedź na to pytanie jest twierdząca, tyle że w zależności od rodzaju zmiennej losowej - tego czy jest ona dyskretna, czy ciągła - używamy tu nieco innych narzędzi.
 
 ### Rozkład prawdopodobieństwa dyskretnej zmiennej losowej
 
@@ -223,7 +223,7 @@ x_i | P(X = x_i)
 0   | 0,5
 1   | 0,5
 
-Ogólnie rzecz biorąc, dla każdej wartości, w której występuje nieciągłość dystrybuanty dyskretnej zmiennej losowej, prawdopodobieństwo wystąpienia danej wartości można odczytać z wykresu dystrybuanty jako *wysokość tego skoku* (bardziej formalnie jest to różnica granicą, do której w danym punkcie zbiega dystrybuanta od góry, a granicą, do której w tym punkcie zbiega ona od dołu).
+Ogólnie rzecz biorąc, dla każdej wartości, w której występuje nieciągłość dystrybuanty dyskretnej zmiennej losowej, prawdopodobieństwo wystąpienia danej wartości można odczytać z wykresu dystrybuanty jako *wysokość tego skoku* (bardziej formalnie jest to różnica pomiędzy granicą, do której w danym punkcie zbiega dystrybuanta od góry, a granicą, do której w tym punkcie zbiega ona od dołu).
 
 Możemy zilustrować to graficznie:
 
@@ -245,8 +245,8 @@ Doszliśmy więc do wniosku, że prawdopodobieństwo uzyskania każdej poszczeg�
 
 W związku z tym w przypadku ciągłych zmiennych losowych posługujemy się **funkcją gęstości prawdopodobieństwa**, która jest **pochodną dystrybuanty**. Tak więc w miejscach, gdzie wartości dystrybuanty rosną szybciej, wartość funkcji gęstości jest większa, a w miejscach, gdzie wartości dystrybuanty rosną wolniej, wartość funkcji gęstości jest mniejsza. Przy tym:
   - funkcja gęstości przyjmuje tylko wartości nieujemne (bo dystrybuata jest funkcją niemalejącą),
-  - pole powierzchni pod wykresem dystrybuanty jest zawsze równe 1,
-  - może się zdarzyć, że w niektórych punktach funkcja gęstości prawdopodobieństwa jest nieokreślona (jeśli dystrybuanta jest w danym punkcie nieróżniczkowalna, np. dlatego, bo jest nieciągła, nie da się w tym punkcie określić wartości funkcji gęstości).
+  - pole powierzchni pod wykresem dystrybuanty jest zawsze równe 1 (bo maksymalną wartością dystrybuanty zawsze jest 1; nawet jeśli nieraz tylko w granicy),
+  - może się zdarzyć, że w niektórych punktach funkcja gęstości prawdopodobieństwa jest nieokreślona (jeśli dystrybuanta jest w danym punkcie nieróżniczkowalna, np. dlatego, bo jest nieciągła, albo dlatego, że nie jest gładka, nie da się w tym punkcie określić wartości funkcji gęstości).
 
 Funkcja gęstości prawdopodobieństwa pozwala nam w wygodny i łatwy do zauważenia na wykresie sposób pokazać, że wartości z pewnych przedziałów mają większe szanse pojawienia się jako opisane daną zmienną losową wyniki doświadczenia losowego, niż wartości z innych przedziałów. W związku z tym rozkłady ciągłych zmiennych losowych zwykle wizualizowane są właśnie przy pomocy wykresóW funkcji gęstości (z szeroko rozpoznawanym dzwonowatym wykresem funkcji gęstości rozkładu normalnego na czele). 
 Po odpowiedim przeskalowaniu osi pionowej wykresu, wykresy funkcji gęstości mogą być porównywane z wykresami obrazującymi rozkłądy zmiennych dyskretnych (w szczególności rozkładami zarejestrowanymi empirycznie, które zawsze są dyskretne). Ważne miejsce w instrumentarium praktycznie stosowanych technik statystycznych stanowią też metody estymacji przebiegu (ciągłej) funkcji gęstości na podstawie (dyskretnego) rozkładu danych empirycznych.

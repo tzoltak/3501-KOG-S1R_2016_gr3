@@ -9,7 +9,7 @@ output:
     toc_depth: 3
 ---
 
-Na dzisiejszych zajęciach...
+Na dzisiejszych zajęciach zapoznamy się z praktycznymi sposobami wykorzystania dystrybuanty i funkcji odwrotnej do dytrybuanty, a także z własnościami rozkłądu normalnego.
 
 
 # Korzystanie z funkcji charakteryzujących rozkłady
@@ -154,6 +154,10 @@ Fakt, że zmienna losowa `X` ma rozkład normalny o średniej $\mu$ i odchyleniu
   - Rozkład normalny **jest symetryczny** (względem wartości oczekiwanej).
   - Rozkład normalny jest jednomodalny, tzn. jego funkcja gęstości prawdopodobieństwa posiada tylko jedno lokalne maksimum.
   - W związku z powyższymi dwoma **wartość oczekiwana, mediana i modalna są takie same**.
+  - **Znając wartości dystrybuanty jednego rozkładu normalnego** (tradycyjnie posługuje się tu rozkładem normalnym standaryzowanym, tzn. o wartości oczekiwanej 0 i odchyleniu standardowym 1), **można łatwo zrekonstruować wartości dystrybuanty dowolnego innego rozkładu normalnego**.
+    - Załóżmy, że znamy (np. posiadamy tablice statystyczne) wartości dystrybuanty rozkładu normalnego standaryzowanego - oznaczmy ją: $\Phi(r) = P(X<r)$ dla $X: N(0; 1)$.
+    - Wartość dystrybuanty dowolnego rozkładu normalnego $Y: N(\mu; \sigma)$ możemy obliczyć jako: $F_Y(r) = \Phi \left( \frac{r - \mu}{\sigma} \right)$.
+    - Analogicznie można postąpić z funkcją odwrotną do dystrybuanty: $F_Y^{-1}(p) = \mu + \Phi^{-1}(p) \cdot \sigma$.
   - **Suma dwóch (lub więcej) zmiennych losowych o rozkładzie normalnym też jest zmienną losową o rozkładzie normalnym.**
 
 #### Nieco mniej ważne własności:
@@ -168,6 +172,62 @@ Fakt, że zmienna losowa `X` ma rozkład normalny o średniej $\mu$ i odchyleniu
     - rozkładu chi-kwadrat (w granicy przy dążącej do nieskończoności liczbie stopni swobody),
     - rozkładu t-Studenta (w granicy przy dążącej do nieskończoności liczbie stopni swobody),
     - rozkładu Poissona (w granicy przy dążącej do nieskończoności wartości oczekiwanej).
+
+### Co jeszcze wynika z tego, że rozkład normalny jest symetryczny?
+
+Dwie punkty: $r_1$ i $r_2$ znajdują się w takiej samej odległości od wartości oczekiwanej zmiennej losowej $X: N(\mu; \sigma)$, tzn. $|\mu - r_1| = |r_2 - \mu|$ **wtedy i tylko wtedy, gdy** $P(X < r_1) = P(X > r_2)$.
+
+```{r echo=FALSE, comment="", prompt=TRUE, collapse=TRUE}
+x = seq(-2, 2, 0.05)
+y1 = pnorm(x)
+y2 = dnorm(x)
+plot(x, y1, col = 2, lwd = 2, type = "l",
+     xlim = c(-1.7, 1.7), xaxt = "n",
+     xlab = expression(paste("X: N(", mu, "; ", sigma, ")")),
+     ylab = "P(X < r)",
+     main = "Dystrybunata")
+axis(1, c(-1, 0, 1), c(expression(r[1]), expression(mu), expression(r[2])),
+     cex = 1.5)
+grid(col = grey(0.5))
+abline(v = c(-1, 1), lwd = 2, lty = 2)
+arrows(c(-1, 1), c(0, 1), c(-1, 1), pnorm(c(-1, 1)),
+       code = 3, lwd = 3, lty = 1, length = 0.1, col = 3)
+arrows(c(-1, 1), 0, 0, 0,
+       code = 3, lwd = 2, lty = 1, length = 0.1, col = 4)
+abline(v = 0)
+abline(h = pnorm(c(-1, 1)), lwd = 2, lty = 2)
+text(c(-0.5, 0.5, -1, 1), c(0, 0, c(0, pnorm(1)) + pnorm(-1) / 2),
+     pos = c(3, 3, 2, 4), font = 2, cex = 1.2,
+     labels = c(expression(paste("d = |", mu, "-", r[1], "|")),
+                expression(paste("d = |", r[2], "-", mu, "|")), "a", "a"))
+x1 = x[x <= -1]
+y21 = y2[x <= -1]
+x2 = x[-1 <= x & x <= 1]
+y22 = y2[-1 <= x & x <= 1]
+x3 = rev(x[x >= 1])
+y23 = rev(y2[x >= 1])
+plot(x, y2, col = 2, lwd = 2, type = "l",
+     xlim = c(-1.7, 1.7), xaxt = "n", ylim = c(0, max(y2)),
+     xlab = expression(paste("X: N(", mu, "; ", sigma, ")")),
+     ylab = "gęstość prawdopodobieństwa",
+     main = "Funkcja gęstości prawdopodobobieństwa")
+axis(1, c(-1, 0, 1), c(expression(r[1]), expression(mu), expression(r[2])),
+     cex = 1.5)
+polygon(c(x1, -1, x1[1]), c(y21, 0, 0), col = 3)
+polygon(c(x2, 1, -1), c(y22, 0, 0), col = 2)
+polygon(c(x3, 1, x3[1]), c(y23, 0, 0), col = 3)
+grid(col = grey(0.5))
+abline(v = c(-1, 0, 1), lwd = 3, lty = 1)
+arrows(c(-1, 1), 0, 0, 0,
+       code = 3, lwd = 3, lty = 1, length = 0.1, col = 1)
+text(c(-0.5, 0.5), c(0, 0), pos = 3, cex = 1.2, col = "white",
+     labels = c(expression(paste("d = |", mu, "-", r[1], "|")),
+                expression(paste("d = |", r[2], "-", mu, "|"))))
+text(c(-1.5, 1.5), c(0.05, 0.05), cex = 2, col = 1, labels = c("a", "a"))
+```
+
+
+W szczególności dla zmiennej losowej o rozkładzie normalnym i **wartości oczekiwanej równej 0** zachodzi: $P(X < r_1) = P(X > r_2)$ **wtedy i tylko wtedy, gdy** $r_1 = -r_2$.
 
 ## Dwa słowa o historii i zastosowaniach
 
@@ -190,7 +250,7 @@ m = dnorm(x, 178.7, 6.4)
 plot(x, k, col = 2, lwd = 2,
      xlim = range(x) + c(2, -2), type = "l",
      xlab = "wzrost [cm]", ylab = "gęstość prawdopodobieństwa",
-     main = "Rozkłady wieku wśród polskich 18-latków")
+     main = "Rozkłady wzrostu wśród polskich 18-latków")
 lines(x, m, col = 4, lwd = 2)
 lines(x, (m + k) / 2, col = 1, lwd = 2)
 grid(col = grey(0.5))
@@ -220,7 +280,7 @@ Przyjmijmy, że: X: N(0, 1), a Y: N(10, 15).
 pnorm(2)
 ```
 
-  - Jaki odsetek obserwacji ma wartości zm. X większe niż 0?
+  - Jaki odsetek obserwacji ma wartości zm. Y większe niż 0?
 ```{r comment="", prompt=TRUE, collapse=TRUE}
 1 - pnorm(0, mean = 10, sd = 15)
 ```
@@ -278,37 +338,37 @@ Korzystając z odpowiednich funkcji programu R udziel odpowiedzi na następując
 
   1. Jakie jest P(X < -2,5)?
 ```{r comment="", prompt=TRUE, collapse=TRUE}
-# to jest miejsce na Twój kod
+pnorm(-2.5)
 ```
 
   2. Jakie jest P(2,5 < X)?
 ```{r comment="", prompt=TRUE, collapse=TRUE}
-# to jest miejsce na Twój kod
+1 - pnorm(2.5)
 ```
 
   3. Jakie jest P(-0,5 < X < 1,5)?
 ```{r comment="", prompt=TRUE, collapse=TRUE}
-# to jest miejsce na Twój kod
+pnorm(1.5) - pnorm(-0.5)
 ```
 
   4. Jakie jest P(Y > -1.8)?
 ```{r comment="", prompt=TRUE, collapse=TRUE}
-# to jest miejsce na Twój kod
+1 - pnorm(-1.8, -1, 0.5)
 ```
 
-  4. Ile wynosi: P(Y < -2) + P(Y > 0)?
+  5. Ile wynosi: P(Y < -2) + P(Y > 0)?
 ```{r comment="", prompt=TRUE, collapse=TRUE}
-# to jest miejsce na Twój kod
+pnorm(-2, -1, 0.5) + (1 - pnorm(0, -1, 0.5))
 ```
 
-  5. Jakie jest P(Z > 1)?
+  6. Jakie jest P(Z > 1)?
 ```{r comment="", prompt=TRUE, collapse=TRUE}
-# to jest miejsce na Twój kod
+1 - punif(1, 0, 1)
 ```
 
-  6. Jakie jest P(0,25 < Z < 0,75)?
+  7. Jakie jest P(0,25 < Z < 0,75)?
 ```{r comment="", prompt=TRUE, collapse=TRUE}
-# to jest miejsce na Twój kod
+punif(0.75) - punif(0.25)
 ```
 
 #### Zadania wymagajace użycia funkcji odwrotnej do dystrybuanty
@@ -317,27 +377,27 @@ Jaka jest taka wartość *r*, że:
 
   1. P(x > r) = 0,95
 ```{r comment="", prompt=TRUE, collapse=TRUE}
-# to jest miejsce na Twój kod
+qnorm(1 - 0.95)
 ```
 
   2. P(x < r) = 0,05
 ```{r comment="", prompt=TRUE, collapse=TRUE}
-# to jest miejsce na Twój kod
+qnorm(0.05)
 ```
 
   3. P(-r < X < r) = 0,98
 ```{r comment="", prompt=TRUE, collapse=TRUE}
-# to jest miejsce na Twój kod
+-1 * qnorm(0.01)
 ```
 
   4. P(r > Y) = 0,2
 ```{r comment="", prompt=TRUE, collapse=TRUE}
-# to jest miejsce na Twój kod
+qnorm(0.2, -1, 0.5)
 ```
 
   5. P(r < Z) = 0,8
 ```{r comment="", prompt=TRUE, collapse=TRUE}
-# to jest miejsce na Twój kod
+qunif(1 - 0.8, 0 , 1)
 ```
 
 # Na następne zajęcia
@@ -346,8 +406,8 @@ Na następnych zajęciach odbędzie się kartkówka, sprawdzająca:
 
   1. Umiejętność rozróżniania od siebie dystrybuanty i funkcji gęstości prawdopodobieństwa (na podstawie wykresów).
   2. Rozpoznawanie pytań, na które pozwala odpowiedzieć dystrybunta od pytań, na które pozwala odpowiedzieć funkcja odwrotna do dystrybuanty.
-  2. Umiejętność odpowiadania na ww. pytania na podstawie odpowiednio anotowanego wykresu dystrybuanty lub funkcji gęstości prawdopodobieństwa.
-  3. Znajomość najważniejszych własności rozkładu normalnego.
+  3. Umiejętność odpowiadania na ww. pytania na podstawie odpowiednio anotowanego wykresu dystrybuanty lub funkcji gęstości prawdopodobieństwa.
+  4. Znajomość najważniejszych własności rozkładu normalnego.
 
 ## Praca domowa
 

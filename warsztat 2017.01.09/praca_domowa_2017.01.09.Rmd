@@ -1,0 +1,97 @@
+---
+title: "Praca domowa na 16.01.2017"
+author: "Tomasz Żółtak"
+date: "11 stycznia 2017"
+output:
+  html_document:
+    css: ../styles.css
+    toc: TRUE
+    toc_depth: 3
+---
+
+# Zadanie 1.
+
+```{r echo=FALSE, comment="", prompt=TRUE, collapse=TRUE}
+plot(c(-10, 0, 1, 10), c(0, 0, 1, 1), xlim = c(-1, 5), type = "l",
+     xlab = "X", ylab = "", main = "A", lwd = 3, col = 2)
+grid(col = grey(0.5))
+plot(c(-10, 2, 3.95, 4, 10), c(0, 0, 1, 0, 0), xlim = c(0, 7), type = "l",
+     xlab = "X", ylab = "", main = "B", lwd = 3, col = 3)
+grid(col = grey(0.5))
+plot(c(-10, seq(-sqrt(2 / pi), sqrt(2 / pi), length.out = 100), 10),
+     c(0, cos(seq(-pi / 2, pi / 2, length.out = 100)) * sqrt(2 / pi), 0),
+     xlim = c(-1, 1), type = "l",
+     xlab = "X", ylab = "", main = "C", lwd = 3, col = 4)
+grid(col = grey(0.5))
+```
+
+Dla każdego z powyższych wykresów wybierz (usuwając niepoprawną odpowiedź), czy obrazuje on przebieg dystrybuanty, czy funkcji gęstości prawdopodobieństwa. Na jakiej podstawie wyciągnąłeś/ęłaś taki wniosek?
+
+Wykres:
+  
+  - A: **dystrybuanta/funkcja gęstości prawdopodobieństwa**, bo: **napisz krótkie uzasadnienie**;
+  - B: **dystrybuanta/funkcja gęstości prawdopodobieństwa**, bo: **napisz krótkie uzasadnienie**;
+  - C: **dystrybuanta/funkcja gęstości prawdopodobieństwa**, bo: **napisz krótkie uzasadnienie**;
+
+# Zadanie 2.
+
+Dana jest pewna zmienna losowa *W*. Przy każdym z poniższych pytań zdecyduj (usuwając niepoprawną odpowiedź), czy aby odpowiedzieć na nie należy posłużyć się dystrybuantą zmiennej *W*, czy funkcją odwrotną do dystrybuanty zmiennej *W*?
+
+  1. Jakie jest *r*, które spełnia warunek: P(W < r) = 0,3? **dystrybuanta/funkcja odwrotna do dystrybuanty**;
+  2. Jakie jest P(W > -1.8)? **dystrybuanta/funkcja odwrotna do dystrybuanty**;
+  3. Jakie jest P(3 < W < 5,1)? **dystrybuanta/funkcja odwrotna do dystrybuanty**;
+
+# Zadanie 3.
+
+Przebieg dystrybuanty zmiennej losowej X obrazuje wykres poniżej.
+
+```{r echo=FALSE, comment="", prompt=TRUE, collapse=TRUE}
+plot(c(-1, 1, 2.5, 3, 4, 5, 6, 7.5, 8, 10),
+     c(0, 0, 0.15, 0.3, 0.3, 0.4, 0.5, 0.95, 1, 1),
+     xlim = c(0, 9), ylim = c(-0.1, 1.1), type = "l", lwd = 3, col = 2,
+     xaxp = c(0, 9, 9), yaxp = c(0, 1, 10), xaxs = "i", yaxs = "i",
+     xlab = "r", ylab = "P(X < r)", main = "Dystrybuanta zm. losowej X")
+grid(nx = 9, ny = 12, col = grey(0.5))
+```
+
+Odpowiedz na pytania:
+
+  1. Ile wynosi P(X < 3,6)? **wpisz odpowiedź**
+  2. Ile wynosi P(X > 2)? **wpisz odpowiedź**
+  3. Ile wynosi P(2 < X < 7)? **wpisz odpowiedź**
+  4. Jaka jest wartość *r* spełniająca warunek: P(X > r) = 0,6? **wpisz odpowiedź**
+  5. Jaka jest wartość *r* spełniająca warunek: P(X < r) = 0,5? **wpisz odpowiedź**
+  
+# Zadanie 4.
+
+Przebieg funkcji gęstości prawdopodobieństwa zmiennej losowej Y obrazuje wykres poniżej.
+
+```{r echo=FALSE, comment="", prompt=TRUE, collapse=TRUE}
+plot(NA, NA, xlim = c(-1, 5), ylim = c(0, 0.5),
+     main = "Funkcja gęstości prawdopodieństwa zm. losowej Y",
+     xlab = "r", ylab = "f(r)")
+grid(col = grey(0.5))
+lines(c(-2, 0), c(0, 0), lwd = 3, col = 4)
+lines(c(0, 0), c(0, 0.4), lwd = 3, lty = 2, col = 4)
+lines(c(0, 2), c(0.4, 0.4), lwd = 3, col = 4)
+lines(c(2, 2), c(0.4, 0.1), lwd = 3, lty = 2, col = 4)
+lines(c(2, 4), c(0.1, 0.1), lwd = 3, col = 4)
+lines(c(4, 4), c(0.1, 0), lwd = 3, lty = 2, col = 4)
+lines(c(4, 6), c(0, 0), lwd = 3, col = 4)
+points(c(0, 0, 2, 2, 4, 4), c(0, 0.4, 0.4, 0.1, 0.1, 0),
+       pch = 13, cex = 2, lwd = 2, col = 4)
+```
+
+Odpowiedz na pytania:
+
+  1. Ile wynosi P(Y < 1)? **wpisz odpowiedź**
+  2. Ile wynosi P(Y > 2)? **wpisz odpowiedź**
+  3. Ile wynosi P(1 < Y < 3)? **wpisz odpowiedź**
+  4. Jaka jest wartość *r* spełniająca warunek: P(Y < r) = 0,8? **wpisz odpowiedź**
+  5. Jaka jest wartość *r* spełniająca warunek: P(Y > r) = 0,15? **wpisz odpowiedź**
+
+# Czynności końcowe
+
+  - Zapisz wyniki swojej pracy (tj. plik "praca_domowa_2017.01.09.Rmd").
+  - Zmień jego nazwę na "moje_imie_i_nazwisko_2017.01.09.Rmd".
+  - Wyślij go na adres email: **zoltakt@is.uw.edu.pl**
