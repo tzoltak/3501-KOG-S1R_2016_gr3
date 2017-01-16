@@ -1,5 +1,5 @@
 ---
-title: "Statystyka I z R<br/>Warsztat 12. Własności rozkładu normalnego; rozkład statystyki z próby"
+title: "Statystyka I z R<br/>Warsztat 12. Własności rozkładu normalnego; korzystanie z dystrybunty i funkcji odwrotnej do dystrybuanty"
 author: "Tomasz Żółtak"
 date: "9 stycznia 2017"
 output:

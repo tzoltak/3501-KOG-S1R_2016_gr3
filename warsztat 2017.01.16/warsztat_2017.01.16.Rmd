@@ -1,0 +1,335 @@
+---
+title: "Statystyka I z R<br/>Warsztat 13. Prosta próba losowa i rozkład statystyki z próby"
+author: "Tomasz Żółtak"
+date: "16 stycznia 2017"
+output:
+  html_document:
+    css: ../styles.css
+    toc: TRUE
+    toc_depth: 2
+---
+
+Na dzisiejszych zajęciach....
+
+
+# Prosta próba losowa
+
+### Próba a populacja
+
+Populacja jest grupą jednostek, czy obiektów, o własnościach której chcemy wypowiedzieć się prowadząc dane badanie empiryczne. Czasem, jeśli populacja taka jest niewielka, lub interesujące nas informacje są (względnie) łatwo dostępne (np. w rejestrach państwowych, z założenia przechowujących dane o wszystkich obywatelach państwa), możemy przeanalizować informacje dotyczące wszystkich członków (elementów) populacji. Zwykle w ramach badania mamy jednak możliwość dotrzeć i zmierzyć interesujące nas własności tylko pewnej, często niezbyt licznej, podgrupy spośród członków interesującej nas populacji. Taką podgrupę będziemy nazywać **próbą**.
+
+Na dzisiejszych zajęciach będziemy zajmować się tym, w jaki sposób można na podstawie własności jednostek wylosowanych (w określony sposób) do próby starać się wnioskować o własnościach całej populacji. Aby to sobie ułatwić przyjmiemy założenie, że znamy wartości interesującej nas cechy dla wszystkich jednostek z populacji. Umożliwi nam to porównanie, jak to, co wiemy, że ma miejsce w populacji znajduje odbicie w tym, co możemy zobaczyć, gdy będziemy losować próby. Poznamy w ten sposób własności narzędzi statystycznych służących do opisywania własności populacji na podstawie próby.
+
+### Próba losowa
+
+Próby mogą być dobierane w różny sposób, niekoniecznie losowy, gdyż - jak zobaczymy za chwilę - może to być w praktyce bardzo trudne, lub wręcz niewykonalne. Wykorzystanie prób losowych ma jednak pewną istotną zaletę - tylko w odniesieniu do prób losowych możemy *z czystym sumieniem* stosować techniki wnioskowania statystycznego, czyli w systematyczny i podparty teorią sposób udzielać odpowiedzi na pytanie, czy obserwowane w danych różnice - pomiędzy grupami, w stosunku do wyników wcześniejszych badań, w porównaniu do wartości, których spodziewalibyśmy się na podstawie teorii - można uznać za wynikające z tego, że podobne różnice zachodzą również w populacji, czy też wynikają one najprawdopodobniej ze specyfiki danej konkretnej próby, którą tym razem wylosowaliśmy (tego, że cechy jednostek w pojedynczej próbie różnią się zawsze w pewnym stopniu od cech całej populacji, z której próba została dobrana).
+
+Nie wchodząc, z braku czasu, w większe szczegóły formalne, jeśli mamy do czynienia z **populacją o skończonej liczebności**, to **metodę doboru z niej jednostek do próby** możemy uznać za losową wtedy, gdy:
+  1. dla każdej jednostki z tej populacji jesteśmy w stanie określić prawdopodobieństwo, że w wyniku zastosowania tej procedury doboru znajdzie się ona w próbie,
+  2. dla każdej jednostki z tej populacji to prawdopodobieństwo musi być większe od zera.
+
+Procedury doboru mogą w praktyce wyglądać bardzo różnie. Najprostsza do wyobrażenia sobie (i pod wieloma względami komfortowa dla badacza) jest sytuacja, w której dysponujemy spisem wszystkich jednostek należących do populacji (nazywamy go wtedy operatem losowania) i możemy na jego podstawie wylosować do próby poszczególne jednostki.
+
+### Prosta próba losowa
+
+Dalej będziemy się zajmować własnościami tylko dwóch szczególnych procedur doboru próby na podstawie znanego operatu, tzw. schematami doboru **prostych prób losowych**. Procedura doboru takiej próby, o założonej liczbności *n* elementów, polega na powtórzeniu *n* razy losowanie pojedynczej jednostki z danej populacji (operatu). Możemy przy tym zastosować jedno z dwóch podejść:
+
+  a) tzw. **dobór niezależny**: po wylosowaniu kolejnego elementu próby każdorazowo *zwracać* go z powrotem do populacji:
+     -  w ten sposób ta sama jednostka może kilkakrotnie zostać wybrana do próby - będzie w niej występować w kilku *kopiach* - może się to wydawać trochę bez sensu, ale:
+        - jeśli populacja jest wielokrotnie liczniejsza od próby, prawdopodobieństwo wielokrotnego wylosowania tej same jednostki jest zaniedbywalnie małe,
+        - gdybyśmy chcieli wyprowadzać wzory na rozkłady analitycznie (przy pomocy dowodów matematycznych), byłoby to w tej sytuacji dużo łatwiejsze - doświadczenie losowe losowe polegające na dobraniu pojedynczego elementu do próby jest dla każdego elementu opisywane zmienną losową o dokładnie takim samym rozkładzie (i jest to rozkład badanej zmiennej w populacji);
+     - ciekawostka: możemy w ten sposób wylosować próbę bardziej liczną, niż populacja;
+        - może się to wydawać pomysł cokolwiek ekscentryczny, ale też znajduje zastosowanie w pewnych dziedzinach statsytsyki (tzw. *bootstrapoewe* metody szacowania wielkości błędów standardowych);
+  b) tzw. **dobór zależny**:po wylosowaniu kolejnego elementu nie *zwracać* go do populacji, lecz kolejne losowania prowadzić na populacji pomniejszonej o te jednostki, które już zostały dobrane do próby:
+     - jest to skądinąd sensowne, ale utrudnia rachunki (gdy wyprowadzać wzory analitycznie);
+     - różnice w stosunku do doboru niezależnego uwidaczniają się tylko w sytuacji, gdy liczebność próby stanowi wystarczająco duży odestek populacji (umownie możemy przyjąć, że gdy losujemy powyżej 3%-4% populacji);
+     - maksymalna możliwa liczebność próby zależnej jest oczywiście równa liczebności populacji.
+
+### Funcja sample()
+
+W R do losowania prostych (i nie tylko, ale nas będą interesować tylko proste) prób losowych ze skończonych populacji może nam posłużyć funkcja `sample()`.
+
+Jeśli wektor `x` zawiera wartości interesującej nas zmiennej dla wszystkich jednostek w populacji, to możemy wylosować pojedynczą prostą, zależną próbę losową o liczebności zadanej wartością `n` wywołując `sample(x, n)`, np.:
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# Niech nasza populacja składa się ze 10 osób
+#   a w zmiennej `x` będzie zapisany ich wzrost:
+x = c(178, 182, 172, 179, 183, 190, 161, 180, 176, 189)
+# wylosujmy dwuelementową próbę prostą, w sposób zależny
+sample(x, 2)
+# możemy też wylosować próbę w sposób niezależny:
+sample(x, 2, replace = TRUE)
+```
+
+Porównajmy jeszcze wyniki losowania w sposób zależny i niezależny, gdy liczebność próby jest równa liczebności populacji:
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# losowanie
+probaZal = sample(x, 10)
+probaNzal = sample(x, 10, replace = TRUE)
+# aby wygodniej porównać skład, posortujmy elementy wg wartości zmiennej
+sort(x)
+# skład próby zależnej dokładnie odpowiada składowi populacji
+sort(probaZal)
+# a skład próby niezależnej już (raczej) nie
+sort(probaNzal)
+```
+
+# Statystka z próby
+
+Na podstawie próby staramy się zwykle **wnioskować na temat wartości pewnych parametrów opisujących rozkłady zmiennych w interesującej nas populacji**. W tym celu wykorzystujemy **statystyki z próby** -  są to parametry rozkładu zmiennej w próbie.
+
+  - Często statystykę z próby obliczamy w sposób zupełnie analogiczny do parametru populacyjnego, o którym chcemy wnioskować (tyle że na podstawie próby).
+    - Np. średnia.
+  - Czasem jednak wiemy, że wartości populacyjne interesującego nas parametru jest lepiej przybliżana przez statystykę z próby, którą trzeba obliczyć nieco inaczej, niż parametr w populacji.
+    - Np. wariancja - używamy statystki z próby, określanej jako *odciążona wariancja*, w której sumę kwadratów odchyleń od średniej dzielimy przez liczebność próby pomniejszoną o jeden (analogiem obliczania wariancji w populacji byłoby dzielenie po prostu przez liczebność próby).
+    
+To, czy pewna statystyka z (dobranej w określony sposób) próby (o danej liczebności) stanowi *dobre* narzędzie do wnioskowania o wartościach interesującego nas parametru populacyjnego możemy oceniać badając **rozkład wartości tej statystyki w populacji wszystkich możliwych do dobrania (w określony sposób) prób**.
+
+Jak można się dowiedzieć, jak taki rozkład wygląda?
+
+  - Tradycyjnie były one wywodzone analitycznie (twierdzenia, twierdzenia graniczne).
+  - Dla bardzo małych prób z małych populacji możemy rozpisać wszystkie możliwe próby i przypisać im prawdopodobieństwa.
+    - W przypadku doboru prostego każda z możliwych prób jest równie prawdopodobna.
+  - Możemy też **przybliżyć** sobie ten rozkład wielokrotnie powtarzając daną procedurę losowania z tej samej populacji i notując wartości statystyki uzyskane za każdym razem. Oczywiście czym więcej zastosujemy powtórzeń, tym lepsze będzie nasze przybliżenie.
+
+## Populacja wszystkich prób
+
+Wróćmy do naszej 10-cio elementowej populacji, z której losowaliśmy dwuelementowe próby. Jak łatwo sprawdzić, różnych takich dwuelementowych prób (rozróżniając próby między sobą również ze względu na kolejność wylosowania jednostek do próby) możemy z tej populacji wylosować:
+
+  - 100 jeśli będziemy stosować dobór niezależny,
+  - 90 jeśli będziemy stosować dobór zależny.
+
+W R możemy je uzyskać w następujący sposób:
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# najpierw opiszemy jednostki w populacji poprzez ich numery
+#   (a nie wartości wzrostu)
+probyNzal = expand.grid(el.1 = 1:10, el.2 = 1:10)
+probyNzal = as.data.frame(probyNzal)
+probyNzal
+# żeby mieć pewność, że w linijce poniżej usuwamy tylko to,
+#   co chcemy (a nie różne osoby, które - tak się zdarzyło -
+#   są równego wzrostu)
+probyZal = probyNzal[probyNzal$el.1 != probyNzal$el.2, ]
+probyZal
+# teraz przypiszmy za numery obserwacji wartości wzrostu
+probyNzal$el.1 = x[probyNzal$el.1]
+probyNzal$el.2 = x[probyNzal$el.2]
+probyNzal
+probyZal$el.1 = x[probyZal$el.1]
+probyZal$el.2 = x[probyZal$el.2]
+probyZal
+```
+
+### Obliczanie wartości statystyk w próbach
+
+Kiedy znamy już wartości zmiennych dla każdej obserwacji w każdej próbie, możemy po łatwo obliczyć wartości statystyki z próby dla każdej z prób. Zróbmy to dla następujących statystyk:
+
+  1. Średniej.
+  2. Wariancji (policzonej wzorem jak dla populacji).
+  3. Odciążonej wariancji (*nieobciążony estymator wariancji na podstawie prostej próby losowej*, czyli dzieląc przez *n-1* zamiast przez *n*).
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+probyNzal$srednia = rowMeans(probyNzal[, 1:2])
+probyNzal$wariancja = rowMeans(probyNzal[, 1:2]^2) - rowMeans(probyNzal[, 1:2])^2
+probyNzal$odc.wariancja = apply(probyNzal[, 1:2], 1, var)
+probyNzal
+probyZal$srednia = rowMeans(probyZal[, 1:2])
+probyZal$wariancja = rowMeans(probyZal[, 1:2]^2) - rowMeans(probyZal[, 1:2])^2
+probyZal$odc.wariancja = apply(probyZal[, 1:2], 1, var)
+probyZal
+```
+
+### Porównajmy teraz uzyskane rozkłady statystyk ze znanymi wartościami populacynymi:
+
+#### Średni wzorst
+
+Średni wzrost w naszej 10-cio elementowej populacji to:
+```{r comment="", prompt=TRUE, collapse=TRUE}
+mean(x)
+```
+Rozkłady statystyki *średnia z próby* mają następujące parametry (są to: średnia statystyki *średnia z próby* i wariancja statsystyki *średnia z próby*):
+```{r comment="", prompt=TRUE, collapse=TRUE}
+round(c("srednia" = mean(probyZal$srednia),
+        "wariancja" = var(probyZal$srednia)*9/10), 1)
+round(c("srednia" = mean(probyNzal$srednia),
+        "wariancja" = var(probyNzal$srednia)*9/10), 1)
+```
+
+Warto zauważyć, że:
+
+  - bez względu na sposób losowania (zależny/niezależny) średnia wartość statystyki *średnia z próby* w populacji wszystkich możliwych prób jest równa wartości parametru *średnia* w badanej (10-cio osobowej) populacji;
+  - rozkład statystyki *średnia z próby* ma większą wariancję przy losowaniu niezależnym, niż przy zależnym.
+
+O statystyce, która posiada pierwszą z opisanych wyżej własności mówimy, że jest **nieobciążonym estymatorem** odpowiedniego parametru populacyjnego (przy danym schemacie doboru próby). Statystyka *średnia z (prostej losowej) próby* jest więc nieobciążonym estymatorem średniej populacyjnej.
+
+Jeśli chodzi o drugą z opisanych własności, to wolimy oczywiście posługiwać się takim estymatorem, którego wartości skupiają się bliżej wartości populacyjnego parametru, o którym chcemy wnioskować. Jeśli estymator jest nieobciążony, to jego wariancja może być wykorzystana jako wskaźnik właśnie tej jego własności. W związku z tym możemy dojść do wniosku, że lepiej byłoby stosować dobór zależny, bo wariancja statystyki *średnia z próby* jest przy takiej metodzie doboru mniejsza, niż gdy losujemy próbę niezależnie. Możemy powiedzieć, że **losowanie zależne jest bardziej efektywne niż losowanie niezależne**.
+
+Znając rozkład statystki z próby możemy też zadać pytanie, jakie jest prawdopodobieństwo, że wylosujemy próbę, w której wartość tej statystyki będzie się różnić od parametru populacyjnego o nie więcej niż pewna zadana wartość. Np. prawdopodobieństwo wylosowania dwuosobowej próby takiej, że statystyka *średnia z próby* będzie się różnić od średniego wzrostu w naszej 10-cio osobowej populacji o nie więcej niż 5 cm wynosi:
+  - przy doborze prostym zależnym:
+```{r comment="", prompt=TRUE, collapse=TRUE}
+sum(abs(probyZal$srednia - mean(x)) <= 5) / nrow(probyZal)
+```
+  - przy doborze prostym niezależnym:
+```{r comment="", prompt=TRUE, collapse=TRUE}
+sum(abs(probyNzal$srednia - mean(x)) <= 5) / nrow(probyNzal)
+```
+
+#### Wariancja wzrostu 
+
+W naszej 10-cio elementowej populacji wariancja wzrostu wynosi:
+```{r comment="", prompt=TRUE, collapse=TRUE}
+mean(x^2) - mean(x)^2
+```
+Rozkłady statystyki *wariancja z próby* mają następujące parametry (są to: średnia statystyki *wariancja z próby* i wariancja statsystyki *wariancja z próby*):
+```{r comment="", prompt=TRUE, collapse=TRUE}
+round(c("srednia" = mean(probyZal$wariancja),
+        "wariancja" = var(probyZal$wariancja)*89/90), 1)
+round(c("srednia" = mean(probyNzal$wariancja),
+        "wariancja" = var(probyNzal$wariancja)*99/100), 1)
+```
+Rozkłady statystyki *odciążona wariancja z próby* mają następujące parametry (są to: średnia statystyki *odciążona wariancja z próby* i wariancja statsystyki *odciążona wariancja z próby*):
+```{r comment="", prompt=TRUE, collapse=TRUE}
+round(c("srednia" = mean(probyZal$odc.wariancja),
+        "wariancja" = var(probyZal$odc.wariancja)*89/90), 1)
+round(c("srednia" = mean(probyNzal$odc.wariancja),
+        "wariancja" = var(probyNzal$odc.wariancja)*99/100), 1)
+```
+
+Warto zauważyć, że:
+
+  - wartości statystyki *wariancja z próby* są średnio o około połowę mniejsze, niż populacyjna wartość wariancji;
+  - średnia wartość statystyki *odciążona wariancja z próby* jest równa populacyjnej wartości wariancji, ale tylko jeśli dobieramy próbę w sposób prosty niezależny;
+  - statystyka *wariancja z próby* ma co prawda dużo mniejszą wariancję, niż statystyka *odciążona wariancja z próby*, ale w tym przypadku raczej nie świadczy to na jej korzyść - jej rozkład jestbardziej skupiony, ale blisko niepożądanej wartości (p. wyżej).
+
+Należy jednak nadmienić, że widoczne tu dosyć spektakularne różnice pomiędzy własnościami statystyk *wariancja z próby* i *odciążona wariancja z próby* **są specyficzne dla próby o niewielkiej liczebności** i szybko zmniejszałyby się, gdyby chcieć rozpatrywać próby liczące coraz więcej elementów.
+
+## Symulacyjne przybliżanie rozkładu statystyki w populacji wszystkich prób
+
+W miarę wzrostu liczebności próby populacja wszystkich prób bardzo szybko staje się niemożliwa do rozpatrzenia w sposób opisany powyżej, gdyż staje się zbyt liczna. W takiej sytuacji (oprócz dowodów analitycznych) możemy ucieć się do symulacji, tj. przybliżyć sobie własności rozkładu interesującej nas statystyki w populacji wszystkich prób, analizując jej własności w wystarczająco dużej podgrupie (*de facto* też próbie, tylko dobranej z populacji wszystkich prób) spośród wszystkich możliwych prób.
+
+Aby tego dokonać będziemy po prostu wielokrotnie (kilka-kilkaset tysięcy razy - zależy to jeszcze od parametru, który nas interesuje) powtarzać założoną procedurę losowania, a dla każdej z wylosowanych prób obliczać wartość interesującej nas statystyki, aby potem móc przeanalizować ich rozkład.
+
+### Pętla for
+
+Aby wielokrotnie powtórzyć tą samą procedurę posłużymy się pętlą `for()`. W R ma ona postać analogiczną jak w Pythonie (a więc analogiczną jak pętla `foreach()` w językach o składni pochodnej od C), a więc w kolejnych obiegach pętla przypisuje wyznaczonej zmiennej kolejne wartości zadanego wektora:
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+for (i in 1:5) {
+  print(i)
+}
+```
+
+### Własności statystyki średnia z próby w dużej próbie
+
+Załóżmy, że interesująca nas populacja liczy 1 mln osób i że dla wszystkich z nich znamy wartości wzrostu i to, czy są to osoby praworęczne, czy leworęczne. Niech wzrost w naszej populacji, opisywany zmienną `w`, ma rozkład zbliżony do normalnego o średniej 178 i odchyleniu standardowym 6:
+```{r comment="", prompt=TRUE, collapse=TRUE}
+w = rnorm(10^6, 178, 6)
+```
+Z kolei zmienna `r` przyjmuje wartości 1 dla leworęcznych a 0 dla praworęcznych, przy czym praworęczni stanowią 70% populacji i cecha ta jest niezwiązana ze wzrostem.
+```{r comment="", prompt=TRUE, collapse=TRUE}
+r = c(rep(0, 10^6 * 0.7), rep(1, 10^6 * 0.3))
+summary(cbind(w, r))
+```
+
+Możemy też narysować ich rozkłady:
+```{r comment="", prompt=TRUE, collapse=TRUE}
+split.screen(c(1,2))
+hist(w, 100, main = "rozkład zm. w")
+screen(2)
+plot(factor(r), main = "rozkład zm. r")
+close.screen(all = TRUE) 
+```
+
+Będą interesować nas własności statystyki *średnia w próbie* przy losowaniu w sposób prosty, zależny dosyć dużych, **400 osobowych prób**.
+
+#### Symulacja
+
+Żeby wystarczająco dobrze przybliżyć sobie te własności, musimy powtórzyć losowanie bardzo dużą liczbę razy - przyjmijmy, że zrobimy to 10 tys. razy. Nasza symulacja będzie wyglądać w ten sposób:
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+# liczba powtórzeń losowania
+lPowt = 10^4
+# liczebność próby
+n = 400
+# tworzymy wektory, w których będziemy zapisywać wartości
+# statystyk "średnia z próby""
+srW = rep(NA, lPowt)
+srR = rep(NA, lPowt)
+# dwie rzeczy konieczne do wizualizacji
+layout(matrix(c(1, 2), nrow = 1))
+j = 2
+# i powtarzamy losowanie, korzystając z pętli for()
+#   to potrwa dłuższą chwilę
+for (i in 1:lPowt) {
+  # losujemy numery osób w populacji
+  proba = sample(1:length(w), n)
+  # i obliczone dla nich średnie zapisujemy w `srW` i `srR`
+  srW[i] = mean(w[proba])
+  srR[i] = mean(r[proba])
+  # wizualizacja (stramy sięnie rysować za często)
+  if (i == j) {
+    j = j * 2
+    hist(srW, seq(176, 180, length.out = 50), col = grey(0.7),
+         main = paste0("rozkład statystyki\n'śr. W z próby' (i= ", i, ")"))
+    abline(v = mean(srW, na.rm = TRUE), lwd = 3, col = 2)
+    hist(srR, seq(0.2, 0.4, length.out = 50), col = grey(0.7),
+         main = paste0("rozkład statystyki\n'śr. R z próby' (i= ", i, ")"))
+    abline(v = mean(srR, na.rm = TRUE), lwd = 3, col = 3)
+  }
+}
+# i jeszcze końcowe rozkłady
+hist(srW, seq(176, 180, length.out = 50), col = grey(0.7),
+     main = paste0("rozkład statystyki\n'śr. W z próby' (i= ", i, ")"))
+abline(v = mean(srW, na.rm = TRUE), lwd = 3, col = 2)
+hist(srR, seq(0.2, 0.4, length.out = 50), col = grey(0.7),
+     main = paste0("rozkład statystyki\n'śr. R z próby' (i= ", i, ")"))
+abline(v = mean(srR, na.rm = TRUE), lwd = 3, col = 3)
+layout(1)
+```
+
+#### Analiza wyników symulacji
+
+Czego spodziewamy się po rozkładach statystyki *średnia z próby* dla zmiennej `w` i dla zmiennej `r`?
+
+Na mocy Centralnego Twierdzenia Granicznego (CTG) powinny one zbiegać do rozkładów normalnych i to zarówno dla zmiennej `w`, jak i dla zmiennej `r` (mimo że ich rozkłady populacyjne są bardzo różne). Parametry tych rozkładów, zgodnie z CTG powinny wynosić:
+
+  - dla rozkładu statystyki *średnia zmiennej `w` z próby*:
+    - wartość oczekiwana 178 (równa średniej zmiennej `w` w populacji),
+    - odch. std. 0,3 (równe odch. std. zmiennej `w` w populacji, podzielonemu przez pierwiastek kwadratowy z liczebności próby: `6 / 400^0.5 = 6 / 20`).
+    - w wynikach naszej symulacji wynoszą zaś:
+```{r comment="", prompt=TRUE, collapse=TRUE}
+c(srednia = mean(srW), odch.std. = sd(srW) * sqrt((lPowt - 1) / lPowt))
+```
+
+  - dla rozkładu statystyki *średnia zmiennej `r` z próby*:
+    - wartość oczekiwana 0,3 (równa średniej zmiennej `r` w populacji),
+    - odch. std. ~0,0229 (równe odch. std. zmiennej `r` w populacji, podzielonemu przez pierwiastek kwadratowy z liczebności próby: `(0.3 * 0.7)^0.5 / 400^0.5 = 0.458 / 20`).
+    - w wynikach naszej symulacji wynoszą zaś:
+```{r comment="", prompt=TRUE, collapse=TRUE}
+c(srednia = mean(srR), odch.std. = sd(srR) * sqrt((lPowt - 1) / lPowt))
+```
+
+Możemy też prześledzić, jak średnie interesujących nas statystyk zmieniały się wraz z kolejnymi obiegami pętli w przeprowadzonej symulacji.
+
+```{r comment="", prompt=TRUE, collapse=TRUE}
+srSrW = cumsum(srW) / (1:lPowt)
+plot(1:lPowt, srSrW, type = "l", lwd = 2,
+     main = "zmiana średniej wartości statystyki 'śr. W z próby'\nw funkcji liczby dokonanych losowań",
+     xlab = "numer iteracji (obiegu pętli)", ylab = "średnia wartość statystyki")
+grid(col = grey(0.5))
+abline(h = mean(w), col = 2, lwd = 3)
+srSrR = cumsum(srR) / (1:lPowt)
+plot(1:lPowt, srSrR, type = "l", lwd = 2,
+     main = "zmiana średniej wartości statystyki 'śr. R z próby'\nw funkcji liczby dokonanych losowań",
+     xlab = "numer iteracji (obiegu pętli)", ylab = "średnia wartość statystyki")
+grid(col = grey(0.5))
+abline(h = mean(r), col = 3, lwd = 3)
+```
+
+Uzyskane wyniki symulacji są więc zgodne z tymi, które wyprowadzone zostały w sposób analityczny.
+
+# Praca domowa
+
+Zostanie nadesłana pocztą.

@@ -18,7 +18,7 @@ Materiały do warsztatów "Statystyka I z R" dla kierunku kognitywistyka na UW, 
 
 ## Co to jest Git
 
-Git jest otwartym programem służącym do kontroli wersji plików, w szczególności (choć bynajmniej wyłącznie) zawierających kod źródłowy. Pierwotnie powstał w celu wspomagania rozwoju kolejnych wersji Linuxa, a obecnie jest jednym z najszerzej wykorzystywanych narzędzi wspomagających prace w projektach informatyczny i dotyczących analizy dany. Więcej o Gicie możesz dowiedzieć się [tutaj](https://git-scm.com/book/pl/v1/Pierwsze-kroki). Na tych zajęciach wykorzystujemy Gita, aby zapewnić (względnie) łatwe i niezawodne udostępnianie materiałów do zajęć.
+Git jest otwartym programem służącym do kontroli wersji plików, w szczególności (choć bynajmniej nie wyłącznie) zawierających kod źródłowy. Pierwotnie powstał w celu wspomagania rozwoju kolejnych wersji Linuxa, a obecnie jest jednym z najszerzej wykorzystywanych narzędzi wspomagających prace w projektach informatyczny i dotyczących analizy danych. Więcej o Gicie możesz dowiedzieć się [tutaj](https://git-scm.com/book/pl/v1/Pierwsze-kroki). Na tych zajęciach wykorzystujemy Gita, aby zapewnić (względnie) łatwe i niezawodne udostępnianie materiałów do zajęć.
 
 ## Tworzenie nowego projektu w RStudio
 
@@ -42,8 +42,8 @@ Na końcu opisany jest sposób rozwiązania typowych problemów.
 Kiedy sami pracujemy na **lokalnym repozytorium** z kontrolą wersji typowy schemat działań wygląda następująco:
 
   1. Dokonujemy aktualizacji kodu (np. piszemy kod wykonujący pewne analizy).
-     - Zmiany, które dokonaliśmy (utworzenie nowych plików, modyfikacja wcześniej istniejących, usunięcie plików, zmiana nazwy plików) są w efekcie zapisane w systemie plików, ale nie w repozytorium.
-     - Niemniej system kontroli wersji śledzi dokonane przez nas zmiany i jest nam w stanie wskazać, że dokonaliśmy modyfikacji (włączając w to pojęcie utworzenie czy skasowanie) danych plików w stosunku do stanu zapisanego w repozytorium.
+     - Zmiany, których dokonaliśmy (utworzenie nowych plików, modyfikacja wcześniej istniejących, usunięcie plików, zmiana nazwy plików) są w efekcie zapisane w systemie plików, ale nie w repozytorium.
+     - Niemniej system kontroli wersji śledzi dokonane przez nas zmiany i jest nam w stanie wskazać, że dokonaliśmy modyfikacji (włączając w to pojęcie utworzenie czy skasowanie) odpowiednich plików w stosunku do stanu zapisanego w repozytorium.
      - W RStudio objawia się to pojawieniem w zakładce *Git* nazw zmodyfikowanych plików (względnie folderów).
   2. Kiedy zakończymy dany etap prac chcemy zapisać ich stan do repozytorium. W tym celu musimy:
      - Oznaczyć systemowi kontroli wersji, stan których plików chcemy zapisać (nie muszą to być wszystkie pliki, które zmodyfikowaliśmy).
@@ -61,12 +61,12 @@ Kiedy sami pracujemy na **lokalnym repozytorium** z kontrolą wersji typowy sche
 
 ### Przypadek 2. Praca z zewnętrznym repozytorium, model I
 
-W tym przypadku oprócz tego, że wykorzystujemy Git lokalnie na własnym komputerze do archiwizowania stanu naszego projektu, korzystamy również zewnętrzne repozytorium, które pozwoli dzielić się z innymi wynikami naszej pracy. Zakładamy przy tym, że inni użytkownicy jedynie zapoznają się z wynikami naszej pracy, jednak w żaden sposób ich nie modyfikują.
+W tym przypadku oprócz tego, że wykorzystujemy Git lokalnie na własnym komputerze do archiwizowania stanu naszego projektu, wykorzystujemy również zewnętrzne repozytorium, które pozwoli dzielić się z innymi wynikami naszej pracy. Zakładamy przy tym, że inni użytkownicy jedynie zapoznają się z wynikami naszej pracy, jednak w żaden sposób ich nie modyfikują.
 
   1. Praca z naszym lokalnym repozytorium przebiega w ten sam sposób, co opisany w przypadku 1.
   2. Po dokonaniu zapisu nowego stanu w naszym lokalnym repozytorium chcemy jednak *wypchnąć* go również do zewnętrznego repozytorium, na którym będą dostępne dla innych.
      - W tym celu musimy zdefiniować takie zewnętrzne repozytorium powiązane z naszym lokalnym.
-     - Zakładając, że jako zewnętrzne repozytorium wykorzystujemy konto na GitHubie (jak w przypadku tego kursu), najprostszym sposobem osiągnięcia tego celu jest przystępując do pracy najpierw utworzyć repozytorium na GitHubie, a potem lokalnie utowrzyć nowy projekt w RStudio związany z tym repozytorium zgodnie z wcześniej opisaną procedurą (przy okazji zostanie utworzone lokalne repozytorium Git na naszym komputerze, powiązane z tym na GitHubie).
+     - Zakładając, że jako zewnętrzne repozytorium wykorzystujemy konto na GitHubie (jak w przypadku tego kursu), najprostszym sposobem osiągnięcia tego celu jest przystępując do pracy najpierw utworzyć repozytorium na GitHubie, a potem lokalnie utworzyć nowy projekt w RStudio, związany z tym repozytorium, zgodnie z wcześniej opisaną procedurą (przy okazji zostanie utworzone lokalne repozytorium Git na naszym komputerze, powiązane z tym na GitHubie).
      - Aby dokonać *wypchnięcia* najnowszego **zapisanego w lokalnym repozytorium** stanu na zewnętrzne repozytorium posługujemy się komendą *push* - w interfejsie RStudio za jej uruchomienie odpowiada zielona strzałka wskazująca w górę, w zakładce *Git*.
   3. Jeśli ktoś chce śledzić nasz projekt, musi utworzyć sobie swoje własne lokalne repozytorium Git, powiązane z uzywanym przez nas zewnętrznym repozytorium, np. stosując opisaną wyżej procedurę tworzenia projektu na podstawie repozytorium w RStudio.
   4. Aby śledzić zmiany podsyłane przez nas sukcesywnie do zewnętrznego repozytorium taka osoba musi co jakiś czas synchronizować stan swojego repozytorium z repozytorium zewnętrznym.
@@ -100,6 +100,6 @@ Aby rozwiązać problem należy otworzyć konsolę Gita, klikając w panelu *Git
 
 #### Problem z dodaniem pliku do poczekalni
 
-W RStudio typowo dodajemy pliki do *poczekalni* zaznaczając pola wyboru przy plikach w zakładce *Git*. Czasem zdarza się jednak, że RStudio zacina się i mimo prób nie chce zaznaczyć pola przy danym pliku.
+W RStudio typowo dodajemy pliki do *poczekalni* zaznaczając pola wyboru przy plikach w zakładce *Git*. Czasem zdarza się jednak, że RStudio zacina się i mimo prób nie chce zaznaczyć pola przy danym pliku (historycznie problemy sprawiały np. pliki, których nazwy zawierają spacje).
 
 W takim przypadku należy otworzyć konsolę Gita, klikając w panelu *Git* w RStudio ikonę zębatki i wybierając opcję *Shell...*. W konsolę, która się pojawi, należy wpisać: `git add "nazwa pliku z.rozszerzeniem"`.
