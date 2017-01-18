@@ -1,0 +1,54 @@
+---
+title: "Praca domowa na 23.01.2017"
+author: "Tomasz Żółtak"
+date: "17 stycznia 2017"
+output:
+  html_document:
+    css: ../styles.css
+    toc: TRUE
+    toc_depth: 3
+---
+
+# Wprowadzenie
+
+Dowiedziono, że przy losowaniu prostym *dużych* prób (co to dokładnie zależy, że próba jest *duża*, zależy od rozkładu populacyjnego interesującej nas zmiennej - ogólnie rzecz biorąc, im bardziej jest on zbliżony do rozkłądu normalnego, tym mniejsza może być *duża* próba) z populacji dużo większych (co najmniej kilka rzędów wielkości) od liczebności próby rozkład statystyki *średnia z próby* jest normalny o wartości oczekiwanej równej średniej populacyjnej i odchyleniu standardowym równym populacyjnemu odchyleniu standardowemu mierzonej zmiennej podzielonemu przez pierwiastek z liczebności próby:
+
+$$\bar{X}: N \left( E(X), \frac{D(X)}{\sqrt{n}} \right)$$
+gdzie $\bar{X}$ oznacza statystykę *średnia [zmiennej X] z próby*, $E(X)$ i $D(X)$ populacyjne średnią i odchylenie standardowe [zmiennej X], a $n$ liczebność losowanej próby.
+
+Zauważmy dwie najważniejsze konsekwencji powyższego stwierdzenia:
+
+  1. Statystyka *średnia z próby* jest w tej sytuacji nieobciążonym estymatorem średniej populacyjnej.
+  2. Wariancja (odchylenie standardowe) estymatora średniej populacyjnej wykorzystującego statystykę *średnia z próby* zależy tylko od dwóch czynników:
+     a) Populacyjnej wariancji (odchylenia standardowego) mierzonej zmiennej, która jest wartością stałą.
+     b) Liczebności próby. Im próba większa, tym mniejsza jest wariancja estymatora (tym mniejsze zróżnicowanie wartości *średnia z próby* w populacji wszystkich możliwych prób). O takim estymatorze mówimy, że jest *zgodny*.
+
+Warto też zwrócić uwagę na dwie konsekwencje faktu, że liczebność populacji jest wielokrotie większa od liczebności próby.
+
+  3. Nie ma znaczenia, czy losujemy zwrotnie, czy bezzwrotnie.
+  4. Dokładna wielkość populacji nie ma znaczenia dla wariancji rozpatrywanego estymatora. Możemy interesować się wyłącznie liczebnością próby.
+
+# Zadania
+
+Wykorzystując przedstawione powyżej twierdzenie (przyjmij, że spełnione są jego założenia) oraz funkcje programu R zwracające wartości dystrybuanty i funkcji odwrotnej do dystrybuanty rozkładu normalnego odpowiedz na poniższe pytania.
+
+  1. Jakie jest prawdopodobieństwo wylosowania z populacji, w której zmienna `X` ma średnią 180 i odchylenie standardowe 10 takiej 100 osobowej prostej próby losowej, że wartość statystyki *średnia `X` z próby* będzie większa niż 182?
+```{r echo=FALSE, comment="", prompt=TRUE, collapse=TRUE}
+# to jest miejsce na Twój kod
+```
+
+  2. Jakie jest prawdopodobieństwo wylosowania z populacji, w której zmienna `Y` ma średnią 0,6 i odchylenie standardowe 0,49 takiej 900 osobowej prostej próby losowej, że wartość statystyki *średnia `Y` z próby* będzie się w niej różnić od średniej populacyjnej o nie więcej niż 0,03?
+```{r echo=FALSE, comment="", prompt=TRUE, collapse=TRUE}
+# to jest miejsce na Twój kod
+```
+
+  3. Zmienna `Z` ma w populacji średnią 4 i odchylenie standardowe 1,5. Jeśli będziemy z tej populacji losować proste próby losowe o liczebności 625 osób, to prawdopodobieństwo, że wartość statystyki *średnia `Z` z próby* znajdzie się w odległosci nie większej niż `d` od średniej populacyjnej wynosi 0,9 (tzn. $P ( |\bar{Z} - 4| \leq d ) = 0,9$). Jaka jest wartość `d`?
+```{r echo=FALSE, comment="", prompt=TRUE, collapse=TRUE}
+# to jest miejsce na Twój kod
+```
+ 
+# Czynności końcowe
+
+  - Zapisz wyniki swojej pracy (tj. plik "praca_domowa_2017.01.16.Rmd").
+  - Zmień jego nazwę na "moje_imie_i_nazwisko_2017.01.16.Rmd".
+  - Wyślij go na adres email: **zoltakt@is.uw.edu.pl**
