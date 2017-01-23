@@ -1,0 +1,48 @@
+---
+title: "Statystyka I z R<br/>Warsztat 14. Od rozkładu statystyki z próby do wnioskowania statystycznego"
+author: "Tomasz Żółtak"
+date: "23 stycznia 2017"
+output:
+  html_document:
+    css: ../styles.css
+    toc: TRUE
+    toc_depth: 2
+---
+
+Na dzisiejszych zajęciach....
+
+# System oceniania
+
+Ocen z zajęć zostanie wyznaczona na podstawie wartości dwóch czynników (branych pod uwagę z równą wagą):
+
+  1. Wyników kartkówek
+  2. Liczby zaliczonych prac domowych.
+
+W przypadku kartkówek:
+
+  - Wyniki każdej kartkówki będą przeliczone na odetek możliwych do uzyskania punktów (od 0 do 1).
+  - Kartkówki, na których dana osoba była nieobecna będą liczone jako 0.
+  - Dla każdej osoby wynik jednej kartkówki, która poszła jej najgorzej, zostanie pominięty.
+  - Przeliczone wyniki dwóch pozostałych zostaną zsumowane i pomnożone przez 5 (w efekcie za kartkówki można uzyskać od 0 do 10 *punktów*).
+
+W przypadku prac domowych:
+
+  - Każda zaliczona praca domowa (z 10, które zostały zadane) daje 1 *punkt* (za prace domowe można uzyskać od 0 do 10 punktów).
+
+Łącznie można uzyskać od 0 do 20 *punktów*, na podstawie których przypisane zostaną oceny końcowe:
+
+  - [10; 12) - 3;
+  - [12; 14) - 3,5;
+  - [14; 16) - 4;
+  - [16; 18) - 4,5;
+  - [18; 20) - 5;
+  - 20 - 5!;
+
+# Znamy wzory na rozkład statystyki z próby - co z tego?
+
+Jesteśmy w stanie określić - czy to analitycznie, czy symulacyjnie - rozkłady statystyk z próby dla populacji o znanym rozkładzie interesującej nas cechy i przy założonym schemacie losowania. Ale jak przejść od tego do wnioskowania na podstawie wynikóW uzyskanych z pojedynczej próby? Na podstawie pojedynczej próby nie jesteśmy przecież w stanie ustalić z pewnością, jaki jest rozkład cechy w populacji, czy jego parametry.
+
+Typowo stosuje się jedno z dwóch rozwiązań:
+
+  1. Weryfikacja hipotez statystycznych metodą Neymana-Pearsona.
+  2. Przedziały ufności (estymację przedziałową).

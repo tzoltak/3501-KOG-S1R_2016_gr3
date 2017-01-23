@@ -9,8 +9,7 @@ output:
     toc_depth: 2
 ---
 
-Na dzisiejszych zajęciach....
-
+Na dzisiejszych zajęciach zapoznamy się z pojęciem prostej próby losowej i prześledzimy sposoby badania własności statystyk z próby.
 
 # Prosta próba losowa
 
